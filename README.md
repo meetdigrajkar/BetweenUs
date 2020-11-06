@@ -14,3 +14,5 @@
 #### PROJECT SUPERVISOR:
 * Dr R Gregory Franks
 
+#### PROJECT PROPOSAL
+* [Project Proposal](https://docs.google.com/document/d/1N3kbB1luJuOBIwO6OK2e0vpyycl8Hvu6G77niTqvcro/edit?usp=sharing)
