@@ -17,7 +17,7 @@ public class Server {
 		this.port = port;
         this.udpSocket = new DatagramSocket(this.port);
         this.connectedClientAddresses = new ArrayList<>();
-        this.sendPort = 7077;
+        this.sendPort = 7078;
 	}
     
 	private void listen() throws Exception {
