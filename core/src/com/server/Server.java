@@ -48,8 +48,8 @@ public class Server {
 				//relay the message received by the client to ALL the other clients
 				for(InetAddress c: connectedClientAddresses) {
 					System.out.println(c);
-					datagramPacket.setAddress(c);
-					serverDatagramSocket.send(datagramPacket);
+					DatagramPacket toClients = new DatagramPacket(input.getBytes(), input.length(), c, 8000);
+					serverDatagramSocket.send(toClients);
 				}
 
 			}

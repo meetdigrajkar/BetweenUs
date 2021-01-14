@@ -46,13 +46,13 @@ public class Client
 		BufferedReader keyboardReader = null;
 		// Create a Datagram Socket...
 		try
-		{
+		{ 
 			address = InetAddress.getByName("72.137.66.20");
 			if(address.equals(InetAddress.getLocalHost())) {
 				address = InetAddress.getByName("127.0.0.1");
 			}
 			
-			datagramSocket = new DatagramSocket();
+			datagramSocket = new DatagramSocket(8000);
 			keyboardReader = new BufferedReader(new
 					InputStreamReader(System.in));
 		}
