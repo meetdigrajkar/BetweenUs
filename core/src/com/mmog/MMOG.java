@@ -30,4 +30,14 @@ public class MMOG extends ApplicationAdapter {
 		batch.dispose();
 		img.dispose();
 	}
+	
+	@Override
+	public void pause() {
+		
+	}
+	
+	@Override 
+	public void resume() {
+		
+	}
 }

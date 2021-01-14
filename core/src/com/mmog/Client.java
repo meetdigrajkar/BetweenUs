@@ -8,7 +8,7 @@ public class Client
 	{
 		public UDPEchoReader(DatagramSocket socket)
 		{
-			datagramSocket = socket;
+			this.datagramSocket = socket;
 			active = true;
 		}
 		public void run()
@@ -38,8 +38,8 @@ public class Client
 		public boolean active;
 		public DatagramSocket datagramSocket;
 	}
-	public static void main(String[] args)
-	{
+
+	public void startClient() {
 		InetAddress address = null;
 		int port = 7077;
 		DatagramSocket datagramSocket = null;
@@ -51,7 +51,7 @@ public class Client
 			if(address.equals(InetAddress.getLocalHost())) {
 				address = InetAddress.getByName("127.0.0.1");
 			}
-			
+
 			datagramSocket = new DatagramSocket(8000);
 			keyboardReader = new BufferedReader(new
 					InputStreamReader(System.in));
@@ -61,10 +61,11 @@ public class Client
 			System.out.println(e);
 			System.exit(1);
 		}
-		// Start the listening thread...
+		
 		UDPEchoReader reader = new UDPEchoReader(datagramSocket);
 		reader.setDaemon(true);
 		reader.start();
+		
 		System.out.println("Ready to send your messages...");
 		try
 		{
@@ -82,6 +83,7 @@ public class Client
 		catch(IOException e)
 		{
 			System.out.println(e);
-		}
+		}	
 	}
+
 } 
