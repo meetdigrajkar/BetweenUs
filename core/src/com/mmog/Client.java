@@ -1,56 +1,83 @@
 package com.mmog;
-import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.Scanner;
 
-public class Client {
-
-    private DatagramSocket udpSocket;
-    private InetAddress serverAddress;
-    private int port,sendport;
-    private Scanner scanner;
-	
-	public Client(int port) throws IOException {
-		//this address is replaced by the address of the machine the server actually runs on
-		//the network that the server runs on needs to have the port forwarded for 7077
-        this.serverAddress = InetAddress.getByName("72.137.66.20");
-        this.port = port;
-        //send port is the port the server listens on.
-        this.sendport = 7077;
-        udpSocket = new DatagramSocket(this.port);
-        scanner = new Scanner(System.in);
+import java.net.*;
+import java.io.*;
+public class Client
+{
+	public static class UDPEchoReader extends Thread
+	{
+		public UDPEchoReader(DatagramSocket socket)
+		{
+			datagramSocket = socket;
+			active = true;
+		}
+		public void run()
+		{
+			byte[] buffer = new byte[1024];
+			DatagramPacket incoming = new DatagramPacket(buffer,
+					buffer.length);
+			String receivedString;
+			while(active)
+			{
+				try
+				{
+					// listen for incoming datagram packet
+					datagramSocket.receive(incoming);
+					// print out received string
+					receivedString = new String(incoming.getData(),
+							0, incoming.getLength());
+					System.out.println("Received from server:" + receivedString);
+				}
+				catch(IOException e)
+				{
+					System.out.println(e);
+					active = false;
+				}
+			}
+		}
+		public boolean active;
+		public DatagramSocket datagramSocket;
 	}
-	
-    private int start() throws IOException {
-        String in;
-        while (true) {
-            in = scanner.nextLine();
-            
-            DatagramPacket p = new DatagramPacket(
-                in.getBytes(), in.getBytes().length, serverAddress, sendport);
-            
-            this.udpSocket.send(p);    
-            
-            
-            
-            byte[] buf = new byte[256];
-            DatagramPacket packet = new DatagramPacket(buf, buf.length);
-            
-            // blocks until a packet is received
-            udpSocket.receive(packet);
-            String msg = new String(packet.getData()).trim();
-            
-            System.out.println(
-                "Message from " + packet.getAddress().getHostAddress() + ": " + msg);
-        }
-    }
-    
-	public static void main(String[] args) throws NumberFormatException, IOException {
-		Client client = new Client(7078);
-        System.out.println("-- Running UDP Client at " + InetAddress.getLocalHost() + " --");
-        client.start();
+	public static void main(String[] args)
+	{
+		InetAddress address = null;
+		int port = 7077;
+		DatagramSocket datagramSocket = null;
+		BufferedReader keyboardReader = null;
+		// Create a Datagram Socket...
+		try
+		{
+			address = InetAddress.getByName("127.0.0.1");
+			datagramSocket = new DatagramSocket();
+			keyboardReader = new BufferedReader(new
+					InputStreamReader(System.in));
+		}
+		catch (IOException e)
+		{
+			System.out.println(e);
+			System.exit(1);
+		}
+		// Start the listening thread...
+		UDPEchoReader reader = new UDPEchoReader(datagramSocket);
+		reader.setDaemon(true);
+		reader.start();
+		System.out.println("Ready to send your messages...");
+		try
+		{
+			String input;
+			while (true)
+			{
+				// read input from the keyboard
+				input = keyboardReader.readLine();
+				// send datagram packet to the server
+				DatagramPacket datagramPacket = new DatagramPacket
+						(input.getBytes(), input.length(), address, port);
+				datagramSocket.send(datagramPacket);
+			}
+		}
+		catch(IOException e)
+		{
+			System.out.println(e);
+		}
 	}
-}
+} 

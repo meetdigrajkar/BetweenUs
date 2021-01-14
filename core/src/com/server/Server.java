@@ -1,62 +1,62 @@
 package com.server;
-import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
-import java.net.SocketException;
+
+import java.net.*;
 import java.util.ArrayList;
+import java.io.*;
 
 public class Server {
-	
-    private DatagramSocket udpSocket;
-    private int port;
-    private ArrayList<InetAddress> connectedClientAddresses;
-    private int sendPort;
-    
-	public Server(int port) throws SocketException, IOException{
-		this.port = port;
-        this.udpSocket = new DatagramSocket(this.port);
-        this.connectedClientAddresses = new ArrayList<>();
-        this.sendPort = 7078;
+
+	private static ArrayList<InetAddress> connectedClientAddresses;
+
+	public static void main(String args[])
+	{
+		connectedClientAddresses = new ArrayList<>();
+		int port = 7077;
+		// create the server...
+		DatagramSocket serverDatagramSocket = null;
+		try
+		{
+			serverDatagramSocket = new DatagramSocket(port);
+			System.out.println("Created UDP Echo Server on port " + port);
+		}
+		catch(IOException e)
+		{
+			System.out.println(e);
+			System.exit(1);
+		}
+		try
+		{
+			byte buffer[] = new byte[1024];
+			DatagramPacket datagramPacket = new
+					DatagramPacket(buffer, buffer.length);
+			String input;
+			while(true)
+			{
+				// listen for datagram packets
+				serverDatagramSocket.receive(datagramPacket);
+				input = new String(datagramPacket.getData(), 0,
+						datagramPacket.getLength());
+				System.out.println("Received from client @address: " + datagramPacket.getAddress().getHostAddress() + " @message: " + input);
+
+				//check if the client is in the connected clients list.
+				//if client is not in the list add its host address to the list
+				InetAddress hostAddress = InetAddress.getByName(datagramPacket.getAddress().getHostAddress());
+				if(!connectedClientAddresses.contains(hostAddress)) {
+					connectedClientAddresses.add(hostAddress);
+				}
+
+				//relay the message received by the client to ALL the other clients
+				for(InetAddress c: connectedClientAddresses) {
+					System.out.println(c);
+					datagramPacket.setAddress(c);
+					serverDatagramSocket.send(datagramPacket);
+				}
+
+			}
+		}
+		catch(IOException e)
+		{
+			System.out.println(e);
+		}
 	}
-    
-	private void listen() throws Exception {
-        System.out.println("-- Running Server at " + InetAddress.getLocalHost() + "--");
-        String msg;
-        
-        while (true) {
-            
-            byte[] buf = new byte[256];
-            DatagramPacket packet = new DatagramPacket(buf, buf.length);
-            
-            // blocks until a packet is received
-            udpSocket.receive(packet);
-            msg = new String(packet.getData()).trim();
-            
-            System.out.println(
-                "Message from " + packet.getAddress().getHostAddress() + ": " + msg);
-           
-            //check if the client is in the connected clients list.
-            //if client is not in the list add its host address to the list
-            for(InetAddress c: connectedClientAddresses) {
-            	InetAddress hostAddress = InetAddress.getByName(packet.getAddress().getHostAddress());
-            	if(!c.equals(hostAddress)) {
-            		this.connectedClientAddresses.add(hostAddress);
-            	}
-            }
-           
-            //relay the message received by the client to ALL the other clients
-            for(InetAddress c: connectedClientAddresses) {
-            	DatagramPacket p = new DatagramPacket(
-                        msg.getBytes(), msg.getBytes().length, c, sendPort);
-                    
-                    this.udpSocket.send(p);          
-            }
-        }
-    }
-    
-    public static void main(String[] args) throws Exception {
-        Server server = new Server(7077);
-        server.listen();
-    }
 }
