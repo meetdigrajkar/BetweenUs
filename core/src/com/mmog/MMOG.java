@@ -2,77 +2,80 @@ package com.mmog;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+
 
 public class MMOG extends ApplicationAdapter {
-    private SpriteBatch batch;
-    private Pixmap pixmap;
-    private Texture texture;
-    private Sprite sprite;
+	private SpriteBatch batch;
+	private Player player;
+	
+	
+	Stage stage;
+	TextButton button;
+	TextButtonStyle textButtonStyle;
+	BitmapFont font;
+	
 	
 	@Override
 	public void create () {
-        batch = new SpriteBatch();
+		stage = new Stage();
+		Gdx.input.setInputProcessor(stage);
+		font = new BitmapFont();
+		textButtonStyle = new TextButtonStyle();
+        textButtonStyle.font = font;
+        button = new TextButton("Join", textButtonStyle);
+        button.pad(100);
+        stage.addActor(button);
         
-        // A Pixmap is basically a raw image in memory as repesented by pixels
-        // We create one 256 wide, 128 height using 8 bytes for Red, Green, Blue and Alpha channels
-        pixmap = new Pixmap(256,128, Pixmap.Format.RGBA8888);
+        button.addListener(new ChangeListener() {
+            @Override
+            public void changed (ChangeEvent event, Actor actor) {
+                System.out.println("Attempting to Join...");
+                Client.connectClientToServer();
+            }
+        });
         
-        //Fill it red
-        pixmap.setColor(Color.RED);
-        pixmap.fill();
-        
-        //Draw two lines forming an X
-        pixmap.setColor(Color.BLACK);
-        pixmap.drawLine(0, 0, pixmap.getWidth()-1, pixmap.getHeight()-1);
-        pixmap.drawLine(0, pixmap.getHeight()-1, pixmap.getWidth()-1, 0);
-        
-        //Draw a circle about the middle
-        pixmap.setColor(Color.YELLOW);
-        pixmap.drawCircle(pixmap.getWidth()/2, pixmap.getHeight()/2, pixmap.getHeight()/2 - 1);
-        
-        
-        texture = new Texture(pixmap);
-        
-        //It's the textures responsibility now... get rid of the pixmap
-        pixmap.dispose();
-        
-        sprite = new Sprite(texture);
+		batch = new SpriteBatch();
+		player = new Player();
 	}
 
 	@Override
 	public void render () {
-        Gdx.gl.glClearColor(0, 0, 0, 1);
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-        
-        batch.begin();
-        sprite.setPosition(0, 0);        
-        sprite.draw(batch);
-        sprite.setPosition(Gdx.graphics.getWidth()/2, Gdx.graphics.getHeight()/2);
-        sprite.draw(batch);
-        batch.end();
+		Gdx.gl.glClearColor(0, 0, 0, 1);
+		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
+		batch.begin();
+		player.render(batch);
+		stage.draw();
+		batch.end();
+		
 	}
 
-	
+
 	@Override
 	public void dispose () {
-        batch.dispose();
-        texture.dispose();
+		batch.dispose();
 	}
-	
+
 	@Override
 	public void pause() {
-		
+
 	}
-	
+
 	@Override 
 	public void resume() {
-		
+
 	}
 }

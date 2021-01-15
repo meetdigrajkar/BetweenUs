@@ -4,6 +4,10 @@ import java.net.*;
 import java.io.*;
 public class Client
 {
+	int port = 7077;
+	DatagramSocket socket;
+	static InetAddress address;
+
 	public static class UDPEchoReader extends Thread
 	{
 		public UDPEchoReader(DatagramSocket socket)
@@ -26,7 +30,9 @@ public class Client
 					// print out received string
 					receivedString = new String(incoming.getData(),
 							0, incoming.getLength());
-					System.out.println("Received from server: @message: " + receivedString);
+					if(receivedString != null) {
+						System.out.println("Received from server: @message: " + receivedString + "...CONNECTED!");
+					}
 				}
 				catch(IOException e)
 				{
@@ -40,7 +46,10 @@ public class Client
 	}
 
 	public void startClient() {
-		InetAddress address = null;
+		System.out.println("Client Ready...");
+	}
+
+	public static boolean connectClientToServer() {
 		int port = 7077;
 		DatagramSocket datagramSocket = null;
 		BufferedReader keyboardReader = null;
@@ -58,29 +67,29 @@ public class Client
 			System.out.println(e);
 			System.exit(1);
 		}
-		
+
 		UDPEchoReader reader = new UDPEchoReader(datagramSocket);
 		reader.setDaemon(true);
 		reader.start();
-		
-		System.out.println("Ready to send your messages...");
+
+		//System.out.println("Ready to send your messages...");
 		try
 		{
 			String input;
-			while (true)
-			{
-				// read input from the keyboard
-				input = keyboardReader.readLine();
-				// send datagram packet to the server
-				DatagramPacket datagramPacket = new DatagramPacket
-						(input.getBytes(), input.length(), address, port);
-				datagramSocket.send(datagramPacket);
-			}
+
+			// read input from the keyboard
+			input = "Attempting to Connect to The Server...";
+			// send datagram packet to the server
+			DatagramPacket datagramPacket = new DatagramPacket
+					(input.getBytes(), input.length(), address, port);
+			datagramSocket.send(datagramPacket);
+
 		}
 		catch(IOException e)
 		{
 			System.out.println(e);
 		}	
+		return false;
 	}
 
 } 
