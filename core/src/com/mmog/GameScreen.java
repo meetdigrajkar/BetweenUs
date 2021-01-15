@@ -2,9 +2,9 @@ package com.mmog;
 
 import com.badlogic.gdx.Screen;
 
-public class MainScreen extends AbstractScreen{
+public class GameScreen extends AbstractScreen{
 
-	public MainScreen() {
+	public GameScreen(int level) {
 		
 	}
 	

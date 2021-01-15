@@ -21,7 +21,7 @@ public class Player {
     private float x;
     private float y;
     private boolean isFlipped;
-    
+    private boolean isDead;
     
     
     public Player()

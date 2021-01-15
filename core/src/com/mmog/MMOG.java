@@ -1,15 +1,10 @@
 package com.mmog;
 
-import com.badlogic.gdx.ApplicationAdapter;
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
@@ -17,7 +12,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 
 
-public class MMOG extends ApplicationAdapter {
+public class MMOG extends Game {
 	private SpriteBatch batch;
 	private Player player;
 	
@@ -49,6 +44,10 @@ public class MMOG extends ApplicationAdapter {
         
 		batch = new SpriteBatch();
 		player = new Player();
+		
+		//uncomment when refactored code in this class into seperate scenes
+		//ScreenManager.getInstance().initialize(this);
+		//ScreenManager.getInstance().showScreen(ScreenEnum.MAIN_MENU);
 	}
 
 	@Override
@@ -60,7 +59,6 @@ public class MMOG extends ApplicationAdapter {
 		player.render(batch);
 		stage.draw();
 		batch.end();
-		
 	}
 
 
