@@ -44,7 +44,8 @@ public class Server {
 				if(!connectedClientAddresses.contains(hostAddress)) {
 					connectedClientAddresses.add(hostAddress);
 				}
-
+				
+				
 				//relay the message received by the client to ALL the other clients
 				for(InetAddress c: connectedClientAddresses) {
 					System.out.println(c);
