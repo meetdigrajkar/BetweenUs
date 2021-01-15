@@ -26,7 +26,7 @@ public class Client
 					// print out received string
 					receivedString = new String(incoming.getData(),
 							0, incoming.getLength());
-					System.out.println("Received from server:" + receivedString);
+					System.out.println("Received from server: @message: " + receivedString);
 				}
 				catch(IOException e)
 				{
@@ -39,7 +39,7 @@ public class Client
 		public DatagramSocket datagramSocket;
 	}
 
-	public static void main(String[] args) {
+	public void startClient() {
 		InetAddress address = null;
 		int port = 7077;
 		DatagramSocket datagramSocket = null;
