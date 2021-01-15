@@ -39,7 +39,7 @@ public class Client
 		public DatagramSocket datagramSocket;
 	}
 
-	public void startClient() {
+	public static void main(String[] args) {
 		InetAddress address = null;
 		int port = 7077;
 		DatagramSocket datagramSocket = null;
@@ -47,10 +47,7 @@ public class Client
 		// Create a Datagram Socket...
 		try
 		{ 
-			address = InetAddress.getByName("72.137.66.20");
-			if(address.equals(InetAddress.getLocalHost())) {
-				address = InetAddress.getByName("127.0.0.1");
-			}
+			address = InetAddress.getByName("127.0.0.1");
 
 			datagramSocket = new DatagramSocket(8000);
 			keyboardReader = new BufferedReader(new
