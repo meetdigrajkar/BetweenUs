@@ -1,13 +1,21 @@
 package com.mmog;
 
 import java.net.*;
+import java.nio.charset.StandardCharsets;
 import java.io.*;
 public class Client
 {
 	int port = 7077;
 	static DatagramSocket socket;
 	static InetAddress address;
-
+    static ByteArrayOutputStream bos;
+	static ObjectOutputStream oos;
+	
+	public Client() throws IOException {
+		bos = new ByteArrayOutputStream();
+		oos = new ObjectOutputStream(bos);
+	}
+	
 	public static class UDPEchoReader extends Thread
 	{
 		public UDPEchoReader(DatagramSocket socket)
@@ -69,22 +77,17 @@ public class Client
 		UDPEchoReader reader = new UDPEchoReader(socket);
 		reader.setDaemon(true);
 		reader.start();
-
-		//System.out.println("Ready to send your messages...");
+		
 		try
 		{
-			String input;
+			String input = "";
 			
-			ByteArrayOutputStream bos = new  ByteArrayOutputStream();
-			ObjectOutputStream oos = new ObjectOutputStream(bos);
-
-			oos.writeInt(0); 
-			oos.flush();
-			byte [] data = bos.toByteArray();
+			//command int for connection request.
+			input += "0,";
 			 
 			// send datagram packet to the server
 			DatagramPacket datagramPacket = new DatagramPacket
-					(data, data.length, address, port);
+					(input.getBytes(), input.length(), address, port);
 			socket.send(datagramPacket);
 
 		}
@@ -97,8 +100,6 @@ public class Client
 	
 	public static void sendUpdate(float x, float y, boolean isFlipped, boolean isDead, boolean isIdle) throws Exception
 	{
-		ByteArrayOutputStream bos = new  ByteArrayOutputStream();
-		ObjectOutputStream oos = new ObjectOutputStream(bos);
 		  oos.writeInt(1); 
 	      oos.writeFloat(x);
 	      oos.writeFloat(y);
@@ -114,39 +115,40 @@ public class Client
 	      socket.send(datagramPacket);	      	      
 	}
 	
+	/*
+	 * This parseCommand method is called when the Client receives a datagram packet from the server (byte array)
+	 */
 	public static void parseCommand(byte[] data) throws IOException
 	{
+		String receivedData = new String(data);
+		String[] dataArray = parseData(receivedData);
+		int playerID = Integer.parseInt(dataArray[0]);
 		
-		ByteArrayInputStream bis = new ByteArrayInputStream(data);
-		ObjectInputStream ois = new ObjectInputStream(bis);
-		int command = ois.readInt();
-		
-		if (command == 0)//connect command
+		if (dataArray[1].equals("0"))//connect command
 		{
-			int playerID = ois.readInt();
 			System.out.println("Connected with @ClientID: " + playerID);
 		}
-		else if (command == 1)//update command
+		else if (dataArray[0].equals("1"))//update command
 		{
-			float x = ois.readFloat();
-			float y = ois.readFloat();
-			boolean isFlipped = ois.readBoolean();
-			boolean isDead = ois.readBoolean();
-			boolean isIdle = ois.readBoolean();
+			//float x = ois.readFloat();
+			//float y = ois.readFloat();
+			//boolean isFlipped = ois.readBoolean();
+			//boolean isDead = ois.readBoolean();
+			//boolean isIdle = ois.readBoolean();
 			//Server should append this after receiving a message before forwarding
-			int playerID = ois.readInt();
+			//int playerID = ois.readInt();
 			
 			
-			System.out.println("Message From player " + playerID + 
-					String.format("(X, Y) = (%f, %f)", x,y   ));
+			//System.out.println("Message From player " + playerID + 
+			//String.format("(X, Y) = (%f, %f)", x,y   ));
 			
 		}
-		
-		ois.close();
-		bis.close();
 		
 	}
 	
-	
+	public static String[] parseData(String receivedData) throws IOException {
+		String dataArray[] = receivedData.split(",");
+		return dataArray;
+	}
 
 } 

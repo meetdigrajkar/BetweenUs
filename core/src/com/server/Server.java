@@ -1,16 +1,22 @@
 package com.server;
 
 import java.net.*;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.io.*;
 
 public class Server {
 
 	private static ArrayList<InetAddress> connectedClientAddresses;
-
-	public static void main(String args[])
+	static ByteArrayOutputStream bos;
+	static ObjectOutputStream oos;
+	
+	public static void main(String args[]) throws ClassNotFoundException, IOException
 	{
+		bos = new  ByteArrayOutputStream();
+		oos = new ObjectOutputStream(bos);
 		connectedClientAddresses = new ArrayList<>();
+		
 		int port = 7077;
 		// create the server...
 		DatagramSocket serverDatagramSocket = null;
@@ -41,21 +47,21 @@ public class Server {
 				if(!connectedClientAddresses.contains(hostAddress)) {
 					connectedClientAddresses.add(hostAddress);
 				}
-				
 			
-				byte[] outputData = AppendData(hostAddress,datagramPacket.getData());
+				//received data from the client
+				input = new String(buffer);
+				String output=(new StringBuilder()).append(connectedClientAddresses.indexOf(hostAddress)).append(",").append(input).toString();
+				System.out.println(output);
 				
-				ByteArrayInputStream bis = new ByteArrayInputStream(outputData);
-				ObjectInputStream ois = new ObjectInputStream(bis);
-				int command = ois.readInt();
+				String[] data = parseData(output);
 				
-				System.out.println("Server received command: " + command + " from @hostAddress: " + hostAddress);
-				
+				System.out.println("Server received command: " + data[1] + " from @hostAddress: " + hostAddress);
+				//System.out.println("command: " + data[0] + " ,playerID: " + data[1]);
 				
 				//relay the message received by the client to ALL the other clients
 				for(InetAddress c: connectedClientAddresses) {
 					System.out.println(c);
-					DatagramPacket toClients = new DatagramPacket(outputData, outputData.length, c, 8000);
+					DatagramPacket toClients = new DatagramPacket(output.getBytes(), output.length(), c, 8000);
 					serverDatagramSocket.send(toClients);
 				}
 
@@ -67,22 +73,8 @@ public class Server {
 		}
 	}
 	
-	public static byte[] AppendData(InetAddress hostAddress, byte[] receivedData) throws IOException {
-		
-		ByteArrayOutputStream bos = new  ByteArrayOutputStream();
-		ObjectOutputStream oos = new ObjectOutputStream(bos);
-		
-		oos.writeInt(connectedClientAddresses.indexOf(hostAddress)); 
-		oos.flush();
-		
-		byte [] data = bos.toByteArray();
-		byte[] combinedData = new byte[receivedData.length + data.length];
-		
-		for(int i =0; i<combinedData.length;i++) {
-			combinedData[i] = i < receivedData.length ? receivedData[i]: data[i - receivedData.length];
-		}
-		
-		return combinedData;
-		
+	public static String[] parseData(String receivedData) throws IOException {
+		String dataArray[] = receivedData.split(",");
+		return dataArray;
 	}
 }
