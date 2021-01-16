@@ -125,6 +125,7 @@ public class Client
 		
 		if (dataArray[1].equals("0"))//connect command
 		{
+			GameScreen.addPlayer(new Player(playerID));
 			System.out.println("Connected with @ClientID: " + playerID);
 		}
 		else if (dataArray[0].equals("1"))//update command
@@ -134,11 +135,8 @@ public class Client
 			boolean isFlipped = Boolean.parseBoolean(dataArray[5]);
 			boolean isDead = Boolean.parseBoolean(dataArray[6]);
 			boolean isIdle = Boolean.parseBoolean(dataArray[7]);
-			
-			//Server should append this after receiving a message before forwarding
-
-			//System.out.println("Message From player " + playerID + 
-			//String.format("(X, Y) = (%f, %f)", x,y   ));
+		
+			GameScreen.updateConnectedClient(playerID, x, y, isFlipped, isDead, isIdle);
 		}
 		
 	}
