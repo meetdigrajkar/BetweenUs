@@ -55,6 +55,7 @@ public class Player {
     
     public void draw(SpriteBatch batch)
     {
+    	elapsedTime += Gdx.graphics.getDeltaTime(); 
     	if (isFlipped && !isIdle)
     	{
     		batch.draw(walkLeft.getKeyFrame(elapsedTime, true), x, y);
@@ -77,40 +78,42 @@ public class Player {
     }
     public void render() throws Exception
     {
-        elapsedTime += Gdx.graphics.getDeltaTime(); 
+    	boolean playerMoved = false;
         if(Gdx.input.isKeyPressed(Input.Keys.A)){
         	x -= 5;
         	isFlipped = true;
         	isIdle=false;
-        	Client.sendUpdate(x, y, isFlipped, isDead, isIdle);        	
+        	playerMoved = true;
         }
         
         else if(Gdx.input.isKeyPressed(Input.Keys.D)){
         	x+=5;
         	isFlipped = false;
         	isIdle=false;
-        	Client.sendUpdate(x, y, isFlipped, isDead, isIdle);        	
+        	playerMoved = true;
         }
         if (Gdx.input.isKeyPressed(Input.Keys.W))
         {
         	y += 5;
         	isIdle = false;
-        	Client.sendUpdate(x, y, isFlipped, isDead, isIdle);        	
+        	playerMoved = true;
         }
         if (Gdx.input.isKeyPressed(Input.Keys.S))
         {
         	y-=5;      
         	isIdle = false;
-        	Client.sendUpdate(x, y, isFlipped, isDead, isIdle);        	
+        	playerMoved = true;
         }
         
         if (!isIdle && !Gdx.input.isKeyPressed(Input.Keys.W) && !Gdx.input.isKeyPressed(Input.Keys.A) && !Gdx.input.isKeyPressed(Input.Keys.S) && !Gdx.input.isKeyPressed(Input.Keys.D) )
         {               	
         	isIdle = true;
-        	Client.sendUpdate(x, y, isFlipped, isDead, isIdle);        	
+        	playerMoved = true;
         }
- 
         
+        if(playerMoved) {
+        	Client.sendUpdate(x, y, isFlipped, isDead, isIdle);
+        }
     }
 
 	public int getPlayerID() {

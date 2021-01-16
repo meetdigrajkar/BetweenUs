@@ -108,7 +108,6 @@ public class Client
 		  toSend +=  isDead +",";  
 		  toSend +=  isIdle +","; 
 		  
-	      socket = new DatagramSocket(8000);
 	      
 	      DatagramPacket datagramPacket = new DatagramPacket(toSend.getBytes(), toSend.length(), address, 7077);	     
 	      socket.send(datagramPacket);	      	      
@@ -125,16 +124,16 @@ public class Client
 		
 		if (dataArray[1].equals("0"))//connect command
 		{
-			GameScreen.addPlayer(new Player(playerID));
+			GameScreen.addPlayer(playerID);
 			System.out.println("Connected with @ClientID: " + playerID);
 		}
-		else if (dataArray[0].equals("1"))//update command
+		else if (dataArray[1].equals("1"))//update command
 		{
-			float x = Float.valueOf(dataArray[3]);
-			float y = Float.valueOf(dataArray[4]);
-			boolean isFlipped = Boolean.parseBoolean(dataArray[5]);
-			boolean isDead = Boolean.parseBoolean(dataArray[6]);
-			boolean isIdle = Boolean.parseBoolean(dataArray[7]);
+			float x = Float.valueOf(dataArray[2]);
+			float y = Float.valueOf(dataArray[3]);
+			boolean isFlipped = Boolean.parseBoolean(dataArray[4]);
+			boolean isDead = Boolean.parseBoolean(dataArray[5]);
+			boolean isIdle = Boolean.parseBoolean(dataArray[6]);
 		
 			GameScreen.updateConnectedClient(playerID, x, y, isFlipped, isDead, isIdle);
 		}
