@@ -64,7 +64,6 @@ public class Server {
 					DatagramPacket toClients = new DatagramPacket(output.getBytes(), output.length(), c, 8000);
 					serverDatagramSocket.send(toClients);
 				}
-
 			}
 		}
 		catch(IOException e)

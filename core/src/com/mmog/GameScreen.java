@@ -1,6 +1,8 @@
 package com.mmog;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 public class GameScreen extends AbstractScreen{
@@ -9,13 +11,16 @@ public class GameScreen extends AbstractScreen{
 	private SpriteBatch spritebatch;
 	
 	public GameScreen(int level) {
-		
+		super();
+	}
+	
+	public GameScreen() {
+		super();
 	}
 	
 	@Override
 	public void show() {
 		// TODO Auto-generated method stub
-		
 	}
 	
 
@@ -28,6 +33,8 @@ public class GameScreen extends AbstractScreen{
 
 	@Override
 	public void render(float delta) {
+		Gdx.gl.glClearColor(0, 0, 0, 1);
+		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		// TODO Auto-generated method stub
 		spritebatch.begin();
 		player.render(spritebatch);

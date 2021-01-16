@@ -100,18 +100,17 @@ public class Client
 	
 	public static void sendUpdate(float x, float y, boolean isFlipped, boolean isDead, boolean isIdle) throws Exception
 	{
-		  oos.writeInt(1); 
-	      oos.writeFloat(x);
-	      oos.writeFloat(y);
-	      oos.writeBoolean(isFlipped);
-	      oos.writeBoolean(isDead);
-	      oos.writeBoolean(isIdle);
-	      oos.flush();
-	      byte [] data = bos.toByteArray();
-	      
+		  String toSend = "";
+		  toSend += "1,"; 
+		  toSend +=  x +","; 
+		  toSend +=  y +",";
+		  toSend +=  isFlipped +","; 
+		  toSend +=  isDead +",";  
+		  toSend +=  isIdle +","; 
+		  
 	      socket = new DatagramSocket(8000);
 	      
-	      DatagramPacket datagramPacket = new DatagramPacket(data, data.length, address, 7077);	     
+	      DatagramPacket datagramPacket = new DatagramPacket(toSend.getBytes(), toSend.length(), address, 7077);	     
 	      socket.send(datagramPacket);	      	      
 	}
 	
@@ -130,18 +129,16 @@ public class Client
 		}
 		else if (dataArray[0].equals("1"))//update command
 		{
-			//float x = ois.readFloat();
-			//float y = ois.readFloat();
-			//boolean isFlipped = ois.readBoolean();
-			//boolean isDead = ois.readBoolean();
-			//boolean isIdle = ois.readBoolean();
+			float x = Float.valueOf(dataArray[3]);
+			float y = Float.valueOf(dataArray[4]);
+			boolean isFlipped = Boolean.parseBoolean(dataArray[5]);
+			boolean isDead = Boolean.parseBoolean(dataArray[6]);
+			boolean isIdle = Boolean.parseBoolean(dataArray[7]);
+			
 			//Server should append this after receiving a message before forwarding
-			//int playerID = ois.readInt();
-			
-			
+
 			//System.out.println("Message From player " + playerID + 
 			//String.format("(X, Y) = (%f, %f)", x,y   ));
-			
 		}
 		
 	}

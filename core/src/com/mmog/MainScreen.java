@@ -17,8 +17,6 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
 
 public class MainScreen extends AbstractScreen{
-	private Player player;
-	SpriteBatch batch;
 	private Texture btn;
 	TextButtonStyle tbs;
 	BitmapFont font;
@@ -48,11 +46,10 @@ public class MainScreen extends AbstractScreen{
             public void clicked(InputEvent event, float x, float y) {
                System.out.println("Attempting to Connect to The Server...");
                Client.connectClientToServer();
+               ScreenManager.getInstance().showScreen(ScreenEnum.GAME);
             };
         });
         
-		batch = new SpriteBatch();
-		player = new Player();
 		Gdx.input.setInputProcessor(this);
 	}
 	
@@ -60,11 +57,7 @@ public class MainScreen extends AbstractScreen{
 	public void render(float delta) {
 		Gdx.gl.glClearColor(0, 0, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-
-		batch.begin();
-		player.render(batch);
 		draw();
-		batch.end();
 	}
 
 	
@@ -94,7 +87,6 @@ public class MainScreen extends AbstractScreen{
 	
 	public void dispose() {
 		// TODO Auto-generated method stub
-		batch.dispose();
 	}
 	
 }
