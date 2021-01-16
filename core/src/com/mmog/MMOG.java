@@ -2,6 +2,7 @@ package com.mmog;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -16,7 +17,7 @@ public class MMOG extends Game {
 	private SpriteBatch batch;
 	private Player player;
 	
-	
+	GameScreen gameScreen;
 	Stage stage;
 	TextButton button;
 	TextButtonStyle textButtonStyle;
@@ -25,11 +26,16 @@ public class MMOG extends Game {
 	
 	@Override
 	public void create () {
+		gameScreen = new GameScreen();
+		setScreen(gameScreen);
 		stage = new Stage();
 		Gdx.input.setInputProcessor(stage);
 		font = new BitmapFont();
 		textButtonStyle = new TextButtonStyle();
         textButtonStyle.font = font;
+        textButtonStyle.fontColor = Color.RED;
+        textButtonStyle.font.getData().setScale(10);
+        textButtonStyle.downFontColor = Color.BLUE;
         button = new TextButton("Join", textButtonStyle);
         button.pad(100);
         stage.addActor(button);
@@ -64,7 +70,12 @@ public class MMOG extends Game {
 
 	@Override
 	public void dispose () {
-		batch.dispose();
+		gameScreen.dispose();
+	}
+
+	@Override
+	public void resize(int width, int height) {
+		gameScreen.resize(width, height);
 	}
 
 	@Override

@@ -1,13 +1,32 @@
 package com.mmog;
 
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.utils.viewport.Viewport;
+import javafx.scene.Camera;
 
 public class GameScreen extends AbstractScreen{
+
+	private Camera camera;
+	private Viewport viewport;
+
+	private SpriteBatch batch;
+	private Texture background;
+
+	private int backgroundOffset;
+
+	private final int WORLD_WIDTH = 1920;
+	private final int WORLD_HEIGTH = 1080;
 
 	public GameScreen(int level) {
 		
 	}
-	
+
+	public GameScreen() {
+
+	}
+
 	public void show() {
 		// TODO Auto-generated method stub
 		
