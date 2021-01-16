@@ -2,20 +2,26 @@ package com.mmog;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.utils.Align;
 
 public class MainScreen extends AbstractScreen{
 	private Player player;
-	TextButton button;
-	TextButtonStyle textButtonStyle;
-	BitmapFont font;
 	SpriteBatch batch;
+	private Texture btn;
+	TextButtonStyle tbs;
+	BitmapFont font;
 	
 	public MainScreen() {
 		// TODO Auto-generated constructor stub
@@ -29,22 +35,25 @@ public class MainScreen extends AbstractScreen{
 
 	
 	public void buildStage() {
+		tbs = new TextButtonStyle();
 		font = new BitmapFont();
-		textButtonStyle = new TextButtonStyle();
-        textButtonStyle.font = font;
-        button = new TextButton("Join", textButtonStyle);
+		tbs.font = font;
+		TextButton button = new TextButton("Join", tbs);
+      
+		button.setPosition(100, 100, Align.center);
         addActor(button);
         
-        button.addListener(new ChangeListener() {
+        button.addListener( new ClickListener() {              
             @Override
-            public void changed (ChangeEvent event, Actor actor) {
-                System.out.println("Attempting to Join...");
-                Client.connectClientToServer();
-            }
+            public void clicked(InputEvent event, float x, float y) {
+               System.out.println("Attempting to Connect to The Server...");
+               Client.connectClientToServer();
+            };
         });
         
 		batch = new SpriteBatch();
 		player = new Player();
+		Gdx.input.setInputProcessor(this);
 	}
 	
 	

@@ -31,12 +31,6 @@ public class Client
 					
 					parseCommand(incoming.getData());
 					
-					
-				/*	receivedString = new String(incoming.getData(),
-							0, incoming.getLength());
-					if(receivedString != null) {
-						System.out.println("Received from server: @message: " + receivedString + "...CONNECTED!");
-					}*/
 				}
 				catch(IOException e)
 				{
@@ -55,7 +49,6 @@ public class Client
 
 	public static boolean connectClientToServer() {
 		int port = 7077;
-		System.out.println("Button pressed");
 		socket = null;
 		BufferedReader keyboardReader = null;
 		// Create a Datagram Socket...
@@ -81,12 +74,17 @@ public class Client
 		try
 		{
 			String input;
+			
+			ByteArrayOutputStream bos = new  ByteArrayOutputStream();
+			ObjectOutputStream oos = new ObjectOutputStream(bos);
 
-			// read input from the keyboard
-			input = "Attempting to Connect to The Server...";
+			oos.writeInt(0); 
+			oos.flush();
+			byte [] data = bos.toByteArray();
+			 
 			// send datagram packet to the server
 			DatagramPacket datagramPacket = new DatagramPacket
-					(input.getBytes(), input.length(), address, port);
+					(data, data.length, address, port);
 			socket.send(datagramPacket);
 
 		}
@@ -96,6 +94,7 @@ public class Client
 		}	
 		return false;
 	}
+	
 	public static void sendUpdate(float x, float y, boolean isFlipped, boolean isDead, boolean isIdle) throws Exception
 	{
 		ByteArrayOutputStream bos = new  ByteArrayOutputStream();
@@ -124,7 +123,8 @@ public class Client
 		
 		if (command == 0)//connect command
 		{
-			
+			int playerID = ois.readInt();
+			System.out.println("Connected with @ClientID: " + playerID);
 		}
 		else if (command == 1)//update command
 		{
@@ -141,6 +141,9 @@ public class Client
 					String.format("(X, Y) = (%f, %f)", x,y   ));
 			
 		}
+		
+		ois.close();
+		bis.close();
 		
 	}
 	

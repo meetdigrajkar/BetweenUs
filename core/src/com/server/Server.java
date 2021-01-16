@@ -34,9 +34,6 @@ public class Server {
 			{
 				// listen for datagram packets
 				serverDatagramSocket.receive(datagramPacket);
-				input = new String(datagramPacket.getData(), 0,
-						datagramPacket.getLength());
-				System.out.println("Received from client @address: " + datagramPacket.getAddress().getHostAddress() + " @message: " + input);
 
 				//check if the client is in the connected clients list.
 				//if client is not in the list add its host address to the list
@@ -45,11 +42,20 @@ public class Server {
 					connectedClientAddresses.add(hostAddress);
 				}
 				
+			
+				byte[] outputData = AppendData(hostAddress,datagramPacket.getData());
+				
+				ByteArrayInputStream bis = new ByteArrayInputStream(outputData);
+				ObjectInputStream ois = new ObjectInputStream(bis);
+				int command = ois.readInt();
+				
+				System.out.println("Server received command: " + command + " from @hostAddress: " + hostAddress);
+				
 				
 				//relay the message received by the client to ALL the other clients
 				for(InetAddress c: connectedClientAddresses) {
 					System.out.println(c);
-					DatagramPacket toClients = new DatagramPacket(input.getBytes(), input.length(), c, 8000);
+					DatagramPacket toClients = new DatagramPacket(outputData, outputData.length, c, 8000);
 					serverDatagramSocket.send(toClients);
 				}
 
@@ -59,5 +65,24 @@ public class Server {
 		{
 			System.out.println(e);
 		}
+	}
+	
+	public static byte[] AppendData(InetAddress hostAddress, byte[] receivedData) throws IOException {
+		
+		ByteArrayOutputStream bos = new  ByteArrayOutputStream();
+		ObjectOutputStream oos = new ObjectOutputStream(bos);
+		
+		oos.writeInt(connectedClientAddresses.indexOf(hostAddress)); 
+		oos.flush();
+		
+		byte [] data = bos.toByteArray();
+		byte[] combinedData = new byte[receivedData.length + data.length];
+		
+		for(int i =0; i<combinedData.length;i++) {
+			combinedData[i] = i < receivedData.length ? receivedData[i]: data[i - receivedData.length];
+		}
+		
+		return combinedData;
+		
 	}
 }
