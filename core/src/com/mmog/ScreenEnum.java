@@ -1,6 +1,7 @@
 package com.mmog;
 
 public enum ScreenEnum {
+	
 	MAIN_MENU {
         public AbstractScreen getScreen(Object... params) {
             return new MainScreen();

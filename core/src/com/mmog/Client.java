@@ -55,6 +55,7 @@ public class Client
 
 	public static boolean connectClientToServer() {
 		int port = 7077;
+		System.out.println("Button pressed");
 		socket = null;
 		BufferedReader keyboardReader = null;
 		// Create a Datagram Socket...
