@@ -66,6 +66,7 @@ public class Server {
 						serverDatagramSocket.send(toClients);
 					}
 				}
+				
 			}
 		}
 		catch(IOException e)

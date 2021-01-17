@@ -8,14 +8,22 @@ import java.util.Map;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
+import com.badlogic.gdx.math.Vector3;
 
 public class GameScreen extends AbstractScreen{
 
 	private Player player;
 	private static HashMap<Integer,Player> connectedPlayers;
 	private SpriteBatch spritebatch;
-
+	OrthographicCamera cam;
+	float width,height;
+	ShapeRenderer sr;
+	
+	
 	public GameScreen(int level) {
 		super();
 	}
@@ -39,19 +47,38 @@ public class GameScreen extends AbstractScreen{
 
 	@Override
 	public void show() {
-		// TODO Auto-generated method stub
+		player = new Player(-1);
+		width = Gdx.graphics.getWidth();
+        height = Gdx.graphics.getHeight();
+		cam = new OrthographicCamera(width, height);
+		
+		cam.setToOrtho(false);
+        cam.position.set(player.getX() + (player.getWidth() * 2), player.getY() + (player.getHeight()), 0);
+        cam.update();
+        
+        spritebatch = new SpriteBatch();
+        spritebatch.setProjectionMatrix(cam.combined);
+        
+        sr = new ShapeRenderer();
 	}
 
 
 	@Override
 	public void buildStage() {
 		// TODO Auto-generated method stub
-		spritebatch = new SpriteBatch();
-		player = new Player(-1);
 	}
 
+	public void update(float delta) {
+		cam.position.set(player.getX() + (player.getWidth() /2), player.getY() + (player.getHeight()/2), 0);
+        cam.unproject(new Vector3(player.getX(), player.getY(), 0));
+        cam.update();
+        spritebatch.setProjectionMatrix(cam.combined);    
+        sr.setProjectionMatrix(cam.combined);
+	}
+	
 	@Override
 	public void render(float delta) {
+		update(delta);
 		Gdx.gl.glClearColor(0, 0, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		// TODO Auto-generated method stub
@@ -71,6 +98,7 @@ public class GameScreen extends AbstractScreen{
 			}
 			connectedPlayers.get(key).draw(spritebatch);
 		}
+		
 		spritebatch.end();
 	}
 
@@ -102,6 +130,7 @@ public class GameScreen extends AbstractScreen{
 	public void dispose() {
 		// TODO Auto-generated method stub
 		spritebatch.dispose();
+		
 	}
 
 }

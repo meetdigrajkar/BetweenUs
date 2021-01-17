@@ -19,7 +19,23 @@ public class Player {
     private float elapsedTime = 0;
     private Sprite sprite;
     private float x;
-    private float y;
+    public float getX() {
+		return x;
+	}
+
+	public void setX(float x) {
+		this.x = x;
+	}
+
+	public float getY() {
+		return y;
+	}
+
+	public void setY(float y) {
+		this.y = y;
+	}
+
+	private float y;
     private boolean isFlipped;
     private boolean isDead;
     private boolean isIdle;
@@ -130,5 +146,13 @@ public class Player {
 		this.isFlipped = isFlipped;
 		this.isDead = isDead;
 		this.isIdle = isIdle;
+	}
+
+	public int getWidth() {
+		return idle.getWidth();
+	}
+
+	public int getHeight() {
+		return idle.getHeight();
 	}
 }
