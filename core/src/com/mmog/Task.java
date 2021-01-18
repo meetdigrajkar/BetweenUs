@@ -25,6 +25,4 @@ public class Task {
 	public void setTaskName(String taskName) {
 		this.taskName = taskName;
 	}
-	
-	
 }
