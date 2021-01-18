@@ -40,6 +40,8 @@ public class MainScreen extends AbstractScreen{
 	public void show() {
 		// TODO Auto-generated method stub
 		player = new Player(-1);
+		
+		player.getTasks().add(new AdminTask());
 	}
 
 

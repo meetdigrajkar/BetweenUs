@@ -25,6 +25,7 @@ import com.badlogic.gdx.physics.box2d.Box2D;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
@@ -44,26 +45,21 @@ public class GameScreen extends AbstractScreen{
 	private Texture btn;
 	TextButtonStyle tbs;
 	BitmapFont font;
-	boolean startedTask,isOverlaping;
-	private Label playerNameLabel;
-	TextButton adminTask;
+	boolean startedTask,isOverlapingATS;
+	private Label playerNameLabel,tasksLabel;
 	private Viewport vp;
 
-	Texture mapTexture,playerTexture;
+	Texture mapTexture,adminStationTexture;
 
-	Sprite mapTextureSprite,playerSprite;
+	Sprite mapTextureSprite,adminStationTextureSprite;
 
 	Rectangle asRec;
 	Rectangle playerRec;
 
-	public GameScreen(int level) {
-		super();
-	}
+	Table table;
 
 	public GameScreen() {
 		super();
-		connectedPlayers = new HashMap<Integer,Player>();
-		isOverlaping = false;
 	}
 
 	public static void addPlayer(int playerID) {
@@ -109,15 +105,10 @@ public class GameScreen extends AbstractScreen{
 
 	@Override
 	public void show() {
-		//player = new Player(-1);
-
-		//add the tasks below to the player at the begining of the game.
-		MainScreen.player.getTasks().add(new AdminTask());
-
 		width = Gdx.graphics.getWidth();
 		height = Gdx.graphics.getHeight();
 		cam = new OrthographicCamera(width, height);
-		vp = new FitViewport(200, 200,cam);
+		vp = new FitViewport(500, 500,cam);
 		this.setViewport(vp);
 
 		cam.setToOrtho(false);
@@ -131,33 +122,37 @@ public class GameScreen extends AbstractScreen{
 
 	@Override
 	public void buildStage() {
-		Gdx.input.setInputProcessor(this);
-		playerTexture = new Texture(Gdx.files.internal("idle.png"));
-		playerSprite = new Sprite(playerTexture);
-		sr = new ShapeRenderer();
+		connectedPlayers = new HashMap<Integer,Player>();
 
-		//ADMIN TASK
+		Gdx.input.setInputProcessor(this);
+		
+		table = new Table();
+		table.setFillParent(true);
+
+		//player name label
 		LabelStyle ls = new LabelStyle(new BitmapFont(),Color.WHITE);
 		Skin uiSkin = new Skin(Gdx.files.internal("uiskin.json"));
 		playerNameLabel = new Label(MainScreen.player.getPlayerName(), ls );
 		addActor(playerNameLabel);
 
-		tbs = new TextButtonStyle();
-		font = new BitmapFont();
-		tbs.font = font;
-		adminTask = new TextButton("Start Admin Task", tbs);
-		startedTask = false;
-		adminTask.setPosition(100, 100, Align.center);
-		addActor(adminTask);
-
-		//admin task station
+		//player's tasks label
+		tasksLabel = new Label(MainScreen.player.tasksToString(), ls);
+		table.add(tasksLabel);
+		addActor(table);
+		
+		//map sprite
 		mapTexture = new Texture(Gdx.files.internal("map.jpg"));
 		mapTextureSprite = new Sprite(mapTexture);
 		mapTextureSprite.setPosition(100, 100);
 		mapTextureSprite.scale(2);
 
-		//collision detection bs
-		asRec = new Rectangle(mapTextureSprite.getX(),mapTextureSprite.getY(),mapTextureSprite.getWidth(),mapTextureSprite.getHeight());
+		//admin task station sprite
+		adminStationTexture = new Texture(Gdx.files.internal("TaskStations/adminTaskStation.png"));
+		adminStationTextureSprite = new Sprite(adminStationTexture);
+		adminStationTextureSprite.setPosition(1430, 195);
+
+		//COLLISION DETECTION FOR ALL THE STATIONS GO HERE, IN THE FORM OF A RECTANGLE
+		asRec = new Rectangle(adminStationTextureSprite.getX(),adminStationTextureSprite.getY(),adminStationTextureSprite.getWidth(),adminStationTextureSprite.getHeight());
 	}
 
 	public void update(float delta) {
@@ -169,15 +164,20 @@ public class GameScreen extends AbstractScreen{
 
 	@Override
 	public void render(float delta) {
+		//clear the previous screen
 		Gdx.gl.glClearColor(0, 0, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
+		//set position of the players name label to follow player
 		playerNameLabel.setPosition(MainScreen.player.getX() + MainScreen.player.getWidth()/2 - MainScreen.player.getPlayerName().length() * 2 - 2, MainScreen.player.getY() + MainScreen.player.getHeight() + 8);
-
+		table.setPosition(MainScreen.player.getX(), MainScreen.player.getY());
+		
+		//updates the camera position
 		update(delta);
 
 		spritebatch.begin();
 		mapTextureSprite.draw(spritebatch);
+		adminStationTextureSprite.draw(spritebatch);
 		try {
 			MainScreen.player.render();
 		} catch (Exception e) {
@@ -191,26 +191,20 @@ public class GameScreen extends AbstractScreen{
 		{
 			p.draw(spritebatch);
 		}
-		
-		draw();
-
-		playerRec = playerSprite.getBoundingRectangle();
-		
-		isOverlaping = playerRec.overlaps(asRec);
-		//if the player is overlaping with the admin station and presses space bar, start task
-		if(isOverlaping) {
-			System.out.println("Admin Task Started!");
-			//find the task with the name admin task
-			for(Task t: MainScreen.player.getTasks()) {
-				if(t.getTaskName().equals("Admin Task")) {
-					//set screen to the Admin Task Screen
-					MainScreen.player.setCurrentTask(t);
-					ScreenManager.getInstance().showScreen(ScreenEnum.ADMIN_TASK);
-				}
-			}
-		}
-		
 		spritebatch.end();
+
+		draw();
+		
+		playerRec = MainScreen.player.sprite.getBoundingRectangle();
+		isOverlapingATS = playerRec.overlaps(asRec);
+
+		//if the player is overlaping with the admin station and presses space bar and has an admin task, then start the task
+		if(isOverlapingATS && Gdx.input.isKeyPressed(Keys.SPACE) && MainScreen.player.hasTask("Admin Task") && !(MainScreen.player.isTaskCompleted("Admin Task"))) {
+			System.out.println("Admin Task Started!");
+			System.out.println("Player Name: " + MainScreen.player.getPlayerName());
+
+			ScreenManager.getInstance().showScreen(ScreenEnum.ADMIN_TASK);
+		}
 	}
 
 	@Override

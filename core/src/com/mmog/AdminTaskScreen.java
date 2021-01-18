@@ -1,7 +1,9 @@
 package com.mmog;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -14,7 +16,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextField.TextFieldStyle;
 
 public class AdminTaskScreen extends AbstractScreen{
 
-	SpriteBatch batch;
 	Table table;
 	TextField crewMemberID;
 
@@ -34,25 +35,21 @@ public class AdminTaskScreen extends AbstractScreen{
 		crewMemberID = new TextField("", uiSkin);
 		table.add(crewMemberIDLabel);
 		table.add(crewMemberID).width(50);
-		System.out.println(MainScreen.player.getPlayerID());
 		addActor(table);
-		//table.setPosition(Gdx.graphics.getWidth()/2,Gdx.graphics.getHeight());
+		table.setPosition(50,50);
 	}
 
 	@Override
 	public void render(float delta) {
 		draw();
-		if(!crewMemberID.getText().equals("")) {
-			if(AdminTask.validateCrewMemberID(crewMemberID.getText())) {
-				System.out.println("TASK COMPLETED!");
-				((AdminTask) MainScreen.player.getCurrentTask()).setTaskCompleted();
-			}
-		}
 
-		if(((AdminTask) MainScreen.player.getCurrentTask()).isTaskCompleted()) {
-			MainScreen.player.setCurrentTask(null);
+		if(AdminTask.validateCrewMemberID(crewMemberID.getText())) {
+			System.out.println("TASK COMPLETED!");
+			
+			MainScreen.player.setTaskCompleted("Admin Task");
 			ScreenManager.getInstance().showScreen(ScreenEnum.GAME);
 		}
+
 	}
 
 }
