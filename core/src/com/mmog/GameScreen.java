@@ -46,7 +46,7 @@ public class GameScreen extends AbstractScreen{
 	TextButtonStyle tbs;
 	BitmapFont font;
 	boolean startedTask,isOverlapingATS;
-	private Label playerNameLabel,tasksLabel;
+	private Label playerNameLabel,tasksLabel,tasksTitleLabel;
 	private Viewport vp;
 
 	Texture mapTexture,adminStationTexture;
@@ -136,7 +136,10 @@ public class GameScreen extends AbstractScreen{
 		addActor(playerNameLabel);
 
 		//player's tasks label
-		tasksLabel = new Label(MainScreen.player.tasksToString(), ls);
+		LabelStyle tasksStyle = new LabelStyle(new BitmapFont(),Color.GOLD);
+		tasksTitleLabel = new Label("CREW MEMBER TASKS", tasksStyle);
+		tasksLabel = new Label(MainScreen.player.tasksToString(), tasksStyle);
+		//table.add(tasksTitleLabel);
 		table.add(tasksLabel);
 		addActor(table);
 		
