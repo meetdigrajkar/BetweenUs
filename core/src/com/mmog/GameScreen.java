@@ -32,7 +32,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.FitViewport;
-import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
 public class GameScreen extends AbstractScreen{
@@ -109,7 +108,6 @@ public class GameScreen extends AbstractScreen{
 		width = Gdx.graphics.getWidth();
 		height = Gdx.graphics.getHeight();
 		cam = new OrthographicCamera(width, height);
-		
 		vp = new FitViewport(1920, 1080,cam);
 		this.setViewport(vp);
 
@@ -139,8 +137,8 @@ public class GameScreen extends AbstractScreen{
 
 		//player's tasks label
 		LabelStyle tasksStyle = new LabelStyle(new BitmapFont(),Color.GOLD);
-		tasksTitleLabel = new Label("CREW MEMBER TASKS", tasksStyle);
 		tasksLabel = new Label(MainScreen.player.tasksToString(), tasksStyle);
+		
 		//table.add(tasksTitleLabel);
 		table.add(tasksLabel);
 		addActor(table);
@@ -175,7 +173,8 @@ public class GameScreen extends AbstractScreen{
 
 		//set position of the players name label to follow player
 		playerNameLabel.setPosition(MainScreen.player.getX() + MainScreen.player.getWidth()/2 - MainScreen.player.getPlayerName().length() * 2 - 2, MainScreen.player.getY() + MainScreen.player.getHeight() + 8);
-		table.setPosition(MainScreen.player.getX(), MainScreen.player.getY());
+		
+		tasksLabel.setPosition(MainScreen.player.getX() - Gdx.graphics.getWidth()/3, MainScreen.player.getY() + Gdx.graphics.getHeight()/3);
 		
 		//updates the camera position
 		update(delta);
