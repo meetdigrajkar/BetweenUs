@@ -1,5 +1,7 @@
 package com.mmog;
 
+import java.util.ArrayList;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Texture;
@@ -19,6 +21,11 @@ public class Player {
     private float elapsedTime = 0;
     private Sprite sprite;
     private float x;
+    private ArrayList<Task> tasks;
+    private Task currentTask; 
+    private String playerName;
+    
+    
     public float getX() {
 		return x;
 	}
@@ -53,6 +60,7 @@ public class Player {
         sprite = new Sprite(idle);
         isIdle = false;
         this.setPlayerID(playerID);
+        this.tasks = new ArrayList<Task>();
         
         x=0;
         y=0;
@@ -154,5 +162,29 @@ public class Player {
 
 	public int getHeight() {
 		return idle.getHeight();
+	}
+
+	public ArrayList<Task> getTasks() {
+		return tasks;
+	}
+
+	public void setTasks(ArrayList<Task> tasks) {
+		this.tasks = tasks;
+	}
+
+	public Task getCurrentTask() {
+		return currentTask;
+	}
+
+	public void setCurrentTask(Task currentTask) {
+		this.currentTask = currentTask;
+	}
+
+	public String getPlayerName() {
+		return playerName;
+	}
+
+	public void setPlayerName(String playerName) {
+		this.playerName = playerName;
 	}
 }

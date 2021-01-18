@@ -33,7 +33,7 @@ public class ScreenManager {
  
         // Get current screen to dispose it
         Screen currentScreen = game.getScreen();
- 
+        
         // Show new screen
         AbstractScreen newScreen = screenEnum.getScreen(params);
         newScreen.buildStage();
