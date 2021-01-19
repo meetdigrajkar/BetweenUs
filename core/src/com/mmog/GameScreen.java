@@ -32,6 +32,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
 public class GameScreen extends AbstractScreen{
@@ -82,7 +83,7 @@ public class GameScreen extends AbstractScreen{
 		for (int key: connectedPlayers.keySet())
 		{
 			if (connectedPlayers.get(key) == null)
-			{                
+			{
 				connectedPlayers.replace(key, new Player(key));
 			}
 
@@ -108,6 +109,7 @@ public class GameScreen extends AbstractScreen{
 		width = Gdx.graphics.getWidth();
 		height = Gdx.graphics.getHeight();
 		cam = new OrthographicCamera(width, height);
+
 		vp = new FitViewport(1920, 1080,cam);
 		this.setViewport(vp);
 
@@ -125,7 +127,7 @@ public class GameScreen extends AbstractScreen{
 		connectedPlayers = new HashMap<Integer,Player>();
 
 		Gdx.input.setInputProcessor(this);
-		
+
 		table = new Table();
 		table.setFillParent(true);
 
@@ -137,12 +139,12 @@ public class GameScreen extends AbstractScreen{
 
 		//player's tasks label
 		LabelStyle tasksStyle = new LabelStyle(new BitmapFont(),Color.GOLD);
+		tasksTitleLabel = new Label("CREW MEMBER TASKS", tasksStyle);
 		tasksLabel = new Label(MainScreen.player.tasksToString(), tasksStyle);
-		
 		//table.add(tasksTitleLabel);
 		table.add(tasksLabel);
 		addActor(table);
-		
+
 		//map sprite
 		mapTexture = new Texture(Gdx.files.internal("map.jpg"));
 		mapTextureSprite = new Sprite(mapTexture);
@@ -162,7 +164,7 @@ public class GameScreen extends AbstractScreen{
 		cam.position.set(MainScreen.player.getX() + (MainScreen.player.getWidth() /2), MainScreen.player.getY() + (MainScreen.player.getHeight()/2), 0);
 		cam.unproject(new Vector3(MainScreen.player.getX(), MainScreen.player.getY(), 0));
 		this.getCamera().update();
-		spritebatch.setProjectionMatrix(cam.combined);    
+		spritebatch.setProjectionMatrix(cam.combined);
 	}
 
 	@Override
@@ -173,8 +175,7 @@ public class GameScreen extends AbstractScreen{
 
 		//set position of the players name label to follow player
 		playerNameLabel.setPosition(MainScreen.player.getX() + MainScreen.player.getWidth()/2 - MainScreen.player.getPlayerName().length() * 2 - 2, MainScreen.player.getY() + MainScreen.player.getHeight() + 8);
-		
-		tasksLabel.setPosition(MainScreen.player.getX() - Gdx.graphics.getWidth()/3, MainScreen.player.getY() + Gdx.graphics.getHeight()/3);
+		table.setPosition(MainScreen.player.getX(), MainScreen.player.getY());
 		
 		//updates the camera position
 		update(delta);
