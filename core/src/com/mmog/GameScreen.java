@@ -75,12 +75,12 @@ public class GameScreen extends AbstractScreen{
 		connectedPlayers.put(playerID, null);
 	}
 
-	public static void updateConnectedClient(int playerID, float x, float y, boolean isFlipped, boolean isDead, boolean isIdle) {
+	public static void updateConnectedClient(int playerID, float x, float y, boolean isFlipped, boolean isDead, boolean isIdle, String playerName) {
 		if(connectedPlayers.get(playerID) == null) {
 			GameScreen.addPlayer(playerID);
 			return;
 		}
-		connectedPlayers.get(playerID).setAll(x, y, isFlipped, isDead, isIdle);
+		connectedPlayers.get(playerID).setAll(x, y, isFlipped, isDead, isIdle, playerName);
 	}
 
 	private ArrayList<Player> getYBasedSortedPlayers() {

@@ -189,7 +189,7 @@ public class Player {
 		}
 
 		if(playerMoved) {
-			Client.sendUpdate(x, y, isFlipped, isDead, isIdle);
+			Client.sendUpdate(x, y, isFlipped, isDead, isIdle, getPlayerName());
 		}
 	}
 
@@ -201,12 +201,13 @@ public class Player {
 		this.playerID = playerID;
 	}
 
-	public void setAll(float x, float y, boolean isFlipped, boolean isDead, boolean isIdle) {
+	public void setAll(float x, float y, boolean isFlipped, boolean isDead, boolean isIdle, String playerName) {
 		this.x = x;
 		this.y = y;
 		this.isFlipped = isFlipped;
 		this.isDead = isDead;
 		this.isIdle = isIdle;
+		this.playerName = playerName;
 	}
 
 	public int getWidth() {
