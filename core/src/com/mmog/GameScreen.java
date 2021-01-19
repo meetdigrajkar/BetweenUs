@@ -48,7 +48,7 @@ public class GameScreen extends AbstractScreen{
 	TextButtonStyle tbs;
 	BitmapFont font;
 	boolean startedTask,isOverlapingATS;
-	private Label playerNameLabel,tasksLabel,tasksTitleLabel;
+	private Label tasksLabel,tasksTitleLabel;
 	private ArrayList<Label> playerLabels;
 	private Viewport vp;
 
@@ -138,20 +138,9 @@ public class GameScreen extends AbstractScreen{
 		table = new Table();
 		table.setFillParent(true);
 
-		//player name label
+		//label skin
 		LabelStyle ls = new LabelStyle(new BitmapFont(),Color.WHITE);
 		Skin uiSkin = new Skin(Gdx.files.internal("uiskin.json"));
-		playerNameLabel = new Label(MainScreen.player.getPlayerName(), ls );
-		
-		//for all the labels, get the player name in the list of players and add it to the label value
-		playerLabels = new ArrayList<>();
-		for(Label playerLabel: playerLabels) {
-			for(Entry<Integer, Player> p: connectedPlayers.entrySet()) {
-				playerLabel = new Label(p.getValue().getPlayerName(),ls);
-			}
-		}
-
-		addActor(playerNameLabel);
 
 		//player's tasks label
 		LabelStyle tasksStyle = new LabelStyle(new BitmapFont(),Color.GOLD);
@@ -224,15 +213,6 @@ public class GameScreen extends AbstractScreen{
 		Gdx.gl.glClearColor(153/255f, 0, 153/255f, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-		//set position of the players name label to follow player
-		playerNameLabel.setPosition(MainScreen.player.getX() + MainScreen.player.getWidth()/2 - MainScreen.player.getPlayerName().length() * 2 - 2, MainScreen.player.getY() + MainScreen.player.getHeight() + 8);
-		
-		for(Label playerLabel: playerLabels) {
-			for(Entry<Integer, Player> p: connectedPlayers.entrySet()) {
-				playerLabel.setPosition(p.getValue().getX() + p.getValue().getWidth()/2 - p.getValue().getPlayerName().length() * 2 - 2, p.getValue().getY() + p.getValue().getHeight() + 8);
-			}
-		}
-		
 		tasksLabel.setPosition(MainScreen.player.getX() - Gdx.graphics.getWidth()/2 +50, MainScreen.player.getY() + Gdx.graphics.getHeight()/3 +150);
 		
 		//updates the camera position
@@ -274,8 +254,6 @@ public class GameScreen extends AbstractScreen{
 		//if the player is overlaping with the admin station and presses space bar and has an admin task, then start the task
 		if(isOverlapingATS && Gdx.input.isKeyPressed(Keys.SPACE) && MainScreen.player.hasTask("Admin Task") && !(MainScreen.player.isTaskCompleted("Admin Task"))) {
 			System.out.println("Admin Task Started!");
-			System.out.println("Player Name: " + MainScreen.player.getPlayerName());
-
 			ScreenManager.getInstance().showScreen(ScreenEnum.ADMIN_TASK);
 		}
 	}
