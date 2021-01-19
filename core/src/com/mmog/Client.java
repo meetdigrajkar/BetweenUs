@@ -98,7 +98,7 @@ public class Client
 		return false;
 	}
 	
-	public static void sendUpdate(float x, float y, boolean isFlipped, boolean isDead, boolean isIdle) throws Exception
+	public static void sendUpdate(float x, float y, boolean isFlipped, boolean isDead, boolean isIdle, String playerName) throws Exception
 	{
 		  String toSend = "";
 		  toSend += "1,"; 
@@ -107,6 +107,7 @@ public class Client
 		  toSend +=  isFlipped +","; 
 		  toSend +=  isDead +",";  
 		  toSend +=  isIdle +","; 
+		  toSend += playerName + ",";
 		  
 	      
 	      DatagramPacket datagramPacket = new DatagramPacket(toSend.getBytes(), toSend.length(), address, 7077);	     
@@ -134,8 +135,9 @@ public class Client
 			boolean isFlipped = Boolean.parseBoolean(dataArray[4]);
 			boolean isDead = Boolean.parseBoolean(dataArray[5]);
 			boolean isIdle = Boolean.parseBoolean(dataArray[6]);
+			String playerName = dataArray[7];
 		
-			GameScreen.updateConnectedClient(playerID, x, y, isFlipped, isDead, isIdle);
+			GameScreen.updateConnectedClient(playerID, x, y, isFlipped, isDead, isIdle, playerName);
 		}
 		
 	}

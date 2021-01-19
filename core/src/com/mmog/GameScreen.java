@@ -6,6 +6,8 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
@@ -32,7 +34,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.FitViewport;
-import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
 public class GameScreen extends AbstractScreen{
@@ -47,11 +48,18 @@ public class GameScreen extends AbstractScreen{
 	TextButtonStyle tbs;
 	BitmapFont font;
 	boolean startedTask,isOverlapingATS;
-	private Label playerNameLabel,tasksLabel,tasksTitleLabel;
+	private Label tasksLabel,tasksTitleLabel;
+	private ArrayList<Label> playerLabels;
 	private Viewport vp;
 
 	Texture mapTexture,adminStationTexture;
-
+	
+	//Map Texture
+	Texture adminTexture, comsTexture, labTexture, O2Texture, specimenTexture,dropShipTexture;
+	
+	//Map Sprites
+	Sprite adminSprite, comsSprite, labSprite, O2Sprite, specimenSprite,dropShipSprite;
+	
 	Sprite mapTextureSprite,adminStationTextureSprite;
 
 	Rectangle asRec;
@@ -67,12 +75,12 @@ public class GameScreen extends AbstractScreen{
 		connectedPlayers.put(playerID, null);
 	}
 
-	public static void updateConnectedClient(int playerID, float x, float y, boolean isFlipped, boolean isDead, boolean isIdle) {
+	public static void updateConnectedClient(int playerID, float x, float y, boolean isFlipped, boolean isDead, boolean isIdle, String playerName) {
 		if(connectedPlayers.get(playerID) == null) {
 			GameScreen.addPlayer(playerID);
 			return;
 		}
-		connectedPlayers.get(playerID).setAll(x, y, isFlipped, isDead, isIdle);
+		connectedPlayers.get(playerID).setAll(x, y, isFlipped, isDead, isIdle, playerName);
 	}
 
 	private ArrayList<Player> getYBasedSortedPlayers() {
@@ -83,7 +91,7 @@ public class GameScreen extends AbstractScreen{
 		for (int key: connectedPlayers.keySet())
 		{
 			if (connectedPlayers.get(key) == null)
-			{
+			{                
 				connectedPlayers.replace(key, new Player(key));
 			}
 
@@ -109,7 +117,6 @@ public class GameScreen extends AbstractScreen{
 		width = Gdx.graphics.getWidth();
 		height = Gdx.graphics.getHeight();
 		cam = new OrthographicCamera(width, height);
-
 		vp = new FitViewport(1920, 1080,cam);
 		this.setViewport(vp);
 
@@ -127,34 +134,67 @@ public class GameScreen extends AbstractScreen{
 		connectedPlayers = new HashMap<Integer,Player>();
 
 		Gdx.input.setInputProcessor(this);
-
+		
 		table = new Table();
 		table.setFillParent(true);
 
-		//player name label
+		//label skin
 		LabelStyle ls = new LabelStyle(new BitmapFont(),Color.WHITE);
 		Skin uiSkin = new Skin(Gdx.files.internal("uiskin.json"));
-		playerNameLabel = new Label(MainScreen.player.getPlayerName(), ls );
-		addActor(playerNameLabel);
 
 		//player's tasks label
 		LabelStyle tasksStyle = new LabelStyle(new BitmapFont(),Color.GOLD);
-		tasksTitleLabel = new Label("CREW MEMBER TASKS", tasksStyle);
 		tasksLabel = new Label(MainScreen.player.tasksToString(), tasksStyle);
+		
 		//table.add(tasksTitleLabel);
 		table.add(tasksLabel);
 		addActor(table);
+		
+		//dropship area
+		dropShipTexture = new Texture(Gdx.files.internal("Map/dropship.png"));
+		dropShipSprite = new Sprite(dropShipTexture);
+		dropShipSprite.setPosition(200, 2000);
+		
+		//admin area
+		adminTexture = new Texture(Gdx.files.internal("Map/admin.png"));
+		adminSprite = new Sprite(adminTexture);
+		adminSprite.setPosition(800, -200);
+		
+		//coms area
+		comsTexture = new Texture(Gdx.files.internal("Map/coms.png"));
+		comsSprite = new Sprite(comsTexture);
+		comsSprite.setPosition(0, 500);
+		
+		//lab area
+		labTexture = new Texture(Gdx.files.internal("Map/lab.png"));
+		labSprite = new Sprite(labTexture);
+		labSprite.setPosition(1800, 1500);
+		
+		//O2 area
+		O2Texture = new Texture(Gdx.files.internal("Map/O2.png"));
+		O2Sprite = new Sprite(O2Texture);
+		O2Sprite.setPosition(-1000, -200 );
+		
+		//specimen area
+		specimenTexture = new Texture(Gdx.files.internal("Map/specimen.png"));
+		specimenSprite = new Sprite(specimenTexture);
+		specimenSprite.setPosition(2700, -100);
 
-		//map sprite
-		mapTexture = new Texture(Gdx.files.internal("map.jpg"));
-		mapTextureSprite = new Sprite(mapTexture);
-		mapTextureSprite.setPosition(100, 100);
-		mapTextureSprite.scale(2);
-
+		
+		//ADD TASK STATION SPRITES HERE
+		
 		//admin task station sprite
 		adminStationTexture = new Texture(Gdx.files.internal("TaskStations/adminTaskStation.png"));
 		adminStationTextureSprite = new Sprite(adminStationTexture);
-		adminStationTextureSprite.setPosition(1430, 195);
+		adminStationTextureSprite.setPosition(1500, 250);
+		
+		//coms task station
+		
+		//lab task station
+		
+		//o2 task station
+		
+		//specimen task station
 
 		//COLLISION DETECTION FOR ALL THE STATIONS GO HERE, IN THE FORM OF A RECTANGLE
 		asRec = new Rectangle(adminStationTextureSprite.getX(),adminStationTextureSprite.getY(),adminStationTextureSprite.getWidth(),adminStationTextureSprite.getHeight());
@@ -164,25 +204,33 @@ public class GameScreen extends AbstractScreen{
 		cam.position.set(MainScreen.player.getX() + (MainScreen.player.getWidth() /2), MainScreen.player.getY() + (MainScreen.player.getHeight()/2), 0);
 		cam.unproject(new Vector3(MainScreen.player.getX(), MainScreen.player.getY(), 0));
 		this.getCamera().update();
-		spritebatch.setProjectionMatrix(cam.combined);
+		spritebatch.setProjectionMatrix(cam.combined);    
 	}
 
 	@Override
 	public void render(float delta) {
 		//clear the previous screen
-		Gdx.gl.glClearColor(0, 0, 0, 1);
+		Gdx.gl.glClearColor(153/255f, 0, 153/255f, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-		//set position of the players name label to follow player
-		playerNameLabel.setPosition(MainScreen.player.getX() + MainScreen.player.getWidth()/2 - MainScreen.player.getPlayerName().length() * 2 - 2, MainScreen.player.getY() + MainScreen.player.getHeight() + 8);
-		table.setPosition(MainScreen.player.getX(), MainScreen.player.getY());
+		tasksLabel.setPosition(MainScreen.player.getX() - Gdx.graphics.getWidth()/2 +50, MainScreen.player.getY() + Gdx.graphics.getHeight()/3 +150);
 		
 		//updates the camera position
 		update(delta);
 
 		spritebatch.begin();
-		mapTextureSprite.draw(spritebatch);
+		
+		//draw map areas here
+		dropShipSprite.draw(spritebatch);
+		adminSprite.draw(spritebatch);
+		comsSprite.draw(spritebatch);
+		labSprite.draw(spritebatch);
+		O2Sprite.draw(spritebatch);
+		specimenSprite.draw(spritebatch);
+
+		//draw task stations here
 		adminStationTextureSprite.draw(spritebatch);
+		
 		try {
 			MainScreen.player.render();
 		} catch (Exception e) {
@@ -206,8 +254,6 @@ public class GameScreen extends AbstractScreen{
 		//if the player is overlaping with the admin station and presses space bar and has an admin task, then start the task
 		if(isOverlapingATS && Gdx.input.isKeyPressed(Keys.SPACE) && MainScreen.player.hasTask("Admin Task") && !(MainScreen.player.isTaskCompleted("Admin Task"))) {
 			System.out.println("Admin Task Started!");
-			System.out.println("Player Name: " + MainScreen.player.getPlayerName());
-
 			ScreenManager.getInstance().showScreen(ScreenEnum.ADMIN_TASK);
 		}
 	}

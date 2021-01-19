@@ -4,12 +4,17 @@ import java.util.ArrayList;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 
 public class Player {
 
@@ -24,6 +29,7 @@ public class Player {
 	private ArrayList<Task> tasks;
 	private Task currentTask; 
 	private String playerName;
+	private Label playerNameLabel;
 
 	public boolean isTaskCompleted(String task) {
 		for(Task t: tasks) {
@@ -53,7 +59,7 @@ public class Player {
 	}
 
 	public String tasksToString() {
-		String tasksString = "-Crew Member's Tasks-\n";
+		String tasksString = "-Crew Member Tasks-\n";
 
 		for(Task t: tasks) {
 			tasksString += t.getTaskName();
@@ -88,6 +94,7 @@ public class Player {
 	private boolean isDead;
 	private boolean isIdle;
 	private int playerID;
+	private BitmapFont f;
 
 
 	public Player(int playerID)
@@ -102,6 +109,8 @@ public class Player {
 		isIdle = false;
 		this.setPlayerID(playerID);
 		this.tasks = new ArrayList<Task>();
+		this.playerName = "";
+		f = new BitmapFont();
 
 		x=0;
 		y=0;
@@ -120,6 +129,9 @@ public class Player {
 
 	public void draw(SpriteBatch batch)
 	{
+		//player name
+		f.draw(batch, getPlayerName(), getX() + getWidth()/2 - getPlayerName().length() * 2 - 2, getY() + getHeight() + 20);
+		
 		elapsedTime += Gdx.graphics.getDeltaTime(); 
 		if (isFlipped && !isIdle)
 		{
@@ -177,7 +189,7 @@ public class Player {
 		}
 
 		if(playerMoved) {
-			Client.sendUpdate(x, y, isFlipped, isDead, isIdle);
+			Client.sendUpdate(x, y, isFlipped, isDead, isIdle, getPlayerName());
 		}
 	}
 
@@ -189,12 +201,13 @@ public class Player {
 		this.playerID = playerID;
 	}
 
-	public void setAll(float x, float y, boolean isFlipped, boolean isDead, boolean isIdle) {
+	public void setAll(float x, float y, boolean isFlipped, boolean isDead, boolean isIdle, String playerName) {
 		this.x = x;
 		this.y = y;
 		this.isFlipped = isFlipped;
 		this.isDead = isDead;
 		this.isIdle = isIdle;
+		this.playerName = playerName;
 	}
 
 	public int getWidth() {
