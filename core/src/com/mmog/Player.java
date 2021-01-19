@@ -53,7 +53,7 @@ public class Player {
 	}
 
 	public String tasksToString() {
-		String tasksString = "-Crew Member's Tasks-\n";
+		String tasksString = "-Crew Member Tasks-\n";
 
 		for(Task t: tasks) {
 			tasksString += t.getTaskName();
