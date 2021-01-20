@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -39,7 +40,9 @@ public class MainScreen extends AbstractScreen{
 
 	public void show() {
 		// TODO Auto-generated method stub
-		player = new Player(-1);
+		Sprite p = new Sprite(new Texture("idle.png"));
+		p.setSize(32, 50);
+		player = new Player(p, -1);
 		
 		//ADD TASKS HERE
 		player.getTasks().add(new AdminTask());
