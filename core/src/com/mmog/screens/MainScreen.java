@@ -1,4 +1,6 @@
-package com.mmog;
+package com.mmog.screens;
+
+import java.util.Random;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
@@ -20,6 +22,10 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
+import com.mmog.Client;
+import com.mmog.players.CrewMember;
+import com.mmog.players.Player;
+import com.mmog.tasks.*;
 
 public class MainScreen extends AbstractScreen{
 	TextButtonStyle tbs;
@@ -34,21 +40,42 @@ public class MainScreen extends AbstractScreen{
 	TextField playerName;
 	public static Player player;
 	private TextureAtlas buttonsAtlas;
+	private Random r;
 
 	public MainScreen() {
 		// TODO Auto-generated constructor stub
 		super();
 	}
 
-
 	public void show() {
 		// TODO Auto-generated method stub
 		Sprite p = new Sprite(new Texture("idle.png"));
 		p.setSize(32, 50);
-		player = new Player(p, -1);
 		
-		//ADD TASKS HERE
-		player.getTasks().add(new AdminTask());
+		//set the player to a crew member or an imposter based on a random number generator
+		r = new Random();
+		int upperBound = 100;
+		int playerTypeSelector = r.nextInt(upperBound);
+		
+		//if the random number is less than 50, player is a crew member
+		//if the random number is greater than 50, player is an imposter
+		
+		//if(playerTypeSelector < 50) {
+		//	player = new CrewMember(p, -1);
+			
+			//ADD TASKS HERE
+		//	((CrewMember) player).addTask(new AdminTask());
+		//}else if(playerTypeSelector > 50){
+		//	player = new Imposter(p, -1);
+		//}
+		
+		player = new CrewMember(p, -1);
+		((CrewMember) player).addTask(new AdminTask());
+		((CrewMember) player).addTask(new ReactorTask());
+		((CrewMember) player).addTask(new ComsTask());
+		((CrewMember) player).addTask(new LabTask());
+		((CrewMember) player).addTask(new ElectricalTask());
+		
 	}
 
 
@@ -78,7 +105,7 @@ public class MainScreen extends AbstractScreen{
 */
 		style1 = new TextButtonStyle();
 		style1.font = font;
-		style1.up = new TextureRegionDrawable(new Texture("button1n.png"));
+		style1.up = new TextureRegionDrawable(new Texture("button2n.png"));
 		style1.down = new TextureRegionDrawable(new Texture("button1p.png"));
 		style1.over = new TextureRegionDrawable(new Texture("button1h.png"));
 		TextButton button1 = new TextButton("Join", style1);
@@ -101,8 +128,6 @@ public class MainScreen extends AbstractScreen{
 		style4.down = buttonskin.getDrawable("button4p");
 		style4.over = buttonskin.getDrawable("button4h");
 		Button button4 = new Button(style2);
-
-
 
         Table table1 = new Table();
 		Label playerNameLabel = new Label("Player Name:", ls );
@@ -164,18 +189,15 @@ public class MainScreen extends AbstractScreen{
 
 	}
 
-
 	public void resize(int width, int height) {
 		// TODO Auto-generated method stub
 
 	}
 
-
 	public void pause() {
 		// TODO Auto-generated method stub
 
 	}
-
 
 	public void resume() {
 		// TODO Auto-generated method stub
@@ -187,7 +209,6 @@ public class MainScreen extends AbstractScreen{
 		// TODO Auto-generated method stub
 
 	}
-
 
 	public void dispose() {
 		// TODO Auto-generated method stub

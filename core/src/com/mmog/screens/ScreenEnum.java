@@ -1,15 +1,10 @@
-package com.mmog;
+package com.mmog.screens;
 
 public enum ScreenEnum {
 	
 	MAIN_MENU {
         public AbstractScreen getScreen(Object... params) {
             return new MainScreen();
-        }
-    },
-	ADMIN_TASK {
-        public AbstractScreen getScreen(Object... params) {
-            return new AdminTaskScreen();
         }
     },
     GAME {

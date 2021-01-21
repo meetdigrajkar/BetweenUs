@@ -1,9 +1,10 @@
-package com.mmog;
+package com.mmog.players;
 
 import java.util.ArrayList;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
@@ -19,6 +20,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
+import com.mmog.Client;
 
 public class Player extends Sprite{
 
@@ -27,24 +29,22 @@ public class Player extends Sprite{
 	private Animation<TextureRegion> walkLeft;
 	private Animation<TextureRegion> walkRight;
 	private float elapsedTime = 0;
-	private ArrayList<Task> tasks;
 	private String playerName;
 	private Label playerNameLabel;
-	private boolean isFlipped;
-	private boolean isDead;
-	private boolean isIdle;
+	private boolean isFlipped, isDead, isIdle;
 	private int playerID;
-	private BitmapFont f;
 	private TiledMapTileLayer collisionLayer;
 	boolean collisionX = false, collisionY = false;
 	float tileWidth,tileHeight;
+	boolean playerMoved = false;
+	private BitmapFont f;
+	
 
 	public Player(Sprite sprite, int playerID)
 	{
 		super(sprite);
 
 		walkRightAtlas = new TextureAtlas(Gdx.files.internal("Walk.atlas"));
-
 		walkLeftAtlas = new TextureAtlas(Gdx.files.internal("Walk.atlas"));
 
 		isFlipped = false;
@@ -53,11 +53,11 @@ public class Player extends Sprite{
 		isIdle = false;
 
 		this.setPlayerID(playerID);
-		this.tasks = new ArrayList<Task>();
+	
 		this.playerName = "";
 
 		f = new BitmapFont();
-
+		
 		for (float i = 0; i < 1; i += 0.01f)
 		{
 			TextureRegion tr = walkLeft.getKeyFrame(i,true);
@@ -68,56 +68,13 @@ public class Player extends Sprite{
 			}
 		}
 	}
-
+	
 	public void setCollisionLayer(TiledMapTileLayer collisionLayer) {
 		this.collisionLayer = collisionLayer;
 	}
 
 	public TiledMapTileLayer getCollisionLayer() {
 		return collisionLayer;
-	}
-
-
-	public boolean isTaskCompleted(String task) {
-		for(Task t: tasks) {
-			if(t.getTaskName().equals(task) && t.isTaskCompleted()) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	public void setTaskCompleted(String task) {
-		for(Task t: tasks) {
-			if(t.getTaskName().equals(task)) {
-				t.setTaskCompleted();
-				return;
-			}
-		}
-	}
-
-	public boolean hasTask(String task) {
-		for(Task t: tasks) {
-			if(t.getTaskName().equals(task)) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	public String tasksToString() {
-		String tasksString = "-Crew Member Tasks-\n";
-
-		for(Task t: tasks) {
-			tasksString += t.getTaskName();
-
-			if(t.isTaskCompleted())
-				tasksString += ": COMPLETED\n";
-			else
-				tasksString += ": INCOMPLETE\n";
-		}
-
-		return tasksString;
 	}
 
 	@Override
@@ -151,42 +108,40 @@ public class Player extends Sprite{
 		}
 	}
 
-	public boolean collisionAtX(int x) {
+	public boolean collisionAtX(int x, String key) {
 		//collision detection in x
-		collisionX = collisionLayer.getCell((int)((getX()+ x) /tileWidth), (int) ((getY() + getHeight()) / tileHeight)).getTile().getProperties().containsKey("blocked");
-		collisionX |= collisionLayer.getCell((int)((getX()+ x) /tileWidth), (int) ((getY() + getHeight()/2) / tileHeight)).getTile().getProperties().containsKey("blocked");
-		collisionX |= collisionLayer.getCell((int)((getX()+ x) /tileWidth), (int) (getY() / tileHeight)).getTile().getProperties().containsKey("blocked");
+		collisionX = collisionLayer.getCell((int)((getX()+ x) /tileWidth), (int) ((getY() + getHeight()) / tileHeight)).getTile().getProperties().containsKey(key);
+		collisionX |= collisionLayer.getCell((int)((getX()+ x) /tileWidth), (int) ((getY() + getHeight()/2) / tileHeight)).getTile().getProperties().containsKey(key);
+		collisionX |= collisionLayer.getCell((int)((getX()+ x) /tileWidth), (int) (getY() / tileHeight)).getTile().getProperties().containsKey(key);
 
-		collisionX |= collisionLayer.getCell((int)((getX()+ x + getWidth()) /tileWidth), (int) ((getY() + getHeight()) / tileHeight)).getTile().getProperties().containsKey("blocked");
-		collisionX |= collisionLayer.getCell((int)((getX()+ x + getWidth()) /tileWidth), (int) ((getY() + getWidth()/2) / tileHeight)).getTile().getProperties().containsKey("blocked");
-		collisionX |= collisionLayer.getCell((int)((getX()+ x + getWidth()) /tileWidth), (int) (getY() / tileHeight)).getTile().getProperties().containsKey("blocked");
+		collisionX |= collisionLayer.getCell((int)((getX()+ x + getWidth()) /tileWidth), (int) ((getY() + getHeight()) / tileHeight)).getTile().getProperties().containsKey(key);
+		collisionX |= collisionLayer.getCell((int)((getX()+ x + getWidth()) /tileWidth), (int) ((getY() + getWidth()/2) / tileHeight)).getTile().getProperties().containsKey(key);
+		collisionX |= collisionLayer.getCell((int)((getX()+ x + getWidth()) /tileWidth), (int) (getY() / tileHeight)).getTile().getProperties().containsKey(key);
 
 		return collisionX;
 	}
 
-	public boolean collisionAtY(int y) {
+	public boolean collisionAtY(int y, String key) {
 		//collision detection in y
-		collisionY = collisionLayer.getCell((int) (getX()/tileWidth), (int) ((getY()+ y)  / tileHeight)).getTile().getProperties().containsKey("blocked");
-		collisionY |= collisionLayer.getCell((int) ((getX()+ getWidth() /2) /tileWidth), (int) ((getY()+ y)  / tileHeight)).getTile().getProperties().containsKey("blocked");
-		collisionY |= collisionLayer.getCell((int) ((getX()+ getWidth()) /tileWidth), (int) ((getY()+ y)  / tileHeight)).getTile().getProperties().containsKey("blocked");
+		collisionY = collisionLayer.getCell((int) (getX()/tileWidth), (int) ((getY()+ y)  / tileHeight)).getTile().getProperties().containsKey(key);
+		collisionY |= collisionLayer.getCell((int) ((getX()+ getWidth() /2) /tileWidth), (int) ((getY()+ y)  / tileHeight)).getTile().getProperties().containsKey(key);
+		collisionY |= collisionLayer.getCell((int) ((getX()+ getWidth()) /tileWidth), (int) ((getY()+ y)  / tileHeight)).getTile().getProperties().containsKey(key);
 
-		collisionY |= collisionLayer.getCell((int) (getX()/tileWidth), (int) ((getY() + y + getHeight()) / tileHeight)).getTile().getProperties().containsKey("blocked");
-		collisionY |= collisionLayer.getCell((int) ((getX()+ getWidth() /2) /tileWidth), (int) ((getY()+ y  + getHeight()) / tileHeight)).getTile().getProperties().containsKey("blocked");
-		collisionY |= collisionLayer.getCell((int) ((getX()+ getWidth()) /tileWidth), (int) ((getY()+ y  + getHeight()) / tileHeight)).getTile().getProperties().containsKey("blocked");
+		collisionY |= collisionLayer.getCell((int) (getX()/tileWidth), (int) ((getY() + y + getHeight()) / tileHeight)).getTile().getProperties().containsKey(key);
+		collisionY |= collisionLayer.getCell((int) ((getX()+ getWidth() /2) /tileWidth), (int) ((getY()+ y  + getHeight()) / tileHeight)).getTile().getProperties().containsKey(key);
+		collisionY |= collisionLayer.getCell((int) ((getX()+ getWidth()) /tileWidth), (int) ((getY()+ y  + getHeight()) / tileHeight)).getTile().getProperties().containsKey(key);
+		
 		return collisionY;
 	}
 
 	public void render(float delta) throws Exception
 	{
-		boolean playerMoved = false;
-		
 		tileWidth = collisionLayer.getTileWidth();
 	    tileHeight = collisionLayer.getTileHeight();
 	    
-	    
 		if(Gdx.input.isKeyPressed(Input.Keys.A)){
 			for(int i = 0; i<8;i++) {
-				if(!collisionAtX(-1)) {
+				if(!collisionAtX(-1,"blocked")) {
 					setX(getX() - 1);
 				}
 			}
@@ -198,7 +153,7 @@ public class Player extends Sprite{
 
 		else if(Gdx.input.isKeyPressed(Input.Keys.D)){
 			for(int i = 0; i<8;i++) {
-				if(!collisionAtX(1)) {
+				if(!collisionAtX(1,"blocked")) {
 					setX(getX() + 1);
 				}
 			}
@@ -211,7 +166,7 @@ public class Player extends Sprite{
 		if (Gdx.input.isKeyPressed(Input.Keys.W))
 		{
 			for(int i = 0; i<8;i++) {
-				if(!collisionAtY(1)) {
+				if(!collisionAtY(1,"blocked")) {
 					setY(getY() + 1);
 				}
 			}
@@ -219,10 +174,11 @@ public class Player extends Sprite{
 			isIdle = false;
 			playerMoved = true;
 		}
+		
 		if (Gdx.input.isKeyPressed(Input.Keys.S))
 		{
 			for(int i = 0; i<8;i++) {
-				if(!collisionAtY(-1)) {
+				if(!collisionAtY(-1,"blocked")) {
 					setY(getY() - 1);
 				}
 			}
@@ -236,6 +192,10 @@ public class Player extends Sprite{
 			playerMoved = true;
 		}
 
+		sendUpdate();
+	}
+	
+	public void sendUpdate() throws Exception {
 		if(playerMoved) {
 			Client.sendUpdate(getX(), getY(), isFlipped, isDead, isIdle, getPlayerName());
 		}
@@ -248,7 +208,7 @@ public class Player extends Sprite{
 	public void setPlayerID(int playerID) {
 		this.playerID = playerID;
 	}
-
+	
 	public void setAll(float x, float y, boolean isFlipped, boolean isDead, boolean isIdle, String playerName) {
 		setX(x);
 		setY(y);
@@ -257,15 +217,7 @@ public class Player extends Sprite{
 		this.isIdle = isIdle;
 		this.playerName = playerName;
 	}
-
-	public ArrayList<Task> getTasks() {
-		return tasks;
-	}
-
-	public void setTasks(ArrayList<Task> tasks) {
-		this.tasks = tasks;
-	}
-
+	
 	public String getPlayerName() {
 		return playerName;
 	}

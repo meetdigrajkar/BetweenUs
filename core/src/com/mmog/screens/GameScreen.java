@@ -1,4 +1,4 @@
-package com.mmog;
+package com.mmog.screens;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -39,6 +39,11 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import com.mmog.players.CrewMember;
+import com.mmog.players.Imposter;
+import com.mmog.players.Player;
+import com.mmog.tasks.AdminTask;
+import com.mmog.tasks.*;
 
 public class GameScreen extends AbstractScreen{
 
@@ -106,16 +111,16 @@ public class GameScreen extends AbstractScreen{
 		width = Gdx.graphics.getWidth();
 		height = Gdx.graphics.getHeight();
 		cam = new OrthographicCamera(width, height);
-		cam.zoom = 0.46f;
+		cam.zoom = 0.36f;
 		vp = new FitViewport(1920, 1080,cam);
 		this.setViewport(vp);
 
 		map = new TmxMapLoader().load("MapAreas/mapfiles/map.tmx");
 		r = new OrthogonalTiledMapRenderer(map);
-		
+
 		MainScreen.player.setCollisionLayer((TiledMapTileLayer) map.getLayers().get(0));
 		MainScreen.player.setPosition(35 * MainScreen.player.getCollisionLayer().getTileWidth(), (MainScreen.player.getCollisionLayer().getHeight() - 10) * MainScreen.player.getCollisionLayer().getTileHeight());
-		
+
 		cam.setToOrtho(false);
 		cam.position.set(MainScreen.player.getX() + (MainScreen.player.getWidth() * 2), MainScreen.player.getY() + (MainScreen.player.getHeight()), 0);
 		cam.update();
@@ -127,24 +132,7 @@ public class GameScreen extends AbstractScreen{
 	@Override
 	public void buildStage() {
 		connectedPlayers = new HashMap<Integer,Player>();
-
 		Gdx.input.setInputProcessor(this);
-
-		table = new Table();
-		table.setFillParent(true);
-
-		//label skin
-		LabelStyle ls = new LabelStyle(new BitmapFont(),Color.WHITE);
-		Skin uiSkin = new Skin(Gdx.files.internal("uiskin.json"));
-
-		//player's tasks label
-		LabelStyle tasksStyle = new LabelStyle(new BitmapFont(),Color.GOLD);
-		tasksLabel = new Label(MainScreen.player.tasksToString(), tasksStyle);
-
-		//table.add(tasksTitleLabel);
-		table.add(tasksLabel);
-		addActor(table);
-
 	}
 
 	public void update(float delta) {
@@ -160,33 +148,66 @@ public class GameScreen extends AbstractScreen{
 		Gdx.gl.glClearColor(0, 0, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-		tasksLabel.setPosition(MainScreen.player.getX() - Gdx.graphics.getWidth()/2 +50, MainScreen.player.getY() + Gdx.graphics.getHeight()/3 +150);
-
 		//updates the camera position
 		update(delta);
 		r.setView(cam);
 		r.render();
 
-		r.getBatch().begin();
-
 		ArrayList<Player> allPlayers = getYBasedSortedPlayers();
+
 		try {
 			MainScreen.player.render(Gdx.graphics.getDeltaTime());
-			//MainScreen.player.draw(r.getBatch());
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+
+		r.getBatch().begin();
 		
 		for (Player p : allPlayers)
 		{
-			p.draw(r.getBatch());
+			if(p instanceof CrewMember) {
+				((CrewMember) p).draw(r.getBatch());
+			}
+			else if(p instanceof Imposter) {
+				((Imposter) p).draw(r.getBatch());
+			}
+		}
+		
+		//if the player is a crew member, call setCurrentTask() on the player which sets the players current task if they have tried to start a task
+		if(MainScreen.player instanceof CrewMember) {
+			
+			//if the player presses space, check the task they want to do and check if the task is not completed then set that task to the current task
+			if(Gdx.input.isKeyPressed(Keys.SPACE)) {
+				((CrewMember) MainScreen.player).setCurrentTaskIfCollided();
+			}
+			//if the player has a current task, render the task screen ui
+			if(((CrewMember) MainScreen.player).getCurrentTask() != null) {
+				//based on the task the player is doing, render the appropriate task 
+				Task task = ((CrewMember) MainScreen.player).getCurrentTask();
+				
+				if(task instanceof AdminTask) {
+					((AdminTask) task).render(r.getBatch());
+				}
+				else if(task instanceof ReactorTask) {
+					System.out.println(task.getTaskName());
+				}
+				else if(task instanceof ElectricalTask) {
+					System.out.println(task.getTaskName());
+				}
+				else if(task instanceof LabTask) {
+					System.out.println(task.getTaskName());
+				}
+				else if(task instanceof LabTask) {
+					System.out.println(task.getTaskName());
+				}
+			}
+		}
+		else if(MainScreen.player instanceof Imposter) {
+			
 		}
 		
 		r.getBatch().end();
-		
-		draw();
-
 	}
 
 	@Override

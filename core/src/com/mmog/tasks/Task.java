@@ -1,4 +1,4 @@
-package com.mmog;
+package com.mmog.tasks;
 
 public class Task {
 

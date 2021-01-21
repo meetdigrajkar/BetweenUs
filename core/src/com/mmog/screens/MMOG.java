@@ -1,6 +1,8 @@
-package com.mmog;
+package com.mmog.screens;
 
 import com.badlogic.gdx.Game;
+import com.mmog.screens.ScreenEnum;
+import com.mmog.screens.ScreenManager;
 
 public class MMOG extends Game {	
 

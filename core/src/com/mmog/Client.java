@@ -2,6 +2,9 @@ package com.mmog;
 
 import java.net.*;
 import java.nio.charset.StandardCharsets;
+
+import com.mmog.screens.GameScreen;
+
 import java.io.*;
 public class Client
 {

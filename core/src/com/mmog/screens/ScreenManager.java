@@ -1,4 +1,4 @@
-package com.mmog;
+package com.mmog.screens;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Screen;
