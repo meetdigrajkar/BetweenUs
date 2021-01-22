@@ -61,6 +61,8 @@ public class GameScreen extends AbstractScreen{
 	private OrthogonalTiledMapRenderer r;
 	private TiledMap map;
 
+	Task task;
+
 	public GameScreen() {
 		super();
 	}
@@ -155,28 +157,20 @@ public class GameScreen extends AbstractScreen{
 
 		ArrayList<Player> allPlayers = getYBasedSortedPlayers();
 
-		try {
-			MainScreen.player.render(Gdx.graphics.getDeltaTime());
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
 		r.getBatch().begin();
-		
-		for (Player p : allPlayers)
-		{
-			if(p instanceof CrewMember) {
-				((CrewMember) p).draw(r.getBatch());
-			}
-			else if(p instanceof Imposter) {
-				((Imposter) p).draw(r.getBatch());
-			}
-		}
-		
+
 		//if the player is a crew member, call setCurrentTask() on the player which sets the players current task if they have tried to start a task
 		if(MainScreen.player instanceof CrewMember) {
-			
+			for (Player p : allPlayers)
+			{
+				if(p instanceof CrewMember) {
+					((CrewMember) p).draw(r.getBatch());
+				}
+				else if(p instanceof Imposter) {
+					((Imposter) p).draw(r.getBatch());
+				}
+			}
+
 			//if the player presses space, check the task they want to do and check if the task is not completed then set that task to the current task
 			if(Gdx.input.isKeyPressed(Keys.SPACE)) {
 				((CrewMember) MainScreen.player).setCurrentTaskIfCollided();
@@ -184,8 +178,8 @@ public class GameScreen extends AbstractScreen{
 			//if the player has a current task, render the task screen ui
 			if(((CrewMember) MainScreen.player).getCurrentTask() != null) {
 				//based on the task the player is doing, render the appropriate task 
-				Task task = ((CrewMember) MainScreen.player).getCurrentTask();
-				
+				task = ((CrewMember) MainScreen.player).getCurrentTask();
+
 				if(task instanceof AdminTask) {
 					((AdminTask) task).render(r.getBatch());
 				}
@@ -204,10 +198,19 @@ public class GameScreen extends AbstractScreen{
 			}
 		}
 		else if(MainScreen.player instanceof Imposter) {
-			
+
 		}
-		
+
 		r.getBatch().end();
+
+		try {
+			if(task == null) {
+				MainScreen.player.render(Gdx.graphics.getDeltaTime());
+			}
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	@Override

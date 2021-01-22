@@ -1,4 +1,4 @@
-package com.mmog.screens;
+package com.mmog;
 
 import com.badlogic.gdx.Game;
 import com.mmog.screens.ScreenEnum;
