@@ -134,7 +134,6 @@ public class GameScreen extends AbstractScreen{
 	@Override
 	public void buildStage() {
 		connectedPlayers = new HashMap<Integer,Player>();
-		Gdx.input.setInputProcessor(this);
 	}
 
 	public void update(float delta) {
@@ -149,7 +148,7 @@ public class GameScreen extends AbstractScreen{
 		//clear the previous screen
 		Gdx.gl.glClearColor(0, 0, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-
+		
 		//updates the camera position
 		update(delta);
 		r.setView(cam);
@@ -175,6 +174,7 @@ public class GameScreen extends AbstractScreen{
 			if(Gdx.input.isKeyPressed(Keys.SPACE)) {
 				((CrewMember) MainScreen.player).setCurrentTaskIfCollided();
 			}
+			
 			//if the player has a current task, render the task screen ui
 			if(((CrewMember) MainScreen.player).getCurrentTask() != null) {
 				//based on the task the player is doing, render the appropriate task 
@@ -189,7 +189,7 @@ public class GameScreen extends AbstractScreen{
 				else if(task instanceof ElectricalTask) {
 					System.out.println(task.getTaskName());
 				}
-				else if(task instanceof LabTask) {
+				else if(task instanceof ComsTask) {
 					System.out.println(task.getTaskName());
 				}
 				else if(task instanceof LabTask) {
@@ -200,17 +200,18 @@ public class GameScreen extends AbstractScreen{
 		else if(MainScreen.player instanceof Imposter) {
 
 		}
-
 		r.getBatch().end();
-
+		
 		try {
-			if(task == null) {
+			if(((CrewMember) MainScreen.player).getCurrentTask() == null) {
+				Gdx.input.setInputProcessor(this);
 				MainScreen.player.render(Gdx.graphics.getDeltaTime());
 			}
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
 	}
 
 	@Override

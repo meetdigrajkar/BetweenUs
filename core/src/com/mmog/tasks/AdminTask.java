@@ -1,25 +1,19 @@
 package com.mmog.tasks;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
-import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
-import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop.Payload;
-import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop.Source;
-import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop.Target;
 import com.badlogic.gdx.scenes.scene2d.utils.DragListener;
+import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.mmog.players.CrewMember;
 import com.mmog.screens.MainScreen;
@@ -32,75 +26,104 @@ public class AdminTask extends Task  {
 	Stage stage;
 
 	Sprite adminCard,adminTextBar,adminbg,adminWalletFront;
-	final Image img;
-
+	final Image cardImg, adminbgImg, adminWalletFrontImg;
+	boolean setInPlace = false;
+	float cardInPlaceXPos;
+	boolean completed = false;
+	private long startTime = 0, elapsedTime = 0;
+	
 	public AdminTask() {
 		super(taskName);
-		
+
 		stage = new Stage();
-		
+
 		adminbg = new Sprite(new Texture("TaskUI/Swipe Card/adminTask.png"));
 		adminCard = new Sprite(new Texture("TaskUI/Swipe Card/admin_Card.png"));
-		adminTextBar = new Sprite(new Texture("TaskUI/Swipe Card/admin_textBar.png"));
 		adminWalletFront = new Sprite(new Texture("TaskUI/Swipe Card/admin_walletFront.png"));
 
 		//resizing because of camera zoom
 		adminbg.setSize(250, 250);
 		adminCard.setSize(100, 55);
 		adminWalletFront.setSize(125, 52);
-		
+
 		LabelStyle ls = new LabelStyle(new BitmapFont(),Color.FIREBRICK);
-		Skin uiSkin = new Skin(Gdx.files.internal("uiskin.json"));
+		final Label textLabel = new Label("Swipe your ID card.", ls);
 		
-		img = new Image(adminCard);
-		stage.addActor(img);
+		adminbgImg = new Image(adminbg);
+		cardImg = new Image(adminCard);
+		adminWalletFrontImg = new Image(adminWalletFront);
+	
+		stage.addActor(adminbgImg);
+		stage.addActor(cardImg);
+		stage.addActor(adminWalletFrontImg);
+		stage.addActor(textLabel);
 		
-		DragAndDrop dragAndDrop = new DragAndDrop();
-		
-		dragAndDrop.addSource(new Source(img) {
+		adminbgImg.setPosition(stage.getWidth()/2,stage.getHeight()/2);
+		cardImg.setPosition((stage.getWidth()/2)+25,stage.getHeight()/2);
+		adminWalletFrontImg.setPosition((stage.getWidth()/2) + 20,stage.getHeight()/2);
+		textLabel.setPosition((stage.getWidth()/2) + 50,(stage.getHeight()/2) + 453);
 
+		cardImg.addListener(new DragListener() {
 			@Override
-			public Payload dragStart(InputEvent event, float x, float y, int pointer) {
-				Payload payload = new Payload();
-				payload.setObject("Some payload!");
-
-				payload.setDragActor(getActor());
-
-				return payload;
-			}
-
-		});
-		
-		dragAndDrop.addTarget(new Target(img) {
-
-			@Override
-			public boolean drag(Source source, Payload payload, float x, float y, int pointer) {
-				 getActor().setPosition(x, y);
-		         System.out.println("touchdragged" + x + ", " + y);
-				return false;
-			}
-
-			@Override
-			public void drop(Source source, Payload payload, float x, float y, int pointer) {
-				// TODO Auto-generated method stub
-				
+			public boolean touchDown(InputEvent e, float x, float y, int pointer, int button) {
+				if(!setInPlace) {
+					cardInPlaceXPos = cardImg.getX();
+					cardImg.setPosition(cardImg.getX(), cardImg.getY() + 190);
+					setInPlace = true;
+				}
+				return true;
 			}
 			
-		});
+			@Override
+			public void touchDragged(InputEvent e, float x, float y, int pointer) {
+				if(setInPlace) {
+					cardImg.setPosition(cardImg.getX() + x, cardImg.getY());
 		
+					//reset the position of the card if it reaches the end of the scanner or if the card is not being dragged
+					if((cardImg.getX() > (adminbgImg.getX() + 500)) || (cardImg.getX() < adminbgImg.getX()))  {
+						cardImg.setX(cardInPlaceXPos);
+					}
+					
+					//check the amount of time it took to drag
+					if((cardImg.getX() >= adminbgImg.getX() + 400)) {
+						elapsedTime = TimeUtils.timeSinceMillis((long) startTime);
+					}
+					
+				}
+			}
+			
+			@Override
+			public void touchUp (InputEvent event, float x, float y, int pointer, int button) {
+				super.touchUp(event, x, y, pointer, button);
+				cardImg.setX(cardInPlaceXPos);
+				startTime = TimeUtils.millis();
+				System.out.println(elapsedTime);
+				
+				if(elapsedTime < 3000 && elapsedTime > 2000) {
+					completed = true;
+				}
+				
+				else if(elapsedTime < 2000 && elapsedTime > 300) {
+					textLabel.setText("TOO FAST!");
+				}
+				
+				else if(elapsedTime > 3000) {
+					textLabel.setText("TOO SLOW!");
+				}
+			}
+		});
+
 	}
 
 	public void render(Batch batch) {
 		((CrewMember) MainScreen.player).draw(batch);
 		Gdx.input.setInputProcessor(stage);
-		
-		adminbg.setPosition(MainScreen.player.getX() - 40,MainScreen.player.getY() - 50);
-		//img.setOrigin(MainScreen.player.getX() - 25,MainScreen.player.getY() - 35);
-		adminWalletFront.setPosition(MainScreen.player.getX() - 30,MainScreen.player.getY() - 50);
-		
-		adminbg.draw(batch);
-		adminWalletFront.draw(batch);
-		
 		stage.draw();
+		
+		if(completed) {
+			System.out.println("SUCCESS!");
+			((CrewMember) MainScreen.player).setCurrentTask(null);
+			((CrewMember) MainScreen.player).setTaskCompleted(taskName);
+		}
 	}
 }

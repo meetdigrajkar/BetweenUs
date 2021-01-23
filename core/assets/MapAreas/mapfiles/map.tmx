@@ -1354,16 +1354,19 @@
   </tile>
   <tile id="1685">
    <properties>
+    <property name="Puneet Task" type="bool" value="false"/>
     <property name="blocked" type="bool" value="false"/>
    </properties>
   </tile>
   <tile id="1686">
    <properties>
+    <property name="Puneet Task" type="bool" value="false"/>
     <property name="blocked" type="bool" value="false"/>
    </properties>
   </tile>
   <tile id="1687">
    <properties>
+    <property name="Puneet Task" type="bool" value="false"/>
     <property name="blocked" type="bool" value="false"/>
    </properties>
   </tile>
@@ -1480,6 +1483,21 @@
   <tile id="1770">
    <properties>
     <property name="blocked" type="bool" value="false"/>
+   </properties>
+  </tile>
+  <tile id="1775">
+   <properties>
+    <property name="Puneet Task" type="bool" value="false"/>
+   </properties>
+  </tile>
+  <tile id="1776">
+   <properties>
+    <property name="Puneet Task" type="bool" value="false"/>
+   </properties>
+  </tile>
+  <tile id="1777">
+   <properties>
+    <property name="Puneet Task" type="bool" value="false"/>
    </properties>
   </tile>
   <tile id="1782">
@@ -2862,6 +2880,11 @@
     <property name="Hole" type="bool" value="false"/>
    </properties>
   </tile>
+  <tile id="2690">
+   <properties>
+    <property name="blocked" type="bool" value="false"/>
+   </properties>
+  </tile>
   <tile id="2694">
    <properties>
     <property name="blocked" type="bool" value="false"/>
@@ -2928,6 +2951,11 @@
    </properties>
   </tile>
   <tile id="2765">
+   <properties>
+    <property name="blocked" type="bool" value="false"/>
+   </properties>
+  </tile>
+  <tile id="2780">
    <properties>
     <property name="blocked" type="bool" value="false"/>
    </properties>
@@ -3039,6 +3067,11 @@
    </properties>
   </tile>
   <tile id="2848">
+   <properties>
+    <property name="blocked" type="bool" value="false"/>
+   </properties>
+  </tile>
+  <tile id="2870">
    <properties>
     <property name="blocked" type="bool" value="false"/>
    </properties>
@@ -3174,6 +3207,11 @@
    </properties>
   </tile>
   <tile id="2939">
+   <properties>
+    <property name="blocked" type="bool" value="false"/>
+   </properties>
+  </tile>
+  <tile id="2960">
    <properties>
     <property name="blocked" type="bool" value="false"/>
    </properties>
@@ -5511,6 +5549,11 @@
     <property name="blocked" type="bool" value="false"/>
    </properties>
   </tile>
+  <tile id="4272">
+   <properties>
+    <property name="blocked" type="bool" value="false"/>
+   </properties>
+  </tile>
   <tile id="4276">
    <properties>
     <property name="blocked" type="bool" value="false"/>
@@ -5601,6 +5644,11 @@
     <property name="blocked" type="bool" value="false"/>
    </properties>
   </tile>
+  <tile id="4362">
+   <properties>
+    <property name="blocked" type="bool" value="false"/>
+   </properties>
+  </tile>
   <tile id="4366">
    <properties>
     <property name="blocked" type="bool" value="false"/>
@@ -5667,6 +5715,11 @@
    </properties>
   </tile>
   <tile id="4440">
+   <properties>
+    <property name="blocked" type="bool" value="false"/>
+   </properties>
+  </tile>
+  <tile id="4452">
    <properties>
     <property name="blocked" type="bool" value="false"/>
    </properties>
@@ -5845,6 +5898,11 @@
     <property name="blocked" type="bool" value="false"/>
    </properties>
   </tile>
+  <tile id="4542">
+   <properties>
+    <property name="blocked" type="bool" value="false"/>
+   </properties>
+  </tile>
   <tile id="4549">
    <properties>
     <property name="Admin Task" type="bool" value="false"/>
@@ -5946,6 +6004,11 @@
    </properties>
   </tile>
   <tile id="4621">
+   <properties>
+    <property name="blocked" type="bool" value="false"/>
+   </properties>
+  </tile>
+  <tile id="4632">
    <properties>
     <property name="blocked" type="bool" value="false"/>
    </properties>
@@ -6324,6 +6387,11 @@
     <property name="blocked" type="bool" value="false"/>
    </properties>
   </tile>
+  <tile id="4908">
+   <properties>
+    <property name="blocked" type="bool" value="false"/>
+   </properties>
+  </tile>
   <tile id="4914">
    <properties>
     <property name="blocked" type="bool" value="false"/>
@@ -6529,6 +6597,11 @@
     <property name="blocked" type="bool" value="false"/>
    </properties>
   </tile>
+  <tile id="5088">
+   <properties>
+    <property name="blocked" type="bool" value="false"/>
+   </properties>
+  </tile>
   <tile id="5101">
    <properties>
     <property name="blocked" type="bool" value="false"/>
@@ -6607,6 +6680,11 @@
   <tile id="5173">
    <properties>
     <property name="Hole" type="bool" value="false"/>
+   </properties>
+  </tile>
+  <tile id="5178">
+   <properties>
+    <property name="blocked" type="bool" value="false"/>
    </properties>
   </tile>
   <tile id="5191">
