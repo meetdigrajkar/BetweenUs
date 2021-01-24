@@ -26,8 +26,13 @@ import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.Box2D;
+import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -43,6 +48,12 @@ import com.mmog.players.CrewMember;
 import com.mmog.players.Imposter;
 import com.mmog.players.Player;
 import com.mmog.tasks.AdminTask;
+
+import box2dLight.ConeLight;
+import box2dLight.Light;
+import box2dLight.PointLight;
+import box2dLight.RayHandler;
+
 import com.mmog.tasks.*;
 
 public class GameScreen extends AbstractScreen{
@@ -53,7 +64,6 @@ public class GameScreen extends AbstractScreen{
 	float width,height;
 	TextButtonStyle tbs;
 	BitmapFont font;
-	private Label tasksLabel,tasksTitleLabel;
 	private Viewport vp;
 
 	Table table;
@@ -62,6 +72,15 @@ public class GameScreen extends AbstractScreen{
 	private TiledMap map;
 
 	Task task;
+
+	//lights
+	RayHandler rayhandler;
+	World world;
+
+	BodyDef bodydef;
+	Body body;
+	Light light;
+
 
 	public GameScreen() {
 		super();
@@ -95,12 +114,9 @@ public class GameScreen extends AbstractScreen{
 		}
 
 		//Render Based On Y-Axis to avoid poor sprite overlap.
-
-
 		Collections.sort(allPlayers, new Comparator<Player>() {
 			@Override
 			public int compare(Player arg0, Player arg1) {
-				// TODO Auto-generated method stub
 				return Float.compare(arg1.getY(), arg0.getY());
 
 			}
@@ -128,6 +144,26 @@ public class GameScreen extends AbstractScreen{
 		cam.update();
 
 		r.getBatch().setProjectionMatrix(cam.combined);
+
+		//light and box stuff
+		this.world = new World(new Vector2(0,0),false);
+
+		rayhandler = new RayHandler(world);
+		rayhandler.setAmbientLight(0, 0, 0, 0.1f);
+
+		bodydef = new BodyDef();
+		bodydef.position.set(MainScreen.player.getX(), MainScreen.player.getY());
+		bodydef.type = BodyType.DynamicBody;
+		bodydef.linearVelocity.set(1f, 1f);
+
+		body = world.createBody(bodydef);
+		body.setActive(true);
+		MainScreen.player.setBody(body);
+		body.setUserData(MainScreen.player);
+
+		light = new ConeLight(rayhandler,120,new Color(1,1,1,0.7f), 350,body.getPosition().x, body.getPosition().y,360,360);
+		light.setPosition(MainScreen.player.getX()+ 17,MainScreen.player.getY()+ 17);
+		light.setSoftnessLength(0f);
 	}
 
 
@@ -136,11 +172,15 @@ public class GameScreen extends AbstractScreen{
 		connectedPlayers = new HashMap<Integer,Player>();
 	}
 
+	public RayHandler getRayHandler() {
+		return rayhandler;
+	}
+
 	public void update(float delta) {
 		cam.position.set(MainScreen.player.getX() + (MainScreen.player.getWidth() /2), MainScreen.player.getY() + (MainScreen.player.getHeight()/2), 0);
 		cam.unproject(new Vector3(MainScreen.player.getX(), MainScreen.player.getY(), 0));
 		this.getCamera().update();
-		r.getBatch().setProjectionMatrix(cam.combined);    
+		r.getBatch().setProjectionMatrix(cam.combined);
 	}
 
 	@Override
@@ -148,7 +188,7 @@ public class GameScreen extends AbstractScreen{
 		//clear the previous screen
 		Gdx.gl.glClearColor(0, 0, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-		
+
 		//updates the camera position
 		update(delta);
 		r.setView(cam);
@@ -163,7 +203,16 @@ public class GameScreen extends AbstractScreen{
 			for (Player p : allPlayers)
 			{
 				if(p instanceof CrewMember) {
-					((CrewMember) p).draw(r.getBatch());
+					//if the player is in the range of the main-player then render in on the screen
+
+					//player's x is less than the main players x + distance
+					//player's x is more than the main players x - distance
+					//player's y is less than the main players y + distance
+					//players' y is more than the main players y - distance
+					if((p.getX() < MainScreen.player.getX() + light.getDistance()) && (p.getX() > MainScreen.player.getX() - light.getDistance()) 
+							&& (p.getY() < MainScreen.player.getY() + light.getDistance()) && (p.getY() > MainScreen.player.getY() - light.getDistance())){
+						((CrewMember) p).draw(r.getBatch());
+					}
 				}
 				else if(p instanceof Imposter) {
 					((Imposter) p).draw(r.getBatch());
@@ -174,7 +223,7 @@ public class GameScreen extends AbstractScreen{
 			if(Gdx.input.isKeyPressed(Keys.SPACE)) {
 				((CrewMember) MainScreen.player).setCurrentTaskIfCollided();
 			}
-			
+
 			//if the player has a current task, render the task screen ui
 			if(((CrewMember) MainScreen.player).getCurrentTask() != null) {
 				//based on the task the player is doing, render the appropriate task 
@@ -201,7 +250,8 @@ public class GameScreen extends AbstractScreen{
 
 		}
 		r.getBatch().end();
-		
+		light.setPosition(MainScreen.player.getX() + 17,MainScreen.player.getY() + 17);
+
 		try {
 			if(((CrewMember) MainScreen.player).getCurrentTask() == null) {
 				Gdx.input.setInputProcessor(this);
@@ -211,7 +261,9 @@ public class GameScreen extends AbstractScreen{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
+		rayhandler.setCombinedMatrix(cam);
+		rayhandler.updateAndRender();
 	}
 
 	@Override
@@ -242,6 +294,11 @@ public class GameScreen extends AbstractScreen{
 	public void dispose() {
 		// TODO Auto-generated method stub
 		r.getBatch().dispose();
+		rayhandler.dispose();
+	}
+
+	public World getWorld() {
+		return this.world;
 	}
 
 }

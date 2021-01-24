@@ -17,10 +17,16 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.math.Vector;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
+import com.badlogic.gdx.physics.box2d.Box2D;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.mmog.Client;
+
+import box2dLight.Light;
 
 public class Player extends Sprite{
 
@@ -39,7 +45,8 @@ public class Player extends Sprite{
 	boolean playerMoved = false;
 	private BitmapFont f;
 	
-
+	protected Body body;
+	
 	public Player(Sprite sprite, int playerID)
 	{
 		super(sprite);
@@ -57,6 +64,7 @@ public class Player extends Sprite{
 		this.playerName = "";
 
 		f = new BitmapFont();
+	
 		
 		for (float i = 0; i < 1; i += 0.01f)
 		{
@@ -67,6 +75,14 @@ public class Player extends Sprite{
 				tr.flip(true, false);
 			}
 		}
+	}
+	
+	public void setBody(Body body) {
+		this.body = body;
+	}
+	
+	public Body getBody() {
+		return this.body;
 	}
 	
 	public void setCollisionLayer(TiledMapTileLayer collisionLayer) {
