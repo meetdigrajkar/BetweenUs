@@ -47,13 +47,6 @@ public class MainScreen extends AbstractScreen{
 
 	public void show() {
 		// TODO Auto-generated method stub
-		
-		/*
-		 * player = new CrewMember(p, -1); ((CrewMember) player).addTask(new
-		 * AdminTask()); ((CrewMember) player).addTask(new ReactorTask()); ((CrewMember)
-		 * player).addTask(new ComsTask()); ((CrewMember) player).addTask(new
-		 * LabTask()); ((CrewMember) player).addTask(new ElectricalTask());
-		 */
 	}
 
 
@@ -140,7 +133,12 @@ public class MainScreen extends AbstractScreen{
 					System.out.println("Attempting to Connect to The Server...");
 					if(!playerName.getText().equals("")) {
 						String name = playerName.getText();
-						Client.connectClientToServer(name);
+						
+						//create all the players and the local player
+						Client.createPlayer(name);
+						Client.createPlayers();
+						Client.connectClientToServer();
+						
 						ScreenManager.getInstance().showScreen(ScreenEnum.LOBBY_SCREEN);
 						joined = true;
 					}

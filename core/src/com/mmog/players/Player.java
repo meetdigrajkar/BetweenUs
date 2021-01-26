@@ -46,7 +46,7 @@ public class Player extends Sprite{
 	private BitmapFont f;
 	protected Body body;
 	public boolean readyToPlay;
-	public String role = "";
+	public String role = "none";
 	Sprite p;
 	
 	public Player(int playerID)

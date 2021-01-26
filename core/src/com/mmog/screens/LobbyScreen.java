@@ -37,25 +37,13 @@ public class LobbyScreen extends AbstractScreen{
 	OrthographicCamera cam;
 	float width,height;
 	TextButton button;
-
-	boolean everyoneReady;
+	
 	Table table;
 	BitmapFont font;
 
 	public LobbyScreen() {
 		super();
 	}
-
-	//create all the players in the connected players array in the client
-	public void createPlayers() {
-		for (Entry<Integer, Player> e : Client.getConnectedPlayers().entrySet()) {
-			if(e.getValue() == null) {
-				Client.getConnectedPlayers().put(e.getKey(), new Player(e.getKey()));
-				e.getValue().setPlayerName(Client.getConnectedPlayersNames().get(e.getKey()));
-			}
-		}
-	}
-
 
 	@Override
 	public void buildStage() {
@@ -77,21 +65,16 @@ public class LobbyScreen extends AbstractScreen{
 			public void clicked(InputEvent event, float x, float y) {
 				if(!Client.getPlayer().readyToPlay) {
 					System.out.println("READY!");
+					
 					Client.getPlayer().readyToPlay = true;
 
 					try {
-						
 							readyToStart();
 					} catch (IOException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 				}
-				else if(Client.getPlayer().readyToPlay) {
-					System.out.println("NOT READY!");
-					Client.getPlayer().readyToPlay = false;
-				}
-
 			}
 		});
 		
@@ -102,9 +85,7 @@ public class LobbyScreen extends AbstractScreen{
 		Client.sendPlayerIsReady();
 	}
 
-
-	public void sendAssignRoleAndStart() {
-		Client.sendPlayerRoleAssign();
+	public static void startGame() {
 		System.out.println("NOW ENTERING GAME!");
 		
 		ScreenManager.getInstance().showScreen(ScreenEnum.GAME);
@@ -113,7 +94,6 @@ public class LobbyScreen extends AbstractScreen{
 
 	@Override
 	public void show() {
-		createPlayers();
 		cameraSetup();
 	}
 
@@ -121,35 +101,34 @@ public class LobbyScreen extends AbstractScreen{
 	public void render(float delta) {
 		Gdx.gl.glClearColor(0, 0, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-
 		//create all the players
-		createPlayers();
 		update(delta);
 
 		//map renderer
 		r.setView(cam);
 		r.render();
 
-		everyoneReady = false;
-
-
-		for(Entry<Integer, Player> e: Client.getConnectedPlayers().entrySet()) {
-			everyoneReady &= e.getValue().readyToPlay;
+		//if the player is ready, disable the ready button 
+		if(Client.getPlayer().readyToPlay) {
+			button.setDisabled(true);
+			button.setVisible(false);
 		}
-
-		if(everyoneReady) { 
-			sendAssignRoleAndStart(); 
-		}
-
+		
+		//if the player role has updated, replace the player with either crew member or imposter
+		Client.replacePlayerByRole();
+		
 		r.getBatch().begin();
+		
+		Client.getPlayer().draw(r.getBatch());
+		
 		//draw all the players to the lobby
-		for (Entry<Integer, Player> e : Client.getConnectedPlayers().entrySet())
+		for (Player p : Client.getPlayers())
 		{
-			Player p = e.getValue();
-			if(p != null) {
+			if(p.getPlayerID() != -1) {
 				p.draw(r.getBatch());
 			}
 		}
+		
 		r.getBatch().end();
 
 		button.setPosition(Client.getPlayer().getX() + 275,Client.getPlayer().getY() + 185);
@@ -161,11 +140,6 @@ public class LobbyScreen extends AbstractScreen{
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
-		
-		if(Client.getPlayer().getIsIdle())
-		{
-			font.setColor(Color.GREEN);
 		}
 		
 		draw();
@@ -203,6 +177,7 @@ public class LobbyScreen extends AbstractScreen{
 	@Override
 	public void dispose() {
 		// TODO Auto-generated method stub
-		r.getBatch().dispose();
+		//r.getBatch().dispose();
+		//this.dispose();
 	}
 }

@@ -22,31 +22,35 @@ public class Client
 	int port = 7077;
 	static DatagramSocket socket;
 	static InetAddress address;
-	private static String name = "";
 
-	//hash map of connected players
-	private static HashMap<Integer,Player> connectedPlayers;
-	private static HashMap<Integer,String> connectedPlayersNames;
-	private static HashMap<Integer, String> connectedPlayersRoles;
+	private static Player player;
+	private static ArrayList<Player> players;
 
 	public Client() throws IOException {
-		connectedPlayers = new HashMap<Integer,Player>();
-		connectedPlayersNames = new HashMap<Integer,String>();
-		connectedPlayersRoles = new HashMap<Integer,String>();
-	}
-
-	public static HashMap<Integer,Player> getConnectedPlayers(){
-		return connectedPlayers;
-	}
-
-	public static HashMap<Integer,String> getConnectedPlayersRoles(){
-		return connectedPlayersRoles;
+		players = new ArrayList<Player>();
 	}
 	
-	public static HashMap<Integer,String> getConnectedPlayersNames(){
-		return connectedPlayersNames;
+	public static ArrayList<Player> getPlayers(){
+		return players;
 	}
-
+	
+	public static void replacePlayerByRole() {
+		if(!player.role.equals("none")) {
+			if(player.role.equals("CrewMember")) {
+				player = new CrewMember(Client.getPlayer().getPlayerID());
+				//start the game, roles are assigned.
+				LobbyScreen.startGame();
+			}
+			else if(Client.getPlayer().role.equals("Imposter")) {
+				player = new Imposter(Client.getPlayer().getPlayerID());
+				//start the game, roles are assigned.
+				LobbyScreen.startGame();
+			}
+			
+			player.setPlayerName(player.getPlayerName());
+		}
+	}
+	
 	public static class UDPEchoReader extends Thread
 	{
 		public UDPEchoReader(DatagramSocket socket)
@@ -79,11 +83,8 @@ public class Client
 		public DatagramSocket datagramSocket;
 	}
 
-	public static void addPlayer(int playerID) {
-		connectedPlayers.put(playerID, null);
-	}
 
-	public static boolean connectClientToServer(String playerName) {
+	public static boolean connectClientToServer() {
 		int port = 7077;
 		socket = null;
 		BufferedReader keyboardReader = null;
@@ -108,12 +109,11 @@ public class Client
 
 		try
 		{	
-			name = playerName;
 			//command int for connection request.
 			String input = "0" + ",";
-			input += name;
+			input += player.getPlayerName();
 
-			System.out.println(name);
+			System.out.println(player.getPlayerName());
 
 			// send datagram packet to the server
 			DatagramPacket datagramPacket = new DatagramPacket
@@ -143,50 +143,45 @@ public class Client
 		socket.send(datagramPacket);	      	      
 	}
 
-	public static Player getPlayer() {
-		Player p = null;
-		for (Entry<Integer, Player> e : getConnectedPlayers().entrySet()) {
-			p = e.getValue();
+	public static void createPlayer(String name) {
+		player = new Player(-1);
+		player.setPlayerName(name);
+	}
 
-			if(p != null && p.getPlayerName().equals(name)) {
-				p = e.getValue();
-			}
+	//create all the players in the connected players array in the client
+	public static void createPlayers() {
+		for(int i= 0; i < 8; i ++) {
+			players.add(new Player(-1));
 		}
-		return p;
+	}
+
+	public static Player getPlayer() {
+		return player;
 	}
 
 	//tell the other clients you are ready
 	public static void sendPlayerIsReady() throws IOException {
 		String toSend = "";
 		toSend += 2 + ",";
-		toSend += getPlayer().getPlayerID() + ",";
+		toSend += getPlayer().getPlayerName();
 
 		DatagramPacket datagramPacket = new DatagramPacket(toSend.getBytes(), toSend.length(), address, 7077);	     
 		socket.send(datagramPacket);
 	}
 
-	public static void sendPlayerRoleAssign(){
-		String toSend = "";
-		toSend += 3 + ",";
-		toSend += getPlayer().getPlayerID() + ",";
-
-		DatagramPacket datagramPacket = new DatagramPacket(toSend.getBytes(), toSend.length(), address, 7077);	     
-		try {
-			socket.send(datagramPacket);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-
 	public static void updateConnectedClient(int playerID, float x, float y, boolean isFlipped, boolean isDead, boolean isIdle) {
-		connectedPlayers.get(playerID).setAll(x, y, isFlipped, isDead, isIdle);
+		for(Player p: players) {
+			if(p.getPlayerID() == playerID) {
+				p.setAll(x, y, isFlipped, isDead, isIdle);
+				return;
+			}
+		}
 	}
 
 	public static boolean removeClient() {
 		String toSend = "";
 		toSend += "4" + ",";
-		toSend += getPlayer().getPlayerID() + ",";
+		toSend += getPlayer().getPlayerName();
 
 		DatagramPacket datagramPacket = new DatagramPacket(toSend.getBytes(), toSend.length(), address, 7077);	     
 		try {
@@ -216,17 +211,21 @@ public class Client
 				String playerName = dataArray[i+1];
 
 				//for all the other connect command requests coming from the server from other clients that are not connected already
-				if(!connectedPlayersNames.containsKey(playerID)) {
-					connectedPlayersNames.put(playerID, playerName);
-					connectedPlayers.put(playerID, null);
-					System.out.println("Connected with @ClientID: " + playerID + " @Name:" + playerName);
-				}
+				for(Player p: players) 
+				{
+					if(p.getPlayerID() == -1) {
+						p.setPlayerID(playerID);
+						p.setPlayerName(playerName);
+					}
+				}	
+				System.out.println("Connected with @ClientID: " + playerID + " @Name:" + playerName);
+
 				i++;
 			}
 		}
 		else if (command == 1)//update command
 		{
-			System.out.println(receivedData);
+			//System.out.println(receivedData);
 			float x = Float.valueOf(dataArray[0]);
 			float y = Float.valueOf(dataArray[1]);
 			boolean isFlipped = Boolean.parseBoolean(dataArray[2]);
@@ -236,29 +235,49 @@ public class Client
 
 			updateConnectedClient(playerID, x, y, isFlipped, isDead, isIdle);
 		}
-		else if(command == 2) //is ready command
-		{
-			//System.out.println(receivedData);
-			int readyPlayerID = Integer.parseInt(dataArray[0]);
-			connectedPlayers.get(readyPlayerID).readyToPlay = true;
-			receivedData = "";
-		}
 		else if(command == 3) {
-			String role = dataArray[1];
-			int playerID = Integer.parseInt(dataArray[0]);
-
-			connectedPlayers.remove(playerID);
-
-			connectedPlayersRoles.put(playerID, role);
-			connectedPlayers.put(playerID, null);
+			String role = dataArray[0];
+			addRoleToPlayer(role);
 		}
 		else if(command == 4) {
-			connectedPlayers.remove(Integer.parseInt(dataArray[0]));
-			connectedPlayersNames.remove(Integer.parseInt(dataArray[0]));
+			String name = dataArray[0];
+			int playerID = -1;
+			
+			for(Player p: players) {
+				if(p.getPlayerName().equals(name)) {
+					playerID = p.getPlayerID();
+				}
+			}
+			removePlayerWithID(playerID);
 		}
-
 	}
-
+	
+	public static Player getPlayerWithID(int playerID) {
+		Player player = null;
+		for(Player p: players) {
+			if(p.getPlayerID() == playerID) {
+				player = p;
+			}
+		}
+		return player;
+	}
+	
+	public static void addPlayerWithID(int playerID) {
+		for(Player p: players) {
+			if(p.getPlayerID() == -1) {
+				p.setPlayerID(playerID);
+			}
+		}
+	}
+	
+	public static void addRoleToPlayer(String role) {
+		player.role = role;
+	}
+	
+	public static void removePlayerWithID(int playerID) {
+		getPlayerWithID(playerID).setPlayerID(-1);
+	}
+	
 	public static String[] parseData(String receivedData) throws IOException {
 		String dataArray[] = receivedData.split(",");
 		return dataArray;

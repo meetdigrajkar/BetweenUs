@@ -57,7 +57,6 @@ import com.mmog.Client;
 import com.mmog.players.CrewMember;
 import com.mmog.players.Imposter;
 import com.mmog.players.Player;
-import com.mmog.tasks.AdminTask;
 
 import box2dLight.ConeLight;
 import box2dLight.Light;
@@ -97,50 +96,22 @@ public class GameScreen extends AbstractScreen{
 		super();
 	}
 
-	/*
-	 * private ArrayList<Player> getYBasedSortedPlayers() { ArrayList<Player>
-	 * allPlayers = new ArrayList(); allPlayers.add(MainScreen.player);
-	 * 
-	 * for (int key: connectedPlayers.keySet()) { if (connectedPlayers.get(key) ==
-	 * null) { connectedPlayers.replace(key, new Player(new Sprite(new
-	 * Texture("idle.png")),key)); }
-	 * 
-	 * allPlayers.add(connectedPlayers.get(key)); }
-	 * 
-	 * //Render Based On Y-Axis to avoid poor sprite overlap.
-	 * Collections.sort(allPlayers, new Comparator<Player>() {
-	 * 
-	 * @Override public int compare(Player arg0, Player arg1) { return
-	 * Float.compare(arg1.getY(), arg0.getY()); } }); return allPlayers; }
-	 */
-	
-	
-	public void createPlayers() {
-		for (Entry<Integer, Player> e : Client.getConnectedPlayers().entrySet()) {
-			if(e.getValue() == null) {
-				String role = Client.getConnectedPlayersRoles().get(e.getKey());
-				
-				if(role.equals("Imposter")) {
-					Client.getConnectedPlayers().put(e.getKey(), new Imposter(e.getKey()));
-				}
-				else if(role.equals("CrewMember")) {
-					Client.getConnectedPlayers().put(e.getKey(), new CrewMember(e.getKey()));
-				}
-				e.getValue().setPlayerName(Client.getConnectedPlayersNames().get(e.getKey()));
-			}
-		}
-	}
-	
-	
 	@Override
 	public void show() {
-		createPlayers();
 		width = Gdx.graphics.getWidth();
 		height = Gdx.graphics.getHeight();
 		cam = new OrthographicCamera(width, height);
 		cam.zoom = 0.38f;
 		vp = new FitViewport(1920, 1080,cam);
 		this.setViewport(vp);
+
+		if(Client.getPlayer() instanceof CrewMember) {
+			((CrewMember) Client.getPlayer()).addTask(new
+					AdminTask()); ((CrewMember) Client.getPlayer()).addTask(new ReactorTask()); ((CrewMember)
+							Client.getPlayer()).addTask(new ComsTask()); ((CrewMember) Client.getPlayer()).addTask(new
+									LabTask()); ((CrewMember) Client.getPlayer()).addTask(new ElectricalTask());
+
+		}
 
 		map = new TmxMapLoader().load("MapAreas/mapfiles/map.tmx");
 		r = new OrthogonalTiledMapRenderer(map);
@@ -225,7 +196,6 @@ public class GameScreen extends AbstractScreen{
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		world.step(1/60f, 6, 2);
 
-		createPlayers();
 		//updates the camera position
 		update(delta);
 
@@ -239,17 +209,27 @@ public class GameScreen extends AbstractScreen{
 
 		r.getBatch().begin();
 
-		
-		for (Entry<Integer, Player> e : Client.getConnectedPlayers().entrySet())
+
+		//draw the player based on whether he is a crew member or imposter
+		if(Client.getPlayer() instanceof CrewMember) {
+			((CrewMember) Client.getPlayer()).draw(r.getBatch());
+		}
+		else if(Client.getPlayer() instanceof Imposter) {
+			Gdx.input.setInputProcessor(this);
+			try {
+				((Imposter) Client.getPlayer()).render(Gdx.graphics.getDeltaTime());
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			((Imposter) Client.getPlayer()).draw(r.getBatch());
+		}
+
+
+		//draw all the other players
+		for (Player p : Client.getPlayers())
 		{
-			Player p = e.getValue();
-		
-			if(p instanceof CrewMember) {
-				((CrewMember) p).draw(r.getBatch());
-			}
-			else if(p instanceof Imposter) {
-				((Imposter) p).draw(r.getBatch());
-			}
+			p.draw(r.getBatch());
 		}
 
 		//if the player is a crew member, call setCurrentTask() on the player which sets the players current task if they have tried to start a task
@@ -284,7 +264,7 @@ public class GameScreen extends AbstractScreen{
 		else if(Client.getPlayer() instanceof Imposter) {
 
 		}
-		
+
 		r.getBatch().end();
 
 		try {
@@ -292,6 +272,7 @@ public class GameScreen extends AbstractScreen{
 				Gdx.input.setInputProcessor(this);
 				Client.getPlayer().render(Gdx.graphics.getDeltaTime());
 			}
+
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
