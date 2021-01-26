@@ -89,7 +89,7 @@ public class Server {
 				}
 				//the server received a Is ready command from the client
 				else if(command == 2) {
-					output = (new StringBuilder()).append(Integer.parseInt(dataArray[1]) + "," + command);
+					output = (new StringBuilder()).append(dataArray[1] + "," + command);
 				}
 				//the server received a assign role and start command from the client, only when everyone is ready assign roles
 				else if(command == 3) {
@@ -105,7 +105,6 @@ public class Server {
 					output.append(command);
 				}
 	
-				System.out.println(output);
 				System.out.println("Server is sending @command: " + command);
 				
 				//relay the message received by the client to ALL the other clients
