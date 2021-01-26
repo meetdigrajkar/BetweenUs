@@ -15,8 +15,8 @@ public class CrewMember extends Player {
 	private BitmapFont f;
 	private Task currentTask;
 
-	public CrewMember(Sprite sprite, int playerID) {
-		super(sprite, playerID);
+	public CrewMember(int playerID) {
+		super(playerID);
 		this.tasks = new ArrayList<Task>();
 		f = new BitmapFont();
 		currentTask = null;

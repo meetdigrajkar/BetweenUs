@@ -12,4 +12,10 @@ public class MMOG extends Game {
 		ScreenManager.getInstance().initialize(this);
 		ScreenManager.getInstance().showScreen(ScreenEnum.MAIN_MENU);
 	}
+	
+	@Override
+	public void dispose() {
+		System.out.println("CLOSED!");
+		Client.removeClient();
+	}
 }

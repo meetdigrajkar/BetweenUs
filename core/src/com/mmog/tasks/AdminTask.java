@@ -15,6 +15,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.DragListener;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
+import com.mmog.Client;
 import com.mmog.players.CrewMember;
 import com.mmog.screens.MainScreen;
 
@@ -116,14 +117,14 @@ public class AdminTask extends Task  {
 	}
 
 	public void render(Batch batch) {
-		((CrewMember) MainScreen.player).draw(batch);
+		((CrewMember) Client.getPlayer()).draw(batch);
 		Gdx.input.setInputProcessor(stage);
 		stage.draw();
 		
 		if(completed) {
 			System.out.println("SUCCESS!");
-			((CrewMember) MainScreen.player).setCurrentTask(null);
-			((CrewMember) MainScreen.player).setTaskCompleted(taskName);
+			((CrewMember) Client.getPlayer()).setCurrentTask(null);
+			((CrewMember) Client.getPlayer()).setTaskCompleted(taskName);
 		}
 	}
 }

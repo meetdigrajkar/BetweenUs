@@ -6,8 +6,8 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 
 public class Imposter extends Player{
 
-	public Imposter(Sprite sprite, int playerID) {
-		super(sprite, playerID);
+	public Imposter(int playerID) {
+		super(playerID);
 	}
 	
 	@Override

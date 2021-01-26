@@ -7,6 +7,11 @@ public enum ScreenEnum {
             return new MainScreen();
         }
     },
+	LOBBY_SCREEN {
+        public AbstractScreen getScreen(Object... params) {
+            return new LobbyScreen();
+        }
+    },
     GAME {
         public AbstractScreen getScreen(Object... params) {
             return new GameScreen();

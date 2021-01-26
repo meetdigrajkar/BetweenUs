@@ -38,10 +38,8 @@ public class MainScreen extends AbstractScreen{
 	Table table;
     Table table1;
 	TextField playerName;
-	public static Player player;
 	private TextureAtlas buttonsAtlas;
-	private Random r;
-
+	
 	public MainScreen() {
 		// TODO Auto-generated constructor stub
 		super();
@@ -49,33 +47,13 @@ public class MainScreen extends AbstractScreen{
 
 	public void show() {
 		// TODO Auto-generated method stub
-		Sprite p = new Sprite(new Texture("idle.png"));
-		p.setSize(32, 50);
 		
-		//set the player to a crew member or an imposter based on a random number generator
-		r = new Random();
-		int upperBound = 100;
-		int playerTypeSelector = r.nextInt(upperBound);
-		
-		//if the random number is less than 50, player is a crew member
-		//if the random number is greater than 50, player is an imposter
-		
-		//if(playerTypeSelector < 50) {
-		//	player = new CrewMember(p, -1);
-			
-			//ADD TASKS HERE
-		//	((CrewMember) player).addTask(new AdminTask());
-		//}else if(playerTypeSelector > 50){
-		//	player = new Imposter(p, -1);
-		//}
-		
-		player = new CrewMember(p, -1);
-		((CrewMember) player).addTask(new AdminTask());
-		((CrewMember) player).addTask(new ReactorTask());
-		((CrewMember) player).addTask(new ComsTask());
-		((CrewMember) player).addTask(new LabTask());
-		((CrewMember) player).addTask(new ElectricalTask());
-		
+		/*
+		 * player = new CrewMember(p, -1); ((CrewMember) player).addTask(new
+		 * AdminTask()); ((CrewMember) player).addTask(new ReactorTask()); ((CrewMember)
+		 * player).addTask(new ComsTask()); ((CrewMember) player).addTask(new
+		 * LabTask()); ((CrewMember) player).addTask(new ElectricalTask());
+		 */
 	}
 
 
@@ -160,11 +138,13 @@ public class MainScreen extends AbstractScreen{
 			public void clicked(InputEvent event, float x, float y) {
 				if(!joined) {
 					System.out.println("Attempting to Connect to The Server...");
-					Client.connectClientToServer();
-					player.setPlayerName(playerName.getText());
-					ScreenManager.getInstance().showScreen(ScreenEnum.GAME);
+					if(!playerName.getText().equals("")) {
+						String name = playerName.getText();
+						Client.connectClientToServer(name);
+						ScreenManager.getInstance().showScreen(ScreenEnum.LOBBY_SCREEN);
+						joined = true;
+					}
 				}
-				joined = true;
 			}
 		});
 

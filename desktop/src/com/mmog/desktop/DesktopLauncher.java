@@ -18,6 +18,5 @@ public class DesktopLauncher {
 		
 		// Start the listening thread...
 		Client client = new Client();
-		client.startClient();
 	}
 }

@@ -44,13 +44,18 @@ public class Player extends Sprite{
 	float tileWidth,tileHeight;
 	boolean playerMoved = false;
 	private BitmapFont f;
-	
 	protected Body body;
+	public boolean readyToPlay;
+	public String role = "";
+	Sprite p;
 	
-	public Player(Sprite sprite, int playerID)
+	public Player(int playerID)
 	{
-		super(sprite);
-
+		super(new Sprite (new Texture("idle.png")));
+		
+		setSize(32,50);
+		
+		readyToPlay = false;
 		walkRightAtlas = new TextureAtlas(Gdx.files.internal("Walk.atlas"));
 		walkLeftAtlas = new TextureAtlas(Gdx.files.internal("Walk.atlas"));
 
@@ -75,6 +80,10 @@ public class Player extends Sprite{
 				tr.flip(true, false);
 			}
 		}
+	}
+	
+	public boolean getIsIdle() {
+		return isIdle;
 	}
 	
 	public void setBody(Body body) {
@@ -205,15 +214,15 @@ public class Player extends Sprite{
 		if (!isIdle && !Gdx.input.isKeyPressed(Input.Keys.W) && !Gdx.input.isKeyPressed(Input.Keys.A) && !Gdx.input.isKeyPressed(Input.Keys.S) && !Gdx.input.isKeyPressed(Input.Keys.D) )
 		{               	
 			isIdle = true;
-			playerMoved = true;
+			playerMoved = false;
 		}
-
+		
 		sendUpdate();
 	}
 	
 	public void sendUpdate() throws Exception {
 		if(playerMoved) {
-			Client.sendUpdate(getX(), getY(), isFlipped, isDead, isIdle, getPlayerName());
+			Client.sendUpdate(getX(), getY(), isFlipped, isDead, isIdle, getPlayerID());
 		}
 	}
 
@@ -225,13 +234,25 @@ public class Player extends Sprite{
 		this.playerID = playerID;
 	}
 	
-	public void setAll(float x, float y, boolean isFlipped, boolean isDead, boolean isIdle, String playerName) {
+	public void setAll(float x, float y, boolean isFlipped, boolean isDead, boolean isIdle) {
 		setX(x);
 		setY(y);
 		this.isFlipped = isFlipped;
 		this.isDead = isDead;
 		this.isIdle = isIdle;
-		this.playerName = playerName;
+	}
+	
+	public ArrayList<String> getAll(){
+		ArrayList<String> allInfo = new ArrayList<>();
+		
+		allInfo.add(playerName);
+		allInfo.add(getX() + "");
+		allInfo.add(getY() + "");
+		allInfo.add(isFlipped + "");
+		allInfo.add(isDead + "");
+		allInfo.add(isIdle + "");
+		
+		return allInfo;
 	}
 	
 	public String getPlayerName() {

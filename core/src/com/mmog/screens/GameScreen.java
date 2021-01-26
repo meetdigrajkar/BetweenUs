@@ -1,5 +1,6 @@
 package com.mmog.screens;
 
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -16,11 +17,15 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
+import com.badlogic.gdx.maps.MapObject;
+import com.badlogic.gdx.maps.MapObjects;
+import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
@@ -31,6 +36,10 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.Box2D;
+import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
+import com.badlogic.gdx.physics.box2d.Fixture;
+import com.badlogic.gdx.physics.box2d.PolygonShape;
+import com.badlogic.gdx.physics.box2d.Shape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -44,6 +53,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import com.mmog.Client;
 import com.mmog.players.CrewMember;
 import com.mmog.players.Imposter;
 import com.mmog.players.Player;
@@ -58,18 +68,18 @@ import com.mmog.tasks.*;
 
 public class GameScreen extends AbstractScreen{
 
-	//public static Player player;
-	private static HashMap<Integer,Player> connectedPlayers;
-	OrthographicCamera cam;
-	float width,height;
 	TextButtonStyle tbs;
 	BitmapFont font;
 	private Viewport vp;
+	OrthographicCamera cam;
+	float width,height;
 
 	Table table;
 
-	private OrthogonalTiledMapRenderer r;
+	//tiled map
 	private TiledMap map;
+	private OrthogonalTiledMapRenderer r;
+	private MapObjects mapObjects;
 
 	Task task;
 
@@ -81,66 +91,65 @@ public class GameScreen extends AbstractScreen{
 	Body body;
 	Light light;
 
+	public static final float TILE_SIZE = 1;
 
 	public GameScreen() {
 		super();
 	}
 
-	public static void addPlayer(int playerID) {
-		connectedPlayers.put(playerID, null);
-	}
-
-	public static void updateConnectedClient(int playerID, float x, float y, boolean isFlipped, boolean isDead, boolean isIdle, String playerName) {
-		if(connectedPlayers.get(playerID) == null) {
-			GameScreen.addPlayer(playerID);
-			return;
-		}
-		connectedPlayers.get(playerID).setAll(x, y, isFlipped, isDead, isIdle, playerName);
-	}
-
-	private ArrayList<Player> getYBasedSortedPlayers() {
-		ArrayList<Player> allPlayers = new ArrayList();
-		allPlayers.add(MainScreen.player);
-
-
-		for (int key: connectedPlayers.keySet())
-		{
-			if (connectedPlayers.get(key) == null)
-			{                
-				connectedPlayers.replace(key, new Player(new Sprite(new Texture("idle.png")),key));
+	/*
+	 * private ArrayList<Player> getYBasedSortedPlayers() { ArrayList<Player>
+	 * allPlayers = new ArrayList(); allPlayers.add(MainScreen.player);
+	 * 
+	 * for (int key: connectedPlayers.keySet()) { if (connectedPlayers.get(key) ==
+	 * null) { connectedPlayers.replace(key, new Player(new Sprite(new
+	 * Texture("idle.png")),key)); }
+	 * 
+	 * allPlayers.add(connectedPlayers.get(key)); }
+	 * 
+	 * //Render Based On Y-Axis to avoid poor sprite overlap.
+	 * Collections.sort(allPlayers, new Comparator<Player>() {
+	 * 
+	 * @Override public int compare(Player arg0, Player arg1) { return
+	 * Float.compare(arg1.getY(), arg0.getY()); } }); return allPlayers; }
+	 */
+	
+	
+	public void createPlayers() {
+		for (Entry<Integer, Player> e : Client.getConnectedPlayers().entrySet()) {
+			if(e.getValue() == null) {
+				String role = Client.getConnectedPlayersRoles().get(e.getKey());
+				
+				if(role.equals("Imposter")) {
+					Client.getConnectedPlayers().put(e.getKey(), new Imposter(e.getKey()));
+				}
+				else if(role.equals("CrewMember")) {
+					Client.getConnectedPlayers().put(e.getKey(), new CrewMember(e.getKey()));
+				}
+				e.getValue().setPlayerName(Client.getConnectedPlayersNames().get(e.getKey()));
 			}
-
-			allPlayers.add(connectedPlayers.get(key));
 		}
-
-		//Render Based On Y-Axis to avoid poor sprite overlap.
-		Collections.sort(allPlayers, new Comparator<Player>() {
-			@Override
-			public int compare(Player arg0, Player arg1) {
-				return Float.compare(arg1.getY(), arg0.getY());
-
-			}
-		});
-		return allPlayers;
 	}
-
+	
+	
 	@Override
 	public void show() {
+		createPlayers();
 		width = Gdx.graphics.getWidth();
 		height = Gdx.graphics.getHeight();
 		cam = new OrthographicCamera(width, height);
-		cam.zoom = 0.36f;
+		cam.zoom = 0.38f;
 		vp = new FitViewport(1920, 1080,cam);
 		this.setViewport(vp);
 
 		map = new TmxMapLoader().load("MapAreas/mapfiles/map.tmx");
 		r = new OrthogonalTiledMapRenderer(map);
 
-		MainScreen.player.setCollisionLayer((TiledMapTileLayer) map.getLayers().get(0));
-		MainScreen.player.setPosition(35 * MainScreen.player.getCollisionLayer().getTileWidth(), (MainScreen.player.getCollisionLayer().getHeight() - 10) * MainScreen.player.getCollisionLayer().getTileHeight());
+		Client.getPlayer().setCollisionLayer((TiledMapTileLayer) map.getLayers().get(0));
+		Client.getPlayer().setPosition(35 * Client.getPlayer().getCollisionLayer().getTileWidth(), (Client.getPlayer().getCollisionLayer().getHeight() - 10) * Client.getPlayer().getCollisionLayer().getTileHeight());
 
 		cam.setToOrtho(false);
-		cam.position.set(MainScreen.player.getX() + (MainScreen.player.getWidth() * 2), MainScreen.player.getY() + (MainScreen.player.getHeight()), 0);
+		cam.position.set(Client.getPlayer().getX() + (Client.getPlayer().getWidth() * 2), Client.getPlayer().getY() + (Client.getPlayer().getHeight()), 0);
 		cam.update();
 
 		r.getBatch().setProjectionMatrix(cam.combined);
@@ -148,28 +157,54 @@ public class GameScreen extends AbstractScreen{
 		//light and box stuff
 		this.world = new World(new Vector2(0,0),false);
 
+		//map objects
+		buildBuildingsBodies();
+
+		//ray handler
 		rayhandler = new RayHandler(world);
-		rayhandler.setAmbientLight(0, 0, 0, 0.1f);
+		rayhandler.setAmbientLight(0.001f);
+		RayHandler.useDiffuseLight(true);
 
-		bodydef = new BodyDef();
-		bodydef.position.set(MainScreen.player.getX(), MainScreen.player.getY());
-		bodydef.type = BodyType.DynamicBody;
-		bodydef.linearVelocity.set(1f, 1f);
-
-		body = world.createBody(bodydef);
-		body.setActive(true);
-		MainScreen.player.setBody(body);
-		body.setUserData(MainScreen.player);
-
-		light = new ConeLight(rayhandler,120,new Color(1,1,1,0.7f), 350,body.getPosition().x, body.getPosition().y,360,360);
-		light.setPosition(MainScreen.player.getX()+ 17,MainScreen.player.getY()+ 17);
-		light.setSoftnessLength(0f);
+		//cone light for the player
+		light = new ConeLight(rayhandler,120,Color.WHITE, 370,Client.getPlayer().getX(), Client.getPlayer().getY(),360,360);
+		light.setPosition(Client.getPlayer().getX()+ 17,Client.getPlayer().getY()+ 17);
 	}
 
+	private void buildBuildingsBodies() {
+		mapObjects = map.getLayers().get("wall layer").getObjects();
+
+		for(MapObject mo: mapObjects) {
+			//System.out.println(mo.getColor());
+			Rectangle rectangle = ((RectangleMapObject)mo).getRectangle();
+
+			//create a dynamic within the world body (also can be KinematicBody or StaticBody
+			BodyDef bodyDef = new BodyDef();
+			bodyDef.type = BodyDef.BodyType.DynamicBody;
+			Body body = world.createBody(bodyDef);
+
+			//create a fixture for each body from the shape
+			Fixture fixture = body.createFixture(getShapeFromRectangle(rectangle),1);
+			fixture.setFriction(0.1F);
+
+			//setting the position of the body's origin. In this case with zero rotation
+			body.setTransform(getTransformedCenterForRectangle(rectangle),0);
+		}		
+	}
+
+	public static Shape getShapeFromRectangle(Rectangle rectangle){
+		PolygonShape polygonShape = new PolygonShape();
+		polygonShape.setAsBox(rectangle.width*0.5F/ TILE_SIZE,rectangle.height*0.5F/ TILE_SIZE);
+		return polygonShape;
+	}
+
+	public static Vector2 getTransformedCenterForRectangle(Rectangle rectangle){
+		Vector2 center = new Vector2();
+		rectangle.getCenter(center);
+		return center.scl(1/TILE_SIZE);
+	}
 
 	@Override
 	public void buildStage() {
-		connectedPlayers = new HashMap<Integer,Player>();
 	}
 
 	public RayHandler getRayHandler() {
@@ -177,8 +212,8 @@ public class GameScreen extends AbstractScreen{
 	}
 
 	public void update(float delta) {
-		cam.position.set(MainScreen.player.getX() + (MainScreen.player.getWidth() /2), MainScreen.player.getY() + (MainScreen.player.getHeight()/2), 0);
-		cam.unproject(new Vector3(MainScreen.player.getX(), MainScreen.player.getY(), 0));
+		cam.position.set(Client.getPlayer().getX() + (Client.getPlayer().getWidth() * 2), Client.getPlayer().getY() + (Client.getPlayer().getHeight()), 0);
+		cam.unproject(new Vector3(Client.getPlayer().getX(), Client.getPlayer().getY(), 0));
 		this.getCamera().update();
 		r.getBatch().setProjectionMatrix(cam.combined);
 	}
@@ -188,46 +223,46 @@ public class GameScreen extends AbstractScreen{
 		//clear the previous screen
 		Gdx.gl.glClearColor(0, 0, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+		world.step(1/60f, 6, 2);
 
+		createPlayers();
 		//updates the camera position
 		update(delta);
+
+		//map renderer
 		r.setView(cam);
 		r.render();
 
-		ArrayList<Player> allPlayers = getYBasedSortedPlayers();
+		light.setPosition(Client.getPlayer().getX() + 17, Client.getPlayer().getY() + 17);
+		rayhandler.setCombinedMatrix(cam);
+		rayhandler.updateAndRender();
 
 		r.getBatch().begin();
 
-		//if the player is a crew member, call setCurrentTask() on the player which sets the players current task if they have tried to start a task
-		if(MainScreen.player instanceof CrewMember) {
-			for (Player p : allPlayers)
-			{
-				if(p instanceof CrewMember) {
-					//if the player is in the range of the main-player then render in on the screen
-
-					//player's x is less than the main players x + distance
-					//player's x is more than the main players x - distance
-					//player's y is less than the main players y + distance
-					//players' y is more than the main players y - distance
-					if((p.getX() < MainScreen.player.getX() + light.getDistance()) && (p.getX() > MainScreen.player.getX() - light.getDistance()) 
-							&& (p.getY() < MainScreen.player.getY() + light.getDistance()) && (p.getY() > MainScreen.player.getY() - light.getDistance())){
-						((CrewMember) p).draw(r.getBatch());
-					}
-				}
-				else if(p instanceof Imposter) {
-					((Imposter) p).draw(r.getBatch());
-				}
+		
+		for (Entry<Integer, Player> e : Client.getConnectedPlayers().entrySet())
+		{
+			Player p = e.getValue();
+		
+			if(p instanceof CrewMember) {
+				((CrewMember) p).draw(r.getBatch());
 			}
+			else if(p instanceof Imposter) {
+				((Imposter) p).draw(r.getBatch());
+			}
+		}
 
+		//if the player is a crew member, call setCurrentTask() on the player which sets the players current task if they have tried to start a task
+		if(Client.getPlayer() instanceof CrewMember) {
 			//if the player presses space, check the task they want to do and check if the task is not completed then set that task to the current task
 			if(Gdx.input.isKeyPressed(Keys.SPACE)) {
-				((CrewMember) MainScreen.player).setCurrentTaskIfCollided();
+				((CrewMember) Client.getPlayer()).setCurrentTaskIfCollided();
 			}
 
 			//if the player has a current task, render the task screen ui
-			if(((CrewMember) MainScreen.player).getCurrentTask() != null) {
+			if(((CrewMember) Client.getPlayer()).getCurrentTask() != null) {
 				//based on the task the player is doing, render the appropriate task 
-				task = ((CrewMember) MainScreen.player).getCurrentTask();
+				task = ((CrewMember) Client.getPlayer()).getCurrentTask();
 
 				if(task instanceof AdminTask) {
 					((AdminTask) task).render(r.getBatch());
@@ -246,24 +281,21 @@ public class GameScreen extends AbstractScreen{
 				}
 			}
 		}
-		else if(MainScreen.player instanceof Imposter) {
+		else if(Client.getPlayer() instanceof Imposter) {
 
 		}
+		
 		r.getBatch().end();
-		light.setPosition(MainScreen.player.getX() + 17,MainScreen.player.getY() + 17);
 
 		try {
-			if(((CrewMember) MainScreen.player).getCurrentTask() == null) {
+			if(((CrewMember) Client.getPlayer()).getCurrentTask() == null) {
 				Gdx.input.setInputProcessor(this);
-				MainScreen.player.render(Gdx.graphics.getDeltaTime());
+				Client.getPlayer().render(Gdx.graphics.getDeltaTime());
 			}
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
-		rayhandler.setCombinedMatrix(cam);
-		rayhandler.updateAndRender();
 	}
 
 	@Override
