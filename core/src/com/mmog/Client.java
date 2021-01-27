@@ -5,6 +5,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map.Entry;
+import java.util.Stack;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
@@ -29,11 +30,11 @@ public class Client
 	public Client() throws IOException {
 		players = new ArrayList<Player>();
 	}
-	
+
 	public static ArrayList<Player> getPlayers(){
 		return players;
 	}
-	
+
 	public static void replacePlayerByRole() {
 		if(!player.role.equals("none")) {
 			if(player.role.equals("CrewMember")) {
@@ -46,11 +47,11 @@ public class Client
 				//start the game, roles are assigned.
 				LobbyScreen.startGame();
 			}
-			
+
 			player.setPlayerName(player.getPlayerName());
 		}
 	}
-	
+
 	public static class UDPEchoReader extends Thread
 	{
 		public UDPEchoReader(DatagramSocket socket)
@@ -199,7 +200,7 @@ public class Client
 	public static void parseCommand(String received) throws IOException
 	{
 		System.out.println(received);
-		
+
 		String[] dataArray = parseData(received);
 
 		int size = dataArray.length;
@@ -207,22 +208,32 @@ public class Client
 
 		if (command == 0)//connect command
 		{
-			for(int i = 0; i < size-1;i ++) {
-				int playerID = Integer.parseInt(dataArray[i]);
-				String playerName = dataArray[i+1];
+			Stack<Integer> playerIDs = new Stack<Integer>();
+            Stack<String> playerNames = new Stack<String>();
 
-				//for all the other connect command requests coming from the server from other clients that are not connected already
-				for(Player p: players) 
-				{
-					if(p.getPlayerID() == -1) {
-						p.setPlayerID(playerID);
-						p.setPlayerName(playerName);
-					}
-				}	
-				System.out.println("Connected with @ClientID: " + playerID + " @Name:" + playerName);
+            for(int i = 0; i < size-1;i+=2) {
+                int playerID = Integer.parseInt(dataArray[i]);
+                String playerName = dataArray[i+1];
 
-				i++;
-			}
+                playerIDs.push(playerID);
+                playerNames.push(playerName);
+
+                System.out.println("Connected with @ClientID: " + playerID + " @Name:" + playerName);
+
+            }
+
+            for(Player p: players) 
+            {
+                if (playerIDs.isEmpty())
+                {
+                    break;
+                }
+
+                 if(p.getPlayerID() == -1) {
+                        p.setPlayerID(playerIDs.pop());
+                        p.setPlayerName(playerNames.pop());
+                    }
+            }
 		}
 		else if (command == 1)//update command
 		{
@@ -243,7 +254,7 @@ public class Client
 		else if(command == 4) {
 			String name = dataArray[0];
 			int playerID = -1;
-			
+
 			for(Player p: players) {
 				if(p.getPlayerName().equals(name)) {
 					playerID = p.getPlayerID();
@@ -252,7 +263,7 @@ public class Client
 			removePlayerWithID(playerID);
 		}
 	}
-	
+
 	public static Player getPlayerWithID(int playerID) {
 		Player player = null;
 		for(Player p: players) {
@@ -262,7 +273,7 @@ public class Client
 		}
 		return player;
 	}
-	
+
 	public static void addPlayerWithID(int playerID) {
 		for(Player p: players) {
 			if(p.getPlayerID() == -1) {
@@ -270,15 +281,15 @@ public class Client
 			}
 		}
 	}
-	
+
 	public static void addRoleToPlayer(String role) {
 		player.role = role;
 	}
-	
+
 	public static void removePlayerWithID(int playerID) {
 		getPlayerWithID(playerID).setPlayerID(-1);
 	}
-	
+
 	public static String[] parseData(String receivedData) throws IOException {
 		String dataArray[] = receivedData.split(",");
 		return dataArray;

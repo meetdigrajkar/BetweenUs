@@ -22,11 +22,8 @@ public class CrewMember extends Player {
 		currentTask = null;
 	}
 	
-	@Override
-	public void draw(Batch batch) {
-		super.draw(batch);
-		
-		f.draw(batch, tasksToString(), getX() - Gdx.graphics.getWidth()/6  , getY() + Gdx.graphics.getHeight()/6 + 35);
+	public void drawTasks(Batch batch) {
+		f.draw(batch, tasksToString(), getX() - (Gdx.graphics.getWidth()/6) + 50  , getY() + Gdx.graphics.getHeight()/6 + 35);
 	}
 	
 	public void addTask(Task task) {

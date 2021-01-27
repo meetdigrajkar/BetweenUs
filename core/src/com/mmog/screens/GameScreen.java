@@ -245,9 +245,13 @@ public class GameScreen extends AbstractScreen{
 				p.draw(r.getBatch());
 		}
 
+		r.getBatch().end();
+		
 		light.setPosition(Client.getPlayer().getX() + 17, Client.getPlayer().getY() + 17);
 		rayhandler.setCombinedMatrix(cam);
 		rayhandler.updateAndRender();
+		
+		r.getBatch().begin();
 
 		//if the player is a crew member, call setCurrentTask() on the player which sets the players current task if they have tried to start a task
 		if(Client.getPlayer() instanceof CrewMember) {
@@ -255,7 +259,8 @@ public class GameScreen extends AbstractScreen{
 			if(Gdx.input.isKeyPressed(Keys.SPACE)) {
 				((CrewMember) Client.getPlayer()).setCurrentTaskIfCollided();
 			}
-
+			((CrewMember) Client.getPlayer()).drawTasks(r.getBatch());
+			
 			//if the player has a current task, render the task screen ui
 			if(((CrewMember) Client.getPlayer()).getCurrentTask() != null) {
 				//based on the task the player is doing, render the appropriate task 
@@ -281,7 +286,6 @@ public class GameScreen extends AbstractScreen{
 		else if(Client.getPlayer() instanceof Imposter) {
 
 		}
-
 		r.getBatch().end();
 
 		try {

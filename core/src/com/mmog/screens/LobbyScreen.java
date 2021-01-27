@@ -48,7 +48,7 @@ public class LobbyScreen extends AbstractScreen{
 	@Override
 	public void buildStage() {
 		table = new Table();
-		table.setFillParent(true);
+		//table.setFillParent(true);
 
 		font = new BitmapFont();
 		TextButtonStyle tbs = new TextButtonStyle();
