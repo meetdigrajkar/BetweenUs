@@ -70,7 +70,8 @@ public class Client
 					// listen for incoming datagram packet
 					datagramSocket.receive(incoming);
 					// print out received string
-					parseCommand(buffer);
+					String received = new String(incoming.getData(),incoming.getOffset(),incoming.getLength());
+					parseCommand(received);
 				}
 				catch(IOException e)
 				{
@@ -117,7 +118,7 @@ public class Client
 
 			// send datagram packet to the server
 			DatagramPacket datagramPacket = new DatagramPacket
-					(input.getBytes(), input.length(), address, port);
+					(input.getBytes(), input.getBytes().length, address, port);
 			socket.send(datagramPacket);
 
 		}
@@ -128,7 +129,7 @@ public class Client
 		return false;
 	}
 
-	public static void sendUpdate(float x, float y, boolean isFlipped, boolean isDead, boolean isIdle, int playerID) throws Exception
+	public static void sendUpdate(float x, float y, boolean isFlipped, boolean isDead, boolean isIdle) throws Exception
 	{
 		String toSend = "";
 		toSend += 1 + ",";
@@ -136,10 +137,9 @@ public class Client
 		toSend +=  y +",";
 		toSend +=  isFlipped + ","; 
 		toSend +=  isDead + ",";  
-		toSend +=  isIdle + ","; 
-		toSend += playerID + ",";
+		toSend +=  isIdle;
 
-		DatagramPacket datagramPacket = new DatagramPacket(toSend.getBytes(), toSend.length(), address, 7077);	     
+		DatagramPacket datagramPacket = new DatagramPacket(toSend.getBytes(), toSend.getBytes().length, address, 7077);	     
 		socket.send(datagramPacket);	      	      
 	}
 
@@ -165,7 +165,7 @@ public class Client
 		toSend += 2 + ",";
 		toSend += getPlayer().getPlayerName();
 
-		DatagramPacket datagramPacket = new DatagramPacket(toSend.getBytes(), toSend.length(), address, 7077);	     
+		DatagramPacket datagramPacket = new DatagramPacket(toSend.getBytes(), toSend.getBytes().length, address, 7077);	     
 		socket.send(datagramPacket);
 	}
 
@@ -183,7 +183,7 @@ public class Client
 		toSend += "4" + ",";
 		toSend += getPlayer().getPlayerName();
 
-		DatagramPacket datagramPacket = new DatagramPacket(toSend.getBytes(), toSend.length(), address, 7077);	     
+		DatagramPacket datagramPacket = new DatagramPacket(toSend.getBytes(), toSend.getBytes().length, address, 7077);	     
 		try {
 			socket.send(datagramPacket);
 		} catch (IOException e) {
@@ -196,13 +196,14 @@ public class Client
 	/*
 	 * This parseCommand method is called when the Client receives a datagram packet from the server (byte array)
 	 */
-	public static void parseCommand(byte[] data) throws IOException
+	public static void parseCommand(String received) throws IOException
 	{
-		String receivedData = new String(data);
-		String[] dataArray = parseData(receivedData);
+		System.out.println(received);
+		
+		String[] dataArray = parseData(received);
 
 		int size = dataArray.length;
-		Integer command = Integer.parseInt(dataArray[size-1].trim());
+		Integer command = Integer.parseInt(dataArray[size-1]);
 
 		if (command == 0)//connect command
 		{

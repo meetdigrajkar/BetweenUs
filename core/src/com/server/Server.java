@@ -55,14 +55,16 @@ public class Server {
 				// listen for datagram packets
 				serverDatagramSocket.receive(datagramPacket);
 
-				String receivedData = new String(buffer);
+				String receivedData = new String(datagramPacket.getData(),datagramPacket.getOffset(),datagramPacket.getLength());
+				
+				System.out.println("received data: " + receivedData);
 				String[] dataArray = parseData(receivedData);
 
 				//check if the client is in the connected clients list.
 				//if client is not in the list add its host address to the list
 				InetAddress hostAddress = InetAddress.getByName(datagramPacket.getAddress().getHostAddress());
 				if(!connectedPlayers.containsValue(hostAddress)) {
-					connectedPlayers.put(connectedPlayers.size() - 1, hostAddress);
+					connectedPlayers.put(connectedPlayers.size(), hostAddress);
 				}
 
 				//get the command that was sent by the client
@@ -105,7 +107,7 @@ public class Server {
 		if(command == 0) {
 			toLocal = true;
 			toAll = true;
-
+			toLocalc = new StringBuilder();
 			String playerName = dataArray[1].trim();
 
 			if(!playersReady.containsKey(playerName)) {
@@ -114,7 +116,7 @@ public class Server {
 
 			//if the player is not in the map, add him to the map
 			if(!connectedPlayersNames.containsValue(playerName)) {
-				connectedPlayersNames.put(connectedPlayersNames.size() - 1, playerName);
+				connectedPlayersNames.put(connectedPlayersNames.size(), playerName);
 			}
 
 			for(Entry<Integer,InetAddress> e: connectedPlayers.entrySet()) {
@@ -123,15 +125,14 @@ public class Server {
 				String name = connectedPlayersNames.get(playerID);
 
 				//sending to the client the packet came from
-				if(address.equals(hostAddress)) {
-					if(!name.equals(playerName)) {
-						toLocalc.append(playerID).append(",").append(name).append(",");
-					}		
-				}
+
+				if(!name.equals(playerName)) {
+					toLocalc.append(playerID).append(",").append(name).append(",");
+				}		
+
 				//sending to all the other clients
-				else if(!address.equals(hostAddress)) {
+				if(address.equals(hostAddress)) {
 					toAllClients.append(playerID).append(",").append(name).append(",");
-					toAllClients.append(command);
 				}
 			}
 			//append the command at the end.
@@ -147,10 +148,19 @@ public class Server {
 			toAll = true;
 
 			toAllClients = (new StringBuilder());
-
 			for(int i = 1; i < dataArray.length; i++) {
-				toAllClients.append(dataArray[i]).append(",");
+				System.out.println(dataArray[i].trim());
+				toAllClients.append(dataArray[i].trim()).append(",");
 			}
+			
+			int playerID = -1337;
+			for(Entry<Integer, InetAddress> e: connectedPlayers.entrySet()) {
+				if(e.getValue().equals(hostAddress)) {
+					playerID = e.getKey();
+				}
+			}
+			
+			toAllClients.append(playerID).append(",");
 			toAllClients.append(command);
 		}
 		//the server received a Is ready command from the client
@@ -193,8 +203,8 @@ public class Server {
 	}
 
 	public static void sendCommand(String toLocalc, String toAllClients, DatagramSocket serverDatagramSocket, int command, boolean toLocal, boolean toAll, InetAddress hostAddress) {
-		DatagramPacket toSend = new DatagramPacket((toLocalc.toString()).getBytes(), toLocalc.length(), hostAddress, 8000);
-		StringBuilder toAllR;
+		DatagramPacket toSend = new DatagramPacket(toLocalc.getBytes(), toLocalc.getBytes().length, hostAddress, 8000);
+		StringBuilder toAllR = new StringBuilder();
 
 		for(Entry<Integer, InetAddress> e : connectedPlayers.entrySet()) {
 			InetAddress address = e.getValue();
@@ -213,12 +223,14 @@ public class Server {
 			//command == 4, need to send close command to ONLY all the other clients
 			//toAllClients to all the other clients
 			//doing the same shit above for update command == 1
-
+			
+			System.out.println(toAllClients);
+			
 			if(command == 0 && address.equals(hostAddress)) {
-				toSend = new DatagramPacket((toLocalc.toString()).getBytes(), toLocalc.length(), hostAddress, 8000);
+				toSend = new DatagramPacket(toLocalc.getBytes(), toLocalc.getBytes().length, hostAddress, 8000);
 			}
 			else if((command == 0 || command == 1 || command == 4 ) && !address.equals(hostAddress)) {
-				toSend = new DatagramPacket((toAllClients.toString()).getBytes(), toAllClients.length(), address, 8000);
+				toSend = new DatagramPacket(toAllClients.getBytes(), toAllClients.getBytes().length, address, 8000);
 			}
 			else if(command == 3) {
 				String assignedRole = "";
@@ -229,16 +241,27 @@ public class Server {
 					assignedRole = assignRole();
 				}
 
-				toAllR.append("Imposter").append(",");
+				toAllR.append("CrewMember").append(",");
 				toAllR.append(command);
-
-				toSend = new DatagramPacket((toAllR.toString()).getBytes(), toAllR.length(), address, 8000);
+				
+				toSend = new DatagramPacket((toAllR.toString()).getBytes(), toAllR.toString().getBytes().length, address, 8000);
 			}
 
 			try {
 				//change the packet to send based on whether to send to local, all (except local), and both
-				System.out.println("Server is sending @command: " + command + " to @ClientID: LOCAL" + " @Address: " + hostAddress);
-				serverDatagramSocket.send(toSend);
+				System.out.println("Server is sending @command: " + command + " to @ClientID: " + e.getKey() + " @Address: " + hostAddress);
+				if (toLocal && address.equals(hostAddress))
+                {
+                serverDatagramSocket.send(toSend);
+                }
+                else if (toAll && !address.equals(hostAddress))
+                {
+                    serverDatagramSocket.send(toSend);
+                }
+                else if (!toAll && !toLocal)
+                {
+                    System.out.println("ma-ma-ma-money shot");
+                }
 			} catch (IOException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();

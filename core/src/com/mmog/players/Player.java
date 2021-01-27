@@ -214,18 +214,15 @@ public class Player extends Sprite{
 		if (!isIdle && !Gdx.input.isKeyPressed(Input.Keys.W) && !Gdx.input.isKeyPressed(Input.Keys.A) && !Gdx.input.isKeyPressed(Input.Keys.S) && !Gdx.input.isKeyPressed(Input.Keys.D) )
 		{               	
 			isIdle = true;
+			Client.sendUpdate(getX(), getY(), isFlipped, isDead, isIdle);
 			playerMoved = false;
 		}
 		
-		sendUpdate();
-	}
-	
-	public void sendUpdate() throws Exception {
 		if(playerMoved) {
-			Client.sendUpdate(getX(), getY(), isFlipped, isDead, isIdle, getPlayerID());
+			Client.sendUpdate(getX(), getY(), isFlipped, isDead, isIdle);
 		}
 	}
-
+	
 	public int getPlayerID() {
 		return playerID;
 	}

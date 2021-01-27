@@ -96,6 +96,26 @@ public class GameScreen extends AbstractScreen{
 		super();
 	}
 
+	private ArrayList<Player> getYBasedSortedPlayers() {
+		ArrayList<Player> allPlayers = new ArrayList();
+		allPlayers.add(Client.getPlayer());
+
+		for (Player p: Client.getPlayers())
+		{
+			allPlayers.add(p);
+		}
+
+		//Render Based On Y-Axis to avoid poor sprite overlap.
+		Collections.sort(allPlayers, new Comparator<Player>() {
+			@Override
+			public int compare(Player arg0, Player arg1) {
+				return Float.compare(arg1.getY(), arg0.getY());
+
+			}
+		});
+		return allPlayers;
+	}
+	
 	@Override
 	public void show() {
 		width = Gdx.graphics.getWidth();
@@ -203,34 +223,32 @@ public class GameScreen extends AbstractScreen{
 		r.setView(cam);
 		r.render();
 
+		r.getBatch().begin();
+
+		//draw all the other players
+		for (Player p : getYBasedSortedPlayers())
+		{
+			//draw the player based on whether he is a crew member or imposter
+			if(p instanceof CrewMember) {
+				((CrewMember) p).draw(r.getBatch());
+			}
+			else if(p instanceof Imposter) {
+				Gdx.input.setInputProcessor(this);
+				try {
+					((Imposter) p).render(Gdx.graphics.getDeltaTime());
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				((Imposter) p).draw(r.getBatch());
+			}
+			else
+				p.draw(r.getBatch());
+		}
+
 		light.setPosition(Client.getPlayer().getX() + 17, Client.getPlayer().getY() + 17);
 		rayhandler.setCombinedMatrix(cam);
 		rayhandler.updateAndRender();
-
-		r.getBatch().begin();
-
-
-		//draw the player based on whether he is a crew member or imposter
-		if(Client.getPlayer() instanceof CrewMember) {
-			((CrewMember) Client.getPlayer()).draw(r.getBatch());
-		}
-		else if(Client.getPlayer() instanceof Imposter) {
-			Gdx.input.setInputProcessor(this);
-			try {
-				((Imposter) Client.getPlayer()).render(Gdx.graphics.getDeltaTime());
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			((Imposter) Client.getPlayer()).draw(r.getBatch());
-		}
-
-
-		//draw all the other players
-		for (Player p : Client.getPlayers())
-		{
-			p.draw(r.getBatch());
-		}
 
 		//if the player is a crew member, call setCurrentTask() on the player which sets the players current task if they have tried to start a task
 		if(Client.getPlayer() instanceof CrewMember) {
