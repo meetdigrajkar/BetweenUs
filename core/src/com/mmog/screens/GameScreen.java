@@ -222,7 +222,6 @@ public class GameScreen extends AbstractScreen{
 		//map renderer
 		r.setView(cam);
 		r.render();
-
 		r.getBatch().begin();
 
 		//draw all the other players
