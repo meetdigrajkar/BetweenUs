@@ -5,6 +5,7 @@
     },
     "activeFile": "map.tmx",
     "expandedProjectPaths": [
+        "."
     ],
     "file.lastUsedOpenFilter": "All Files (*)",
     "fileStates": {
@@ -31,16 +32,19 @@
             "scaleInDock": 1
         },
         "map.tmx": {
-            "scale": 0.25,
+            "scale": 0.5,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 1704,
-                "y": 1456
+                "x": 1112,
+                "y": 844
             }
+        },
+        "map.tmx#mapTileSet": {
+            "scaleInDock": 0.125
         },
         "mapTileSet.tsx": {
             "scaleInDock": 1,
-            "scaleInEditor": 1
+            "scaleInEditor": 3
         }
     },
     "map.lastUsedFormat": "tmx",
@@ -49,6 +53,7 @@
         "mapTileSet.tsx"
     ],
     "project": "map.tiled-project",
+    "property.type": "bool",
     "recentFiles": [
         "mapTileSet.tsx",
         "map.tmx",
