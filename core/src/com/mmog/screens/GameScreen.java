@@ -101,7 +101,8 @@ public class GameScreen extends AbstractScreen{
 	}
 
 	private ArrayList<Player> getYBasedSortedPlayers() {
-		ArrayList<Player> allPlayers = new ArrayList();
+		ArrayList<Player> allPlayers = new ArrayList<Player>();
+		
 		allPlayers.add(Client.getPlayer());
 
 		for (Player p: Client.getPlayers())
