@@ -129,7 +129,7 @@ public class Server {
 			//get the room that the player wants to join
 
 			for(Room room: rooms) {
-				if(room.getRoomName().equals(dataArray[2])) {
+				if(room.getRoomName().equals(roomName)) {
 					for(Entry<Integer,InetAddress> e: room.connectedPlayers.entrySet()) {
 						InetAddress address = e.getValue();
 						int playerID = e.getKey();
@@ -159,21 +159,23 @@ public class Server {
 			//needs to send this to all the other clients
 			toLocal = false;
 			toAll = true;
-
-			int playerID = -22;
 			roomName = dataArray[2];
+			int playerID = -5;
+			System.out.println(roomName);
+			toAllClients = (new StringBuilder());
 
 			for(Room room: rooms) {
 				if(room.getRoomName().equals(roomName)) {
-					toAllClients = (new StringBuilder());
-					
+					System.out.println("found room");
+					room.addPlayer(dataArray[0], hostAddress);
+				
 					for(int i = 3; i < dataArray.length; i++) {
-						System.out.println(dataArray[i].trim());
+						//System.out.println(dataArray[i].trim());
 						toAllClients.append(dataArray[i].trim()).append(",");
 					}
 
-					for(Entry<Integer, InetAddress> e: room.connectedPlayers.entrySet()) {
-						if(e.getValue().equals(hostAddress)) {
+					for(Entry<Integer, String> e: room.connectedPlayersNames.entrySet()) {
+						if(e.getValue().equals(dataArray[1])) {
 							playerID = e.getKey();
 						}
 					}
@@ -210,10 +212,7 @@ public class Server {
 		}
 		//command to create a room and connect the host player
 		else if(command == 5) {
-			toLocal = true;
-			toAll = false;
 			roomName = dataArray[1];
-
 			//dataArray[0] = command
 			//dataArray[1] = room name
 			//dataArray[2] = host name
@@ -228,9 +227,6 @@ public class Server {
 		}
 		//refresh command for updating available rooms
 		else if(command == 6) {
-			toLocal = true;
-			toAll = false;
-
 			toLocalc = new StringBuilder();
 			//dataArray[0] = command
 			//dataArray[1] = player name
@@ -248,7 +244,6 @@ public class Server {
 
 	public static void sendCommand(String toLocalc, String toAllClients, DatagramSocket serverDatagramSocket, int command, boolean toLocal, boolean toAll, InetAddress hostAddress, String roomName) {
 		DatagramPacket toSend = new DatagramPacket(toLocalc.getBytes(), toLocalc.getBytes().length, hostAddress, 8000);
-		StringBuilder toAllR = new StringBuilder();
 
 		//refresh available rooms command sent
 		if(command == 6 || command == 5) {

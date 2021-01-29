@@ -46,7 +46,6 @@ public class Room {
 			connectedPlayers.put(connectedPlayers.size(), hostAddress);
 		}
 		
-		//if the player is not in the map, add him to the map
 		if(!connectedPlayersNames.containsValue(playerName)) {
 			connectedPlayersNames.put(connectedPlayersNames.size(), playerName);
 		}
