@@ -3,6 +3,7 @@ package com.server;
 import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map.Entry;
 import java.util.Random;
 
 public class Room {
@@ -33,6 +34,22 @@ public class Room {
 		setR(new Random());
 	}
 	
+	public String getAllPlayersNames() {
+		String names = "";
+		for(Entry<Integer, String> e: connectedPlayersNames.entrySet()) {
+			names += e.getValue() + ",";
+		}
+		
+		return names;
+	}
+	
+	public boolean isRoomEmpty() {
+		if(connectedPlayers.size() == 0) {
+			return true;
+		}
+		return false;
+	}
+	
 	//checks if the lobby is full so the game can start
 	public boolean isRoomFull() {
 		if(connectedPlayers.size() == (numCrew + numImp)) {
@@ -49,6 +66,20 @@ public class Room {
 		if(!connectedPlayersNames.containsValue(playerName)) {
 			connectedPlayersNames.put(connectedPlayersNames.size(), playerName);
 		}
+	}
+	
+	public boolean removePlayer(String playerName) {
+		String name = "";
+		for(Entry<Integer, String> e: connectedPlayersNames.entrySet()) {
+			name = e.getValue();
+			
+			if(name.equals(playerName)) {
+				connectedPlayersNames.remove(e.getKey(), playerName);
+				connectedPlayers.remove(e.getKey());
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	public String getHostName() {

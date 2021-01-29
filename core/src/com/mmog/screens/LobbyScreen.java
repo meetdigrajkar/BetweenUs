@@ -110,7 +110,7 @@ public class LobbyScreen extends AbstractScreen{
 		vp = new FitViewport(1920, 1080,cam);
 		this.setViewport(vp);
 
-		map = new TmxMapLoader().load("MapAreas/mapfiles/lobby.tmx");
+		map = new TmxMapLoader().load(Gdx.files.internal("MapAreas/mapfiles/lobby.tmx").toString());
 		r = new OrthogonalTiledMapRenderer(map);
 
 		Client.getPlayer().setCollisionLayer((TiledMapTileLayer) map.getLayers().get(0));

@@ -23,7 +23,7 @@ public class CrewMember extends Player {
 	}
 	
 	public void drawTasks(Batch batch) {
-		f.draw(batch, tasksToString(), getX() - (Gdx.graphics.getWidth()/6) + 50  , getY() + Gdx.graphics.getHeight()/6 + 35);
+		f.draw(batch, tasksToString(), getX() - (Gdx.graphics.getWidth()/6) + 40  , getY() + Gdx.graphics.getHeight()/6 + 45);
 	}
 	
 	public void addTask(Task task) {

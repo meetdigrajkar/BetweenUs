@@ -15,5 +15,10 @@ public class MMOG extends Game {
 	
 	@Override
 	public void dispose() {
+		System.out.println("CLOSED!");
+
+		if(Client.getPlayer() != null || Client.getPlayers() != null) {
+			Client.removeClient();
+		}
 	}
 }

@@ -68,7 +68,6 @@ import com.mmog.tasks.*;
 public class GameScreen extends AbstractScreen{
 
 	TextButtonStyle tbs;
-	BitmapFont font;
 	private Viewport vp;
 	OrthographicCamera cam;
 	float width,height;
@@ -91,6 +90,11 @@ public class GameScreen extends AbstractScreen{
 	Light light;
 
 	public static final float TILE_SIZE = 1;
+	
+	//make fonts here
+	BitmapFont font = new BitmapFont(Gdx.files.internal("UI/textf.fnt"));
+	LabelStyle lsI = new LabelStyle(font, Color.RED);
+	Label backToMain = new Label("To Main", lsI);
 
 	public GameScreen() {
 		super();
@@ -115,7 +119,7 @@ public class GameScreen extends AbstractScreen{
 		});
 		return allPlayers;
 	}
-	
+
 	@Override
 	public void show() {
 		width = Gdx.graphics.getWidth();
@@ -215,7 +219,9 @@ public class GameScreen extends AbstractScreen{
 		Gdx.gl.glClearColor(0, 0, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		world.step(1/60f, 6, 2);
-
+		
+		Gdx.input.setInputProcessor(this);
+		
 		//updates the camera position
 		update(delta);
 
@@ -223,7 +229,7 @@ public class GameScreen extends AbstractScreen{
 		r.setView(cam);
 		r.render();
 		r.getBatch().begin();
-
+		
 		//draw all the other players
 		for (Player p : getYBasedSortedPlayers())
 		{
@@ -232,7 +238,6 @@ public class GameScreen extends AbstractScreen{
 				((CrewMember) p).draw(r.getBatch());
 			}
 			else if(p instanceof Imposter) {
-				Gdx.input.setInputProcessor(this);
 				try {
 					((Imposter) p).render(Gdx.graphics.getDeltaTime());
 				} catch (Exception e) {
@@ -244,8 +249,11 @@ public class GameScreen extends AbstractScreen{
 			else
 				p.draw(r.getBatch());
 		}
-
+		
 		r.getBatch().end();
+		
+		Gdx.input.setInputProcessor(this);
+		//this.draw();
 		
 		light.setPosition(Client.getPlayer().getX() + 17, Client.getPlayer().getY() + 17);
 		rayhandler.setCombinedMatrix(cam);
@@ -259,8 +267,9 @@ public class GameScreen extends AbstractScreen{
 			if(Gdx.input.isKeyPressed(Keys.SPACE)) {
 				((CrewMember) Client.getPlayer()).setCurrentTaskIfCollided();
 			}
-			((CrewMember) Client.getPlayer()).drawTasks(r.getBatch());
 			
+			((CrewMember) Client.getPlayer()).drawTasks(r.getBatch());
+
 			//if the player has a current task, render the task screen ui
 			if(((CrewMember) Client.getPlayer()).getCurrentTask() != null) {
 				//based on the task the player is doing, render the appropriate task 
@@ -298,6 +307,15 @@ public class GameScreen extends AbstractScreen{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
+		if(Gdx.input.isKeyPressed(Keys.ESCAPE)) {
+			System.out.println("Escape key Pressed!");
+			Client.removeClient();
+			
+			System.out.println("Back To Main Screen!");
+			ScreenManager.getInstance().showScreen(ScreenEnum.MAIN_MENU);
+		}
+		
 	}
 
 	@Override
@@ -328,11 +346,11 @@ public class GameScreen extends AbstractScreen{
 	public void dispose() {
 		// TODO Auto-generated method stub
 		System.out.println("CLOSED!");
-		
+
 		Client.removeClient();
-		
 		r.getBatch().dispose();
 		rayhandler.dispose();
+		//ScreenManager.getInstance().showScreen(ScreenEnum.MAIN_MENU);
 	}
 
 	public World getWorld() {
