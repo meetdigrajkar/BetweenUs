@@ -136,6 +136,7 @@ public class JoinScreen extends AbstractScreen {
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
 				System.out.println("Refreshed!");
+				
 				try {
 					Client.sendRefreshCommand();
 				} catch (IOException e) {

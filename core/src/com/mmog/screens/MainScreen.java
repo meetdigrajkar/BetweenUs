@@ -109,15 +109,17 @@ public class MainScreen extends AbstractScreen{
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
 				System.out.println("Heading to Join Room Screen!");
-				
-				if(Client.getPlayer() == null || Client.getPlayers() == null) {
-					//create all the players and the local player
-					Client.createPlayer(MainScreen.playerName.getText());
-					Client.createPlayers();
-				}
+		
+				if(!playerName.getText().equals("") || !playerName.getText().contains(",")) {
+					if(Client.getPlayer() == null || Client.getPlayers() == null) {
+						//create all the players and the local player
+						Client.createPlayer(playerName.getText());
+						Client.createPlayers();
+					}
 
-				if(!Client.getPlayer().getPlayerName().equals("")) {
-					ScreenManager.getInstance().showScreen(ScreenEnum.JOIN_SCREEN);
+					if(!Client.getPlayer().getPlayerName().equals("")) {
+						ScreenManager.getInstance().showScreen(ScreenEnum.JOIN_SCREEN);
+					}
 				}
 			}
 		});
@@ -127,15 +129,17 @@ public class MainScreen extends AbstractScreen{
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
 				System.out.println("Heading to Create Room Screen!");
-				
-				if(Client.getPlayer() == null || Client.getPlayers() == null) {
-					//create all the players and the local player
-					Client.createPlayer(MainScreen.playerName.getText());
-					Client.createPlayers();
-				}
-				
-				if(!Client.getPlayer().getPlayerName().equals("")) {
-					ScreenManager.getInstance().showScreen(ScreenEnum.CREATE_ROOM);
+
+				if(!playerName.getText().equals("") || !playerName.getText().contains(",")) {
+					if(Client.getPlayer() == null || Client.getPlayers() == null) {
+						//create all the players and the local player
+						Client.createPlayer(playerName.getText());
+						Client.createPlayers();
+					}
+
+					if(!Client.getPlayer().getPlayerName().equals("")) {
+						ScreenManager.getInstance().showScreen(ScreenEnum.CREATE_ROOM);
+					}
 				}
 			}
 		});

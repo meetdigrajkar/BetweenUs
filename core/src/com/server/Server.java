@@ -56,7 +56,7 @@ public class Server {
 				InetAddress hostAddress = InetAddress.getByName(datagramPacket.getAddress().getHostAddress());
 
 				//get the command that was sent by the client
-				int command = Integer.parseInt(dataArray[0].trim());
+				int command = Integer.parseInt(dataArray[0]);
 
 				//parse the command
 				parseCommandAndSend(command, dataArray, hostAddress,serverDatagramSocket);
@@ -129,9 +129,8 @@ public class Server {
 			//get the room that the player wants to join
 
 			for(Room room: rooms) {
+				room.addPlayer(playerName, hostAddress);
 				if(room.getRoomName().equals(roomName)) {
-					room.addPlayer(dataArray[1], hostAddress);
-					
 					for(Entry<Integer,InetAddress> e: room.connectedPlayers.entrySet()) {
 						InetAddress address = e.getValue();
 						int playerID = e.getKey();
@@ -161,17 +160,14 @@ public class Server {
 			//needs to send this to all the other clients
 			toLocal = false;
 			toAll = true;
+			
 			roomName = dataArray[2];
 			int playerID = -5;
-			System.out.println(roomName);
 			toAllClients = (new StringBuilder());
 
 			for(Room room: rooms) {
+				room.addPlayer(dataArray[1], hostAddress);
 				if(room.getRoomName().equals(roomName)) {
-					System.out.println("found room");
-					
-					room.addPlayer(dataArray[1], hostAddress);
-					
 					for(int i = 3; i < dataArray.length; i++) {
 						//System.out.println(dataArray[i].trim());
 						toAllClients.append(dataArray[i].trim()).append(",");
@@ -233,24 +229,39 @@ public class Server {
 			toLocalc = new StringBuilder();
 			//dataArray[0] = command
 			//dataArray[1] = player name
-
+			
 			for(Room room: rooms) {
 				toLocalc.append(room.getRoomName()).append(",");
 			}
 
 			toLocalc.append(command);
+			
+			System.out.println(toLocalc + " @address: " + hostAddress);
+			sendRefreshCommand(toLocalc.toString(), serverDatagramSocket, hostAddress);
 		}
-
+		
 		//send the command
 		sendCommand(toLocalc.toString(),toAllClients.toString(),serverDatagramSocket, command, toLocal, toAll, hostAddress, roomName);
+	}
+	
+	public static void sendRefreshCommand(String toLocalc, DatagramSocket serverDatagramSocket, InetAddress hostAddress) {
+		DatagramPacket toSend = new DatagramPacket(toLocalc.getBytes(), toLocalc.getBytes().length, hostAddress, 8000);
+		
+		try {
+			serverDatagramSocket.send(toSend);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return;
 	}
 
 	public static void sendCommand(String toLocalc, String toAllClients, DatagramSocket serverDatagramSocket, int command, boolean toLocal, boolean toAll, InetAddress hostAddress, String roomName) {
 		DatagramPacket toSend = new DatagramPacket(toLocalc.getBytes(), toLocalc.getBytes().length, hostAddress, 8000);
 
 		//refresh available rooms command sent
-		if(command == 6 || command == 5) {
-			try {
+		if(command == 5) {
+			try {	
 				serverDatagramSocket.send(toSend);
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
