@@ -328,7 +328,9 @@ public class GameScreen extends AbstractScreen{
 	public void dispose() {
 		// TODO Auto-generated method stub
 		System.out.println("CLOSED!");
+		
 		Client.removeClient();
+		
 		r.getBatch().dispose();
 		rayhandler.dispose();
 	}

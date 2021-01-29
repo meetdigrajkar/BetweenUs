@@ -130,11 +130,13 @@ public class Server {
 
 			for(Room room: rooms) {
 				if(room.getRoomName().equals(roomName)) {
+					room.addPlayer(dataArray[1], hostAddress);
+					
 					for(Entry<Integer,InetAddress> e: room.connectedPlayers.entrySet()) {
 						InetAddress address = e.getValue();
 						int playerID = e.getKey();
 						String name = room.connectedPlayersNames.get(playerID);
-
+						
 						//sending to the client the packet came from
 						if(!name.equals(playerName)) {
 							toLocalc.append(playerID).append(",").append(name).append(",");
@@ -167,8 +169,9 @@ public class Server {
 			for(Room room: rooms) {
 				if(room.getRoomName().equals(roomName)) {
 					System.out.println("found room");
-					room.addPlayer(dataArray[0], hostAddress);
-				
+					
+					room.addPlayer(dataArray[1], hostAddress);
+					
 					for(int i = 3; i < dataArray.length; i++) {
 						//System.out.println(dataArray[i].trim());
 						toAllClients.append(dataArray[i].trim()).append(",");
