@@ -130,6 +130,8 @@ public class CreateRoomScreen extends AbstractScreen {
 					if((numCrew >= 1 && numCrew <= 10) && (numImp >= 0 && numImp <= 2)) {
 						try {
 							Client.getPlayer().connectedRoomName = roomName.getText();
+							Client.getPlayer().setIsHost();
+							
 							System.out.println("Created a Room with The Room Name: " + roomName.getText() + " c: " + numCrew  + " i: " + numImp);
 							Client.sendCreateRoomCommand(roomName.getText(),numCrew,numImp);
 							

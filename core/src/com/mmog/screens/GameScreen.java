@@ -107,7 +107,9 @@ public class GameScreen extends AbstractScreen{
 
 		for (Player p: Client.getPlayers())
 		{
-			allPlayers.add(p);
+			if(p.getPlayerID() != -10) {
+				allPlayers.add(p);
+			}
 		}
 
 		//Render Based On Y-Axis to avoid poor sprite overlap.

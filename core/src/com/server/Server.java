@@ -67,17 +67,6 @@ public class Server {
 						System.out.println("# of players in @room: " + room.getRoomName() + " is: " + room.getAllPlayersNames());
 					}
 				}
-
-				for(Room room: rooms) {
-					if(room.isRoomFull() && !room.startGame) {
-						room.startGame = true;
-						sendStartGameCommand(room, serverDatagramSocket);
-					}
-					
-					if(room.isRoomEmpty()) {
-						room.startGame = false;
-					}
-				}
 			}
 		}
 		catch(IOException e)
@@ -194,6 +183,17 @@ public class Server {
 
 			toAllClients.append(playerID).append(",");
 			toAllClients.append(command);
+		}//host sent the command to start the game.
+		else if(command == 3) {
+			String rname = dataArray[1];
+			
+			for(Room room: rooms) {
+				if(room.getRoomName().equals(rname)) {
+					room.startGame = true;
+					sendStartGameCommand(room, serverDatagramSocket);
+					break;
+				}
+			}
 		}
 		//the server received a disconnect request from the client
 		else if(command == 4) {

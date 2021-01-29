@@ -49,6 +49,7 @@ public class Player extends Sprite{
 	public String role = "none";
 	Sprite p;
 	public String connectedRoomName = "";
+	public boolean isHost;
 	
 	public Player(int playerID)
 	{
@@ -59,7 +60,7 @@ public class Player extends Sprite{
 		readyToPlay = false;
 		walkRightAtlas = new TextureAtlas(Gdx.files.internal("Walk.atlas"));
 		walkLeftAtlas = new TextureAtlas(Gdx.files.internal("Walk.atlas"));
-
+		isHost = false;
 		isFlipped = false;
 		walkRight = new Animation<TextureRegion>(1/15f, walkRightAtlas.getRegions());
 		walkLeft = new Animation<TextureRegion>(1/15f, walkLeftAtlas.getRegions());
@@ -81,6 +82,16 @@ public class Player extends Sprite{
 				tr.flip(true, false);
 			}
 		}
+	}
+	
+	public void setIsHost() {
+		isHost = true;
+	}
+	
+	public void resetPlayer() {
+		playerID = -10;
+		playerName = "";
+		connectedRoomName = "";
 	}
 	
 	public boolean getIsIdle() {

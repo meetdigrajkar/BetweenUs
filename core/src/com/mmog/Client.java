@@ -169,7 +169,16 @@ public class Client
 		DatagramPacket datagramPacket = new DatagramPacket(toSend.getBytes(), toSend.getBytes().length, address, 7077);	     
 		socket.send(datagramPacket);
 	}
-
+	
+	public static void sendStartCommand() throws IOException {
+		String toSend = "";
+		toSend += 3 + ",";
+		toSend += player.connectedRoomName;	
+		
+		DatagramPacket datagramPacket = new DatagramPacket(toSend.getBytes(), toSend.getBytes().length, address, 7077);	     
+		socket.send(datagramPacket);
+	}
+	
 	public static void createPlayer(String name) {
 		player = new Player(-1);
 		player.setPlayerName(name);
@@ -203,6 +212,10 @@ public class Client
 
 		System.out.println(toSend);
 
+		//player is no longer in that room, reset
+		player.connectedRoomName = "";
+		
+		
 		DatagramPacket datagramPacket = new DatagramPacket(toSend.getBytes(), toSend.getBytes().length, address, 7077);	     
 		try {
 			socket.send(datagramPacket);
@@ -240,7 +253,6 @@ public class Client
 				System.out.println("Connected with @ClientID: " + playerID + " @Name:" + playerName);
 
 			}
-
 			for(Player p: players) 
 			{
 				if (playerIDs.isEmpty())
@@ -323,11 +335,7 @@ public class Client
 	}
 
 	public static void removePlayerWithID(int playerID) {
-		for(Player p: players) {
-			if(p.getPlayerID() == playerID) {
-				players.remove(p);
-			}
-		}
+		getPlayerWithID(playerID).resetPlayer();
 	}
 
 	public static String[] parseData(String receivedData) throws IOException {
