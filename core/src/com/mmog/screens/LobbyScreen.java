@@ -37,7 +37,7 @@ public class LobbyScreen extends AbstractScreen{
 	OrthographicCamera cam;
 	float width,height;
 	TextButton button;
-	
+
 	Table table;
 	BitmapFont font;
 
@@ -47,51 +47,10 @@ public class LobbyScreen extends AbstractScreen{
 
 	@Override
 	public void buildStage() {
-		table = new Table();
-		//table.setFillParent(true);
-
 		font = new BitmapFont();
-		TextButtonStyle tbs = new TextButtonStyle();
-		//font.getData().scale(2);
 		font.setColor(Color.RED);
-		tbs.font = font;
-
-		button = new TextButton("Join", tbs);
-		table.add(button);
-
-		//button listener for the ready button to be ready to join game and be assigned a role
-		button.addListener( new ClickListener() {
-			@Override
-			public void clicked(InputEvent event, float x, float y) {
-				if(!Client.getPlayer().readyToPlay) {
-					System.out.println("READY!");
-					
-					Client.getPlayer().readyToPlay = true;
-
-					try {
-							readyToStart();
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-				}
-			}
-		});
-		
-		addActor(table);
 	}
-
-	public void readyToStart() throws IOException {
-		Client.sendPlayerIsReady();
-	}
-
-	public static void startGame() {
-		System.out.println("NOW ENTERING GAME!");
-		
-		ScreenManager.getInstance().showScreen(ScreenEnum.GAME);
-	}
-
-
+	
 	@Override
 	public void show() {
 		cameraSetup();
@@ -113,14 +72,14 @@ public class LobbyScreen extends AbstractScreen{
 			button.setDisabled(true);
 			button.setVisible(false);
 		}
-		
+
 		//if the player role has updated, replace the player with either crew member or imposter
 		Client.replacePlayerByRole();
-		
+
 		r.getBatch().begin();
-		
+
 		Client.getPlayer().draw(r.getBatch());
-		
+
 		//draw all the players to the lobby
 		for (Player p : Client.getPlayers())
 		{
@@ -128,10 +87,8 @@ public class LobbyScreen extends AbstractScreen{
 				p.draw(r.getBatch());
 			}
 		}
-		
-		r.getBatch().end();
 
-		button.setPosition(Client.getPlayer().getX() + 275,Client.getPlayer().getY() + 185);
+		r.getBatch().end();
 
 		//allow player movement
 		try {
@@ -141,7 +98,7 @@ public class LobbyScreen extends AbstractScreen{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 		draw();
 	}
 

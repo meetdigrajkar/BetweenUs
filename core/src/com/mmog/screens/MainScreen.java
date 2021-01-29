@@ -7,39 +7,25 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.InputListener;
-import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
-import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.mmog.Client;
-import com.mmog.players.CrewMember;
-import com.mmog.players.Player;
-import com.mmog.tasks.*;
+
 
 public class MainScreen extends AbstractScreen{
 	TextButtonStyle tbs;
-	TextButtonStyle style1;
-	TextButtonStyle style2;
-	TextButtonStyle style3;
-	TextButtonStyle style4;
-	BitmapFont font;
 	boolean joined;
 	Table table;
-    Table table1;
-	TextField playerName;
-	private TextureAtlas buttonsAtlas;
-	
+	Table table1;
+	public static TextField playerName;
+	SpriteBatch batch;
+
 	public MainScreen() {
 		// TODO Auto-generated constructor stub
 		super();
@@ -52,117 +38,132 @@ public class MainScreen extends AbstractScreen{
 
 	public void buildStage() {
 		tbs = new TextButtonStyle();
-		font = new BitmapFont();
+
+		//make fonts here
+		BitmapFont font = new BitmapFont(Gdx.files.internal("UI/textf.fnt"));
+		BitmapFont gameTitleFont = new BitmapFont(Gdx.files.internal("UI/gameText.fnt"));
+		BitmapFont labelFont = new BitmapFont(Gdx.files.internal("UI/labelFont.fnt"));
+
+		//make label styles here
+		LabelStyle ls = new LabelStyle(font, Color.MAGENTA);
+		LabelStyle gameTitleFontLabel = new LabelStyle(gameTitleFont, Color.WHITE);
+		LabelStyle labelFontStyle = new LabelStyle(labelFont, Color.BLACK);
+
 		tbs.font = font;
-		TextButton button = new TextButton("Join", tbs);
 		joined = false;
 
-		//button.setPosition(150, 50, Align.center);
+		final TextureRegionDrawable bg = new TextureRegionDrawable(new Texture("UI/background2.png"));
+		final TextureRegionDrawable textbox = new TextureRegionDrawable(new Texture("UI/textbox.png"));
 
 		table = new Table();
 		table.setFillParent(true);
-        table.setBackground(new TextureRegionDrawable(new Texture("Menu_blank.png")));
-		LabelStyle ls = new LabelStyle(new BitmapFont(),Color.FIREBRICK);
-		Skin uiSkin = new Skin(Gdx.files.internal("uiskin.json"));
+		table.setBackground(bg);
 
-		buttonsAtlas = new TextureAtlas(Gdx.files.internal("Buttons.atlas"));
-		Skin buttonskin = new Skin(buttonsAtlas);
-/*
-		ImageButton.ImageButtonStyle stylebig = new ImageButton.ImageButtonStyle();
-		stylebig.up = buttonskin.getDrawable("buttonbign");
-		stylebig.down = buttonskin.getDrawable("buttonbigp");
-		stylebig.over = buttonskin.getDrawable("buttonbigh");
-		ImageButton buttonBig = new ImageButton(stylebig);
-*/
-		style1 = new TextButtonStyle();
-		style1.font = font;
-		style1.up = new TextureRegionDrawable(new Texture("button2n.png"));
-		style1.down = new TextureRegionDrawable(new Texture("button1p.png"));
-		style1.over = new TextureRegionDrawable(new Texture("button1h.png"));
-		TextButton button1 = new TextButton("Join", style1);
+		//make labels here
+		Label playerNameLabel = new Label("Player Name", labelFontStyle);
+		Label gameLabel = new Label("Between Us", gameTitleFontLabel);
 
-		style2 = new TextButtonStyle();
-		style2.font = font;
-		style2.up = new TextureRegionDrawable(new Texture("button2n.png"));
-		style2.down = new TextureRegionDrawable(new Texture("button2p.png"));
-		style2.over = new TextureRegionDrawable(new Texture("button2h.png"));
-		TextButton button2 = new TextButton("Settings", style1);
+		//make text button styles here
+		TextButton.TextButtonStyle textbs = new TextButton.TextButtonStyle();
+		textbs.font = font;
 
-		Button.ButtonStyle style3 = new Button.ButtonStyle();
-		style3.up = buttonskin.getDrawable("button3n");
-		style3.down = buttonskin.getDrawable("button3p");
-		style3.over = buttonskin.getDrawable("button3h");
-		Button button3 = new Button(style2);
+		//make buttons here
+		TextButton button1 = new TextButton("Join Room", textbs);
+		TextButton button2 = new TextButton("Create Room", textbs);
+		TextButton button3 = new TextButton("Settings",textbs);
+		TextButton button4 = new TextButton("About",textbs);
 
-		Button.ButtonStyle style4 = new Button.ButtonStyle();
-		style4.up = buttonskin.getDrawable("button4n");
-		style4.down = buttonskin.getDrawable("button4p");
-		style4.over = buttonskin.getDrawable("button4h");
-		Button button4 = new Button(style2);
+		TextField.TextFieldStyle tfs = new TextField.TextFieldStyle();
+		tfs.font = font;
+		tfs.background = textbox;
+		tfs.fontColor = new Color(Color.PURPLE);
 
-        Table table1 = new Table();
-		Label playerNameLabel = new Label("Player Name:", ls );
-		playerName = new TextField("", uiSkin);
-		table.center().top();
+		//table setting sizes
 		float MAX_WIDTH = Gdx.graphics.getWidth();
 		float MAX_HEIGTH = Gdx.graphics.getHeight();
 		table.setSize(MAX_WIDTH, MAX_HEIGTH);
 
-		//table.add(playerNameLabel);
-		//table.add(playerName).width(150);
-		//table.debugAll();
-		table.row().padTop(100);
-		table.add(button1).width(100).height(40);
-		table.add(button2).width(100).height(40).padLeft(10);
-		table.row().padTop(10);
-		table.add(button3).width(100).height(40);
-		table.add(button4).width(100).height(40).padLeft(10);
-		table.row().padTop(10);
-		table.add(playerNameLabel);
-		table.add(playerName).width(100).height(20);
+		playerName = new TextField("", tfs);
+		playerName.setAlignment(Align.center);
 
+		//table items go here
+		table.center().top();
+		table.add(gameLabel).padLeft(40);
+		table.row();
+		table.add(playerNameLabel).padBottom(5).padLeft(40);
+		table.row();
+		table.add(playerName).width(100).height(25).padBottom(5).padLeft(40);
+		table.row().center();
+		table.add(button1).width(90).padLeft(40);
+		table.row().center();
+		table.add(button2).width(90).padLeft(40);
 
-		//System.out.println(GameScreen.player.getPlayerID());
+		table.row();
+		table.add(button3).padRight(200);
+		table.add(button4);
+
 		addActor(table);
-		//ddActor(button);
-		
+
+		//add button listeners here
 		button1.addListener( new ClickListener() {
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
-				if(!joined) {
-					System.out.println("Attempting to Connect to The Server...");
-					if(!playerName.getText().equals("")) {
-						String name = playerName.getText();
-						
-						//create all the players and the local player
-						Client.createPlayer(name);
-						Client.createPlayers();
-						Client.connectClientToServer();
-						
-						ScreenManager.getInstance().showScreen(ScreenEnum.LOBBY_SCREEN);
-						joined = true;
-					}
+				System.out.println("Heading to Join Room Screen!");
+				
+				if(Client.getPlayer() == null || Client.getPlayers() == null) {
+					//create all the players and the local player
+					Client.createPlayer(MainScreen.playerName.getText());
+					Client.createPlayers();
+				}
+
+				if(!Client.getPlayer().getPlayerName().equals("")) {
+					ScreenManager.getInstance().showScreen(ScreenEnum.JOIN_SCREEN);
 				}
 			}
 		});
 
+		//create room button listener
 		button2.addListener( new ClickListener() {
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
-				if(!joined) {
-					System.out.println("Heading to Settings from menu");
-					//ScreenManager.getInstance().showScreen(ScreenEnum.SETTINGS);
+				System.out.println("Heading to Create Room Screen!");
+				
+				if(Client.getPlayer() == null || Client.getPlayers() == null) {
+					//create all the players and the local player
+					Client.createPlayer(MainScreen.playerName.getText());
+					Client.createPlayers();
 				}
-				joined = true;
+				
+				if(!Client.getPlayer().getPlayerName().equals("")) {
+					ScreenManager.getInstance().showScreen(ScreenEnum.CREATE_ROOM);
+				}
 			}
 		});
 
+		//settings button listener
+		button3.addListener( new ClickListener() {
+			@Override
+			public void clicked(InputEvent event, float x, float y) {
+				System.out.println("Heading to Settings from menu");
+				//ScreenManager.getInstance().showScreen(ScreenEnum.SETTINGS);
+			}
+		});
+
+		//about button listener
+		button4.addListener( new ClickListener() {
+			@Override
+			public void clicked(InputEvent event, float x, float y) {
+				System.out.println("Heading to About from menu");
+				//ScreenManager.getInstance().showScreen(ScreenEnum.SETTINGS);=
+			}
+		});
 		Gdx.input.setInputProcessor(this);
 	}
 
 	public void render(float delta) {
 		Gdx.gl.glClearColor(0, 0, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
 		draw();
 
 	}

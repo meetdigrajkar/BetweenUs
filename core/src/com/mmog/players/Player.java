@@ -48,6 +48,7 @@ public class Player extends Sprite{
 	public boolean readyToPlay;
 	public String role = "none";
 	Sprite p;
+	public String connectedRoomName = "";
 	
 	public Player(int playerID)
 	{

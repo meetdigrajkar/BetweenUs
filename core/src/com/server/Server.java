@@ -17,22 +17,13 @@ public class Server {
 
 	//private static ArrayList<InetAddress> connectedClientAddresses;
 
-	private static HashMap<Integer,InetAddress> connectedPlayers;
-	private static HashMap<Integer, String> connectedPlayersNames;
-	private static Random r;
-	private static ArrayList<String> rolelist;
-	private static HashMap<String,Boolean> playersReady;
-	private static boolean everyoneReady = false;
-	private static boolean gameStarted = false;
+	//list of rooms
+	private static ArrayList<Room> rooms;
 
 	public static void main(String args[]) throws ClassNotFoundException, IOException
-	{
-		connectedPlayers = new HashMap<Integer,InetAddress>();
-		connectedPlayersNames = new HashMap<Integer,String>();
-		playersReady = new HashMap<String,Boolean>();
-		rolelist = new ArrayList<>();
+	{	
+		rooms = new ArrayList<Room>();
 
-		r = new Random();
 		int port = 7077;
 		// create the server...
 		DatagramSocket serverDatagramSocket = null;
@@ -56,37 +47,30 @@ public class Server {
 				serverDatagramSocket.receive(datagramPacket);
 
 				String receivedData = new String(datagramPacket.getData(),datagramPacket.getOffset(),datagramPacket.getLength());
-				
+
 				System.out.println("received data: " + receivedData);
 				String[] dataArray = parseData(receivedData);
 
 				//check if the client is in the connected clients list.
 				//if client is not in the list add its host address to the list
 				InetAddress hostAddress = InetAddress.getByName(datagramPacket.getAddress().getHostAddress());
-				if(!connectedPlayers.containsValue(hostAddress)) {
-					connectedPlayers.put(connectedPlayers.size(), hostAddress);
-				}
 
 				//get the command that was sent by the client
 				int command = Integer.parseInt(dataArray[0].trim());
 
-				if(!gameStarted) {
-					for(Entry<String, Boolean> r: playersReady.entrySet()) {
-						if(r.getValue()) {
-							everyoneReady = true;
-						}
-					}
-				}
-				//System.out.println(gameStarted + "command: "+ command);
-
-				if(!gameStarted && everyoneReady) {
-					command = 3;
-				}
-
 				//parse the command
 				parseCommandAndSend(command, dataArray, hostAddress,serverDatagramSocket);
-				//print output command
-				//System.out.println(output);
+				
+				if(!rooms.isEmpty()) {
+					System.out.println("number of rooms: " + rooms.size());
+				}
+				
+				for(Room room: rooms) {
+					if(room.isRoomFull() && !room.startGame) {
+						room.startGame = true;
+						sendStartGameCommand(room, serverDatagramSocket);
+					}
+				}
 			}
 		}
 		catch(IOException e)
@@ -95,11 +79,42 @@ public class Server {
 		}
 	}
 
+	//sends the command to all the clients in the room to start the game
+	public static void sendStartGameCommand(Room room, DatagramSocket serverDatagramSocket) {
+		StringBuilder toAllClients = (new StringBuilder());
+		String toallString = "";
+		
+		//appending only crew member for now, but should be the assigned role.
+		toAllClients.append("CrewMember").append(",");
+		toAllClients.append(3);
+		toallString = toAllClients.toString();
+
+		for(Entry<Integer, InetAddress> e : room.connectedPlayers.entrySet()) {
+			InetAddress address = e.getValue();
+			
+			DatagramPacket toSend = new DatagramPacket(toallString.getBytes(), toallString.getBytes().length, address, 8000);
+			
+			try {
+				serverDatagramSocket.send(toSend);
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		}
+		return;
+	}
+
+
+	public static void addRoom(String hostName, String roomName, float numCrew, float numImp, InetAddress hostAddress) {
+		Room room = new Room(hostName, roomName, hostAddress,numCrew, numImp);
+		room.addPlayer(hostName, hostAddress);
+		rooms.add(room);
+	}
 
 	public static void parseCommandAndSend(int command, String[] dataArray, InetAddress hostAddress,DatagramSocket serverDatagramSocket) {
 		StringBuilder toAllClients = new StringBuilder();
 		StringBuilder toLocalc = new StringBuilder();
-
+		String roomName = null;
 		boolean toLocal = false, toAll = false;
 
 		//the server received a connection request from the client
@@ -107,39 +122,37 @@ public class Server {
 		if(command == 0) {
 			toLocal = true;
 			toAll = true;
+
 			toLocalc = new StringBuilder();
 			String playerName = dataArray[1].trim();
+			roomName = dataArray[2];
+			//get the room that the player wants to join
 
-			if(!playersReady.containsKey(playerName)) {
-				playersReady.put(playerName, false);
-			}
+			for(Room room: rooms) {
+				if(room.getRoomName().equals(dataArray[2])) {
+					for(Entry<Integer,InetAddress> e: room.connectedPlayers.entrySet()) {
+						InetAddress address = e.getValue();
+						int playerID = e.getKey();
+						String name = room.connectedPlayersNames.get(playerID);
 
-			//if the player is not in the map, add him to the map
-			if(!connectedPlayersNames.containsValue(playerName)) {
-				connectedPlayersNames.put(connectedPlayersNames.size(), playerName);
-			}
+						//sending to the client the packet came from
+						if(!name.equals(playerName)) {
+							toLocalc.append(playerID).append(",").append(name).append(",");
+						}		
 
-			for(Entry<Integer,InetAddress> e: connectedPlayers.entrySet()) {
-				InetAddress address = e.getValue();
-				int playerID = e.getKey();
-				String name = connectedPlayersNames.get(playerID);
+						//sending to all the other clients
+						if(address.equals(hostAddress)) {
+							toAllClients.append(playerID).append(",").append(name).append(",");
+						}
+					}
 
-				//sending to the client the packet came from
+					//append the command at the end.
+					toLocalc.append(command);
+					toAllClients.append(command);
 
-				if(!name.equals(playerName)) {
-					toLocalc.append(playerID).append(",").append(name).append(",");
-				}		
-
-				//sending to all the other clients
-				if(address.equals(hostAddress)) {
-					toAllClients.append(playerID).append(",").append(name).append(",");
+					createRoleList(roomName);
 				}
 			}
-			//append the command at the end.
-			toLocalc.append(command);
-			toAllClients.append(command);
-
-			createRoleList();
 		}
 		//the server received an update request from the client
 		else if(command == 1) {
@@ -147,159 +160,199 @@ public class Server {
 			toLocal = false;
 			toAll = true;
 
-			toAllClients = (new StringBuilder());
-			for(int i = 1; i < dataArray.length; i++) {
-				System.out.println(dataArray[i].trim());
-				toAllClients.append(dataArray[i].trim()).append(",");
-			}
-			
-			int playerID = -1337;
-			for(Entry<Integer, InetAddress> e: connectedPlayers.entrySet()) {
-				if(e.getValue().equals(hostAddress)) {
-					playerID = e.getKey();
+			int playerID = -22;
+			roomName = dataArray[2];
+
+			for(Room room: rooms) {
+				if(room.getRoomName().equals(roomName)) {
+					toAllClients = (new StringBuilder());
+					
+					for(int i = 3; i < dataArray.length; i++) {
+						System.out.println(dataArray[i].trim());
+						toAllClients.append(dataArray[i].trim()).append(",");
+					}
+
+					for(Entry<Integer, InetAddress> e: room.connectedPlayers.entrySet()) {
+						if(e.getValue().equals(hostAddress)) {
+							playerID = e.getKey();
+						}
+					}
 				}
 			}
-			
+
 			toAllClients.append(playerID).append(",");
 			toAllClients.append(command);
 		}
-		//the server received a Is ready command from the client
-		else if(command == 2) {
-			//System.out.println(dataArray[1]);
-			if(playersReady.containsKey(dataArray[1])) {
-				playersReady.replace(dataArray[1], true);
-			}
-			everyoneReady = true;
-		}
-		//server sends the role assigned to each player
-		else if(command == 3) {
-			toLocal = true;
-			toAll = true;
-			gameStarted = true;
-		}//the server received a disconnect request from the client
+		//the server received a disconnect request from the client
 		else if(command == 4) {
 			toLocal = false;
 			toAll = true;
 
+			roomName = dataArray[2];
+
 			toAllClients = (new StringBuilder());
-			System.out.println("CLOSED REQUESTED!");
-			String name = dataArray[1].trim();
+			String name = dataArray[1];
+			System.out.println("CLOSED REQUESTED!" + "for @Player: " + name + "in @Room-name: " + roomName);
 
-			for(Entry<Integer,String> entry: connectedPlayersNames.entrySet()) {
-				if(entry.getValue().equals(name)) {
-					connectedPlayersNames.remove(entry.getKey());
-					connectedPlayers.remove(entry.getKey());
-					playersReady.remove(name);
+			for(Room room: rooms) {
+				if(room.getRoomName().equals(dataArray[2])) {
+					for(Entry<Integer,String> entry: room.connectedPlayersNames.entrySet()) {
+						if(entry.getValue().equals(name)) {
+							room.connectedPlayersNames.remove(entry.getKey());
+							room.connectedPlayers.remove(entry.getKey());
 
-					toAllClients.append(name).append(",");
+							toAllClients.append(name).append(",");
+						}
+					}
 				}
 			}
-
 			toAllClients.append(command);
+		}
+		//command to create a room and connect the host player
+		else if(command == 5) {
+			toLocal = true;
+			toAll = false;
+			roomName = dataArray[1];
+
+			//dataArray[0] = command
+			//dataArray[1] = room name
+			//dataArray[2] = host name
+			//dataArray[3] = num of crew
+			//dataArray[4] = num of imposters
+			
+			addRoom(dataArray[2], dataArray[1], Float.parseFloat(dataArray[3]), Float.parseFloat(dataArray[4]), hostAddress);
+
+			//sending the room host the host name, and the room name back
+			toLocalc = new StringBuilder();
+			toLocalc.append(dataArray[1]).append(",").append(dataArray[2]).append(",").append(command);
+		}
+		//refresh command for updating available rooms
+		else if(command == 6) {
+			toLocal = true;
+			toAll = false;
+
+			toLocalc = new StringBuilder();
+			//dataArray[0] = command
+			//dataArray[1] = player name
+
+			for(Room room: rooms) {
+				toLocalc.append(room.getRoomName()).append(",");
+			}
+
+			toLocalc.append(command);
 		}
 
 		//send the command
-		sendCommand(toLocalc.toString(),toAllClients.toString(),serverDatagramSocket, command, toLocal, toAll, hostAddress);
+		sendCommand(toLocalc.toString(),toAllClients.toString(),serverDatagramSocket, command, toLocal, toAll, hostAddress, roomName);
 	}
 
-	public static void sendCommand(String toLocalc, String toAllClients, DatagramSocket serverDatagramSocket, int command, boolean toLocal, boolean toAll, InetAddress hostAddress) {
+	public static void sendCommand(String toLocalc, String toAllClients, DatagramSocket serverDatagramSocket, int command, boolean toLocal, boolean toAll, InetAddress hostAddress, String roomName) {
 		DatagramPacket toSend = new DatagramPacket(toLocalc.getBytes(), toLocalc.getBytes().length, hostAddress, 8000);
 		StringBuilder toAllR = new StringBuilder();
 
-		for(Entry<Integer, InetAddress> e : connectedPlayers.entrySet()) {
-			InetAddress address = e.getValue();
-
-			//4 situations------------------------------------------------------
-			//1
-			//command == 0, need to send to both local and all other clients
-			//toLocalc to local and toAllClients to all the other clients
-			//2
-			//command == 1, need to send update command to ONLY all other clients
-			//toAllClients to all the other clients
-			//3
-			//command == 3, need to send role assignment to ONLY the local client
-			//toLocalc to the local client
-			//4
-			//command == 4, need to send close command to ONLY all the other clients
-			//toAllClients to all the other clients
-			//doing the same shit above for update command == 1
-			
-			System.out.println(toAllClients);
-			
-			if(command == 0 && address.equals(hostAddress)) {
-				toSend = new DatagramPacket(toLocalc.getBytes(), toLocalc.getBytes().length, hostAddress, 8000);
-			}
-			else if((command == 0 || command == 1 || command == 4 ) && !address.equals(hostAddress)) {
-				toSend = new DatagramPacket(toAllClients.getBytes(), toAllClients.getBytes().length, address, 8000);
-			}
-			else if(command == 3) {
-				String assignedRole = "";
-
-				//give the player a role
-				toAllR = new StringBuilder();
-				if(!rolelist.isEmpty()) {
-					assignedRole = assignRole();
-				}
-
-				toAllR.append("CrewMember").append(",");
-				toAllR.append(command);
-				
-				toSend = new DatagramPacket((toAllR.toString()).getBytes(), toAllR.toString().getBytes().length, address, 8000);
-			}
-
+		//refresh available rooms command sent
+		if(command == 6 || command == 5) {
 			try {
-				//change the packet to send based on whether to send to local, all (except local), and both
-				System.out.println("Server is sending @command: " + command + " to @ClientID: " + e.getKey() + " @Address: " + hostAddress);
-				if (toLocal && address.equals(hostAddress))
-                {
-                serverDatagramSocket.send(toSend);
-                }
-                else if (toAll && !address.equals(hostAddress))
-                {
-                    serverDatagramSocket.send(toSend);
-                }
-                else if (!toAll && !toLocal)
-                {
-                    System.out.println("ma-ma-ma-money shot");
-                }
-			} catch (IOException e1) {
+				serverDatagramSocket.send(toSend);
+			} catch (IOException e) {
 				// TODO Auto-generated catch block
-				e1.printStackTrace();
+				e.printStackTrace();
+			}
+			return;
+		}
+
+		for(Room room: rooms) {
+			if(room.getRoomName().equals(roomName)) {
+				for(Entry<Integer, InetAddress> e : room.connectedPlayers.entrySet()) {
+					InetAddress address = e.getValue();
+
+					//4 situations------------------------------------------------------
+					//1
+					//command == 0, need to send to both local and all other clients
+					//toLocalc to local and toAllClients to all the other clients
+					//2
+					//command == 1, need to send update command to ONLY all other clients
+					//toAllClients to all the other clients
+					//3
+					//command == 3, need to send role assignment to ONLY the local client
+					//toLocalc to the local client
+					//4
+					//command == 4, need to send close command to ONLY all the other clients
+					//toAllClients to all the other clients
+					//doing the same shit above for update command == 1
+
+					//System.out.println(toAllClients);
+
+					if((command == 0) && address.equals(hostAddress)) {
+						toSend = new DatagramPacket(toLocalc.getBytes(), toLocalc.getBytes().length, hostAddress, 8000);
+					}
+					else if((command == 0 || command == 1 || command == 4 ) && !address.equals(hostAddress)) {
+						toSend = new DatagramPacket(toAllClients.getBytes(), toAllClients.getBytes().length, address, 8000);
+					}
+
+					try {
+						//change the packet to send based on whether to send to local, all (except local), and both
+						System.out.println("Server is sending @command: " + command + " to @ClientID: " + e.getKey() + " @Address: " + hostAddress);
+						if (toLocal && address.equals(hostAddress))
+						{
+							serverDatagramSocket.send(toSend);
+						}
+						else if (toAll && !address.equals(hostAddress))
+						{
+							serverDatagramSocket.send(toSend);
+						}
+						else if (!toAll && !toLocal)
+						{
+							System.out.println("ma-ma-ma-money shot");
+						}
+					} catch (IOException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+				}
 			}
 		}
 	}
 
-	public static void createRoleList() {
-		//populate role list with roles
-		for(int i = 0; i <connectedPlayers.size(); i++) {
-			if(connectedPlayers.size() >= 8 && i < 2 ) {
-				rolelist.add("Imposter");
+	public static void createRoleList(String roomName) {
+		for(Room room: rooms) {
+			if(room.getRoomName().equals(roomName)) {
+				//populate role list with roles
+				for(int i = 0; i <room.connectedPlayers.size(); i++) {
+					if(room.connectedPlayers.size() >= 8 && i < 2 ) {
+						room.rolelist.add("Imposter");
+					}
+					else if(room.connectedPlayers.size() < 8 && i == 0 ) {
+						room.rolelist.add("Imposter");
+					}
+					else
+						room.rolelist.add("CrewMember");
+				}
 			}
-			else if(connectedPlayers.size() < 8 && i == 0 ) {
-				rolelist.add("Imposter");
-			}
-			else
-				rolelist.add("CrewMember");
 		}
 	}
 
-	public static String assignRole() {
+	public static String assignRole(String roomName) {
 		String role = "";
 		//every player has a 50/50 chance of being imposter or crewmember
 		int upperBound = 100;
-		int playerTypeSelector = r.nextInt(upperBound);
 
-		if(playerTypeSelector < 50 && rolelist.contains("Imposter")) {
-			role = "Imposter";
-			rolelist.remove("Imposter");
-		}
-		else if(playerTypeSelector >= 50 && rolelist.contains("CrewMember")) {
-			role = "CrewMember";
-			rolelist.remove("CrewMember");
-		}
-		else if (!rolelist.contains("Imposter") && rolelist.contains("CrewMember")) {
-			role = "CrewMember";
-			rolelist.remove("CrewMember");
+		for(Room room: rooms) {
+			if(room.getRoomName().equals(roomName)) {
+				int playerTypeSelector = room.getR().nextInt(upperBound);
+				if(playerTypeSelector < 50 && room.rolelist.contains("Imposter")) {
+					role = "Imposter";
+					room.rolelist.remove("Imposter");
+				}
+				else if(playerTypeSelector >= 50 && room.rolelist.contains("CrewMember")) {
+					role = "CrewMember";
+					room.rolelist.remove("CrewMember");
+				}
+				else if (!room.rolelist.contains("Imposter") && room.rolelist.contains("CrewMember")) {
+					role = "CrewMember";
+					room.rolelist.remove("CrewMember");
+				}
+			}
 		}
 
 		return role;

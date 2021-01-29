@@ -14,21 +14,45 @@ import com.mmog.players.CrewMember;
 import com.mmog.players.Imposter;
 import com.mmog.players.Player;
 import com.mmog.screens.GameScreen;
+import com.mmog.screens.JoinScreen;
 import com.mmog.screens.LobbyScreen;
 import com.mmog.screens.MainScreen;
+import com.mmog.screens.ScreenEnum;
+import com.mmog.screens.ScreenManager;
 
 import java.io.*;
 public class Client
 {
-	int port = 7077;
+	static int port = 7077;
 	static DatagramSocket socket;
 	static InetAddress address;
-
 	private static Player player;
 	private static ArrayList<Player> players;
 
 	public Client() throws IOException {
 		players = new ArrayList<Player>();
+		initSockets();
+	}
+
+	public static void initSockets() {
+		port = 7077;
+		socket = null;
+		// Create a Datagram Socket...
+		try
+		{ 
+			address = InetAddress.getByName("127.0.0.1");
+
+			socket = new DatagramSocket(8000);
+		}
+		catch (IOException e)
+		{
+			System.out.println(e);
+			System.exit(1);
+		}
+
+		UDPEchoReader reader = new UDPEchoReader(socket);
+		reader.setDaemon(true);
+		reader.start();
 	}
 
 	public static ArrayList<Player> getPlayers(){
@@ -37,15 +61,25 @@ public class Client
 
 	public static void replacePlayerByRole() {
 		if(!player.role.equals("none")) {
+			System.out.println("NOW ENTERING GAME!");
+			String name = getPlayer().getPlayerName();
+			String roomName = getPlayer().connectedRoomName;
+			
 			if(player.role.equals("CrewMember")) {
-				player = new CrewMember(Client.getPlayer().getPlayerID());
+				player = new CrewMember(getPlayer().getPlayerID());
+				player.setPlayerName(name);
+				player.connectedRoomName = roomName;
 				//start the game, roles are assigned.
-				LobbyScreen.startGame();
+				
+				ScreenManager.getInstance().showScreen(ScreenEnum.GAME);
 			}
 			else if(Client.getPlayer().role.equals("Imposter")) {
-				player = new Imposter(Client.getPlayer().getPlayerID());
+				player = new Imposter(getPlayer().getPlayerID());
+				player.setPlayerName(name);
+				player.connectedRoomName = roomName;
 				//start the game, roles are assigned.
-				LobbyScreen.startGame();
+				
+				ScreenManager.getInstance().showScreen(ScreenEnum.GAME);
 			}
 
 			player.setPlayerName(player.getPlayerName());
@@ -86,54 +120,25 @@ public class Client
 	}
 
 
-	public static boolean connectClientToServer() {
-		int port = 7077;
-		socket = null;
-		BufferedReader keyboardReader = null;
-		// Create a Datagram Socket...
-		try
-		{ 
-			address = InetAddress.getByName("127.0.0.1");
+	public static void connectClientToServer() throws IOException {
 
-			socket = new DatagramSocket(8000);
-			keyboardReader = new BufferedReader(new
-					InputStreamReader(System.in));
-		}
-		catch (IOException e)
-		{
-			System.out.println(e);
-			System.exit(1);
-		}
+		//command int for connection request.
+		String input = "0" + ",";
+		input += player.getPlayerName() + ",";
+		input += player.connectedRoomName;
 
-		UDPEchoReader reader = new UDPEchoReader(socket);
-		reader.setDaemon(true);
-		reader.start();
-
-		try
-		{	
-			//command int for connection request.
-			String input = "0" + ",";
-			input += player.getPlayerName();
-
-			System.out.println(player.getPlayerName());
-
-			// send datagram packet to the server
-			DatagramPacket datagramPacket = new DatagramPacket
-					(input.getBytes(), input.getBytes().length, address, port);
-			socket.send(datagramPacket);
-
-		}
-		catch(IOException e)
-		{
-			System.out.println(e);
-		}	
-		return false;
+		// send datagram packet to the server
+		DatagramPacket datagramPacket = new DatagramPacket
+				(input.getBytes(), input.getBytes().length, address, port);
+		socket.send(datagramPacket);
 	}
 
 	public static void sendUpdate(float x, float y, boolean isFlipped, boolean isDead, boolean isIdle) throws Exception
 	{
 		String toSend = "";
 		toSend += 1 + ",";
+		toSend += player.getPlayerName() + ",";
+		toSend += player.connectedRoomName + ",";
 		toSend +=  x +","; 
 		toSend +=  y +",";
 		toSend +=  isFlipped + ","; 
@@ -142,6 +147,27 @@ public class Client
 
 		DatagramPacket datagramPacket = new DatagramPacket(toSend.getBytes(), toSend.getBytes().length, address, 7077);	     
 		socket.send(datagramPacket);	      	      
+	}
+
+	public static void sendCreateRoomCommand(String roomName, float numCrew, float numImp) throws IOException {
+		String toSend = "";
+		toSend += 5 + ",";
+		toSend += roomName +",";
+		toSend += player.getPlayerName() + ",";
+		toSend +=  numCrew +",";
+		toSend +=  numImp;
+
+		DatagramPacket datagramPacket = new DatagramPacket(toSend.getBytes(), toSend.getBytes().length, address, 7077);	     
+		socket.send(datagramPacket);
+	}
+
+	public static void sendRefreshCommand() throws IOException {
+		String toSend = "";
+		toSend += 6 + ",";
+		toSend += player.getPlayerName();
+
+		DatagramPacket datagramPacket = new DatagramPacket(toSend.getBytes(), toSend.getBytes().length, address, 7077);	     
+		socket.send(datagramPacket);
 	}
 
 	public static void createPlayer(String name) {
@@ -160,16 +186,6 @@ public class Client
 		return player;
 	}
 
-	//tell the other clients you are ready
-	public static void sendPlayerIsReady() throws IOException {
-		String toSend = "";
-		toSend += 2 + ",";
-		toSend += getPlayer().getPlayerName();
-
-		DatagramPacket datagramPacket = new DatagramPacket(toSend.getBytes(), toSend.getBytes().length, address, 7077);	     
-		socket.send(datagramPacket);
-	}
-
 	public static void updateConnectedClient(int playerID, float x, float y, boolean isFlipped, boolean isDead, boolean isIdle) {
 		for(Player p: players) {
 			if(p.getPlayerID() == playerID) {
@@ -182,7 +198,10 @@ public class Client
 	public static boolean removeClient() {
 		String toSend = "";
 		toSend += "4" + ",";
+		toSend += player.connectedRoomName + ",";
 		toSend += getPlayer().getPlayerName();
+
+		System.out.println(toSend);
 
 		DatagramPacket datagramPacket = new DatagramPacket(toSend.getBytes(), toSend.getBytes().length, address, 7077);	     
 		try {
@@ -209,31 +228,31 @@ public class Client
 		if (command == 0)//connect command
 		{
 			Stack<Integer> playerIDs = new Stack<Integer>();
-            Stack<String> playerNames = new Stack<String>();
+			Stack<String> playerNames = new Stack<String>();
 
-            for(int i = 0; i < size-1;i+=2) {
-                int playerID = Integer.parseInt(dataArray[i]);
-                String playerName = dataArray[i+1];
+			for(int i = 0; i < size-1;i+=2) {
+				int playerID = Integer.parseInt(dataArray[i]);
+				String playerName = dataArray[i+1];
 
-                playerIDs.push(playerID);
-                playerNames.push(playerName);
+				playerIDs.push(playerID);
+				playerNames.push(playerName);
 
-                System.out.println("Connected with @ClientID: " + playerID + " @Name:" + playerName);
+				System.out.println("Connected with @ClientID: " + playerID + " @Name:" + playerName);
 
-            }
+			}
 
-            for(Player p: players) 
-            {
-                if (playerIDs.isEmpty())
-                {
-                    break;
-                }
+			for(Player p: players) 
+			{
+				if (playerIDs.isEmpty())
+				{
+					break;
+				}
 
-                 if(p.getPlayerID() == -1) {
-                        p.setPlayerID(playerIDs.pop());
-                        p.setPlayerName(playerNames.pop());
-                    }
-            }
+				if(p.getPlayerID() == -1) {
+					p.setPlayerID(playerIDs.pop());
+					p.setPlayerName(playerNames.pop());
+				}
+			}
 		}
 		else if (command == 1)//update command
 		{
@@ -261,6 +280,23 @@ public class Client
 				}
 			}
 			removePlayerWithID(playerID);
+		}
+		else if(command == 5) {
+			//server has returned the created room's host name and the room name
+			String roomName = dataArray[0];
+			String hostName = dataArray[1];
+			
+			System.out.println("Server added @Room:" + roomName + " @host:" + hostName);
+		}
+		else if(command == 6) {
+			if(dataArray.length == 1) {
+				System.out.println("Reply from Server: No Rooms Available");
+			}
+			else {
+				for(int i = 0; i < size - 1; i ++) {
+					JoinScreen.addRoom(dataArray[i]);
+				}
+			}
 		}
 	}
 
@@ -294,5 +330,4 @@ public class Client
 		String dataArray[] = receivedData.split(",");
 		return dataArray;
 	}
-
 } 
