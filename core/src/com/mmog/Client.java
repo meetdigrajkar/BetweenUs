@@ -177,7 +177,7 @@ public class Client
 
 	//create all the players in the connected players array in the client
 	public static void createPlayers() {
-		for(int i= 0; i <= 8; i ++) {
+		for(int i= 0; i < 8; i ++) {
 			players.add(new Player(-1));
 		}
 	}
@@ -323,11 +323,7 @@ public class Client
 	}
 
 	public static void removePlayerWithID(int playerID) {
-		for(Player p: players) {
-			if(p.getPlayerID() == playerID) {
-				players.remove(p);
-			}
-		}
+		getPlayerWithID(playerID).setPlayerID(-1);
 	}
 
 	public static String[] parseData(String receivedData) throws IOException {
