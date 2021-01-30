@@ -53,9 +53,13 @@ public class CreateRoomScreen extends AbstractScreen {
 
 		//make fonts here
 		BitmapFont font = new BitmapFont(Gdx.files.internal("UI/newlabelfont.fnt"));
-		BitmapFont gameTitleFont = new BitmapFont(Gdx.files.internal("UI/cf.fnt"));
+		BitmapFont gameTitleFont = new BitmapFont(Gdx.files.internal("UI/newlabelfont.fnt"));
 		BitmapFont labelFont = new BitmapFont(Gdx.files.internal("UI/labelFont.fnt"));
 
+		//resizing fonts
+		font.getData().setScale(0.1f);
+		gameTitleFont.getData().setScale(0.2f);
+		
 		//make label styles here
 		LabelStyle lsC = new LabelStyle(font, Color.GREEN);
 		LabelStyle lsI = new LabelStyle(font, Color.RED);
@@ -106,7 +110,7 @@ public class CreateRoomScreen extends AbstractScreen {
 		//add to the table
 		//table items go here
 		table.center().top();
-		table.add(createRoomLabel);
+		table.add(createRoomLabel).padRight(20).padBottom(20);
 		table.row();
 		table.add(numOfCrewMembersLabel);
 		table.add(crewMembers).width(50).height(25);
@@ -116,8 +120,8 @@ public class CreateRoomScreen extends AbstractScreen {
 		table.row();
 		table.add(roomLabel);
 		table.add(roomName).width(100).height(25);
-		table.row();
-		table.add(createRoom).center().padLeft(150).padBottom(60);
+		table.row().padBottom(60);
+		table.add(createRoom).center().padLeft(150).padTop(50).padBottom(40);
 		table.row();
 		table.add(backToMain).left();
 

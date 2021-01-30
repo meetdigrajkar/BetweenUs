@@ -210,6 +210,7 @@ public class Client
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		ScreenManager.getInstance().showScreen(ScreenEnum.MAIN_MENU);
 		return true;
 	}
 

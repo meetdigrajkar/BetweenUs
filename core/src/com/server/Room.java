@@ -4,6 +4,7 @@ import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
+import java.util.Map.Entry;
 
 public class Room {
 	
@@ -41,6 +42,13 @@ public class Room {
 		return false;
 	}
 	
+	public boolean isRoomEmpty() {
+		if(connectedPlayers.size() == 0) {
+			return true;
+		}
+		return false;
+	}
+	
 	public void addPlayer(String playerName, InetAddress hostAddress) {		
 		if(!connectedPlayers.containsValue(hostAddress)) {
 			connectedPlayers.put(connectedPlayers.size(), hostAddress);
@@ -48,6 +56,16 @@ public class Room {
 		
 		if(!connectedPlayersNames.containsValue(playerName)) {
 			connectedPlayersNames.put(connectedPlayersNames.size(), playerName);
+		}
+	}
+	
+	public void removePlayer(String name) {
+		for(Entry<Integer,String> entry: connectedPlayersNames.entrySet()) {
+			if(entry.getValue().equals(name)) {
+				connectedPlayersNames.remove(entry.getKey());
+				connectedPlayers.remove(entry.getKey());
+				break;
+			}
 		}
 	}
 	

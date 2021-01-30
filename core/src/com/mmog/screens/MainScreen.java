@@ -38,6 +38,10 @@ public class MainScreen extends AbstractScreen{
 
 	public void show() {
 		// TODO Auto-generated method stub
+		if(Client.getPlayer() != null) {
+			playerName.setText(Client.getPlayer().getPlayerName());
+		}
+		Gdx.input.setInputProcessor(this); 
 	}
 
 
@@ -47,13 +51,18 @@ public class MainScreen extends AbstractScreen{
 
 		//make fonts here
 		BitmapFont font = new BitmapFont(Gdx.files.internal("UI/newlabelfont.fnt"));
-		BitmapFont gameTitleFont = new BitmapFont(Gdx.files.internal("UI/f.fnt"));
-		BitmapFont labelFont = new BitmapFont(Gdx.files.internal("UI/labelFont.fnt"));
+		BitmapFont gameTitleFont = new BitmapFont(Gdx.files.internal("UI/newlabelfont.fnt"));
+		BitmapFont labelFont = new BitmapFont(Gdx.files.internal("UI/newlabelfont.fnt"));
 
+		//resizing fonts
+		font.getData().setScale(0.1f);
+		gameTitleFont.getData().setScale(0.4f);
+		labelFont.getData().setScale(0.1f);
+		
 		//make label styles here
 		LabelStyle ls = new LabelStyle(font, Color.MAGENTA);
 		LabelStyle gameTitleFontLabel = new LabelStyle(gameTitleFont, Color.WHITE);
-		LabelStyle labelFontStyle = new LabelStyle(labelFont, Color.BLACK);
+		LabelStyle labelFontStyle = new LabelStyle(labelFont, Color.RED);
 
 		tbs.font = font;
 		joined = false;
@@ -67,7 +76,7 @@ public class MainScreen extends AbstractScreen{
 		//make labels here
 		Label playerNameLabel = new Label("Player Name", labelFontStyle);
 		Label gameLabel = new Label("Between Us", gameTitleFontLabel);
-
+		
 		//make text button styles here
 		TextButton.TextButtonStyle textbs = new TextButton.TextButtonStyle();
 		textbs.font = font;
@@ -100,15 +109,15 @@ public class MainScreen extends AbstractScreen{
 
 		//table items go here
 		table.center().top();
-		table.add(gameLabel).padLeft(40);
+		table.add(gameLabel).padLeft(30).padBottom(30);
 		table.row();
-		table.add(playerNameLabel).padBottom(5).padLeft(40);
+		table.add(playerNameLabel).padBottom(5).padLeft(30);
 		table.row();
-		table.add(playerName).width(100).height(25).padBottom(5).padLeft(40);
+		table.add(playerName).width(100).height(25).padBottom(25).padLeft(30);
 		table.row().center();
-		table.add(button1).width(90).padLeft(40).padBottom(25);
+		table.add(button1).width(90).padLeft(30).padBottom(25);
 		table.row().center();
-		table.add(button2).width(90).padLeft(40).padBottom(25);
+		table.add(button2).width(90).padLeft(30).padBottom(35);
 
 		table.row();
 		table.add(button3).padRight(200);
@@ -123,14 +132,14 @@ public class MainScreen extends AbstractScreen{
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
 				System.out.println("Heading to Join Room Screen!");
-
-				if(Client.getPlayer() == null || Client.getPlayers() == null) {
+				
+				if(!playerName.getText().equals("") && !playerName.getText().contains(",")) {
 					//create all the players and the local player
 					Client.createPlayer(playerName.getText());
 					Client.createPlayers();
 				}
-
-				if(!Client.getPlayer().getPlayerName().equals("")) {
+				
+				if(Client.getPlayer() != null && !playerName.getText().equals("") && !playerName.getText().contains(",")) {
 					ScreenManager.getInstance().showScreen(ScreenEnum.JOIN_SCREEN);
 				}
 			}
@@ -142,13 +151,13 @@ public class MainScreen extends AbstractScreen{
 			public void clicked(InputEvent event, float x, float y) {
 				System.out.println("Heading to Create Room Screen!");
 
-				if(Client.getPlayer() == null || Client.getPlayers() == null) {
+				if(!playerName.getText().equals("") && !playerName.getText().contains(",")) {
 					//create all the players and the local player
 					Client.createPlayer(playerName.getText());
 					Client.createPlayers();
 				}
-
-				if(!Client.getPlayer().getPlayerName().equals("")) {
+				
+				if(Client.getPlayer() != null && !playerName.getText().equals("") && !playerName.getText().contains(",")) {
 					ScreenManager.getInstance().showScreen(ScreenEnum.CREATE_ROOM);
 				}
 			}
@@ -171,7 +180,6 @@ public class MainScreen extends AbstractScreen{
 				//ScreenManager.getInstance().showScreen(ScreenEnum.SETTINGS);=
 			}
 		});
-		Gdx.input.setInputProcessor(this);
 	}
 
 	public static Animation<TextureRegion> createBackgroundAnimation(Animation<TextureRegion> animation) {

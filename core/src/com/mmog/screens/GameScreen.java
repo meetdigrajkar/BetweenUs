@@ -251,6 +251,12 @@ public class GameScreen extends AbstractScreen{
 		rayhandler.setCombinedMatrix(cam);
 		rayhandler.updateAndRender();
 		
+		if(Gdx.input.isKeyPressed(Keys.ESCAPE)) {
+			System.out.println("Back To Main Screen!");
+			System.out.println("CLOSED!");
+			Client.removeClient();
+		}
+		
 		r.getBatch().begin();
 
 		//if the player is a crew member, call setCurrentTask() on the player which sets the players current task if they have tried to start a task
@@ -327,10 +333,6 @@ public class GameScreen extends AbstractScreen{
 	@Override
 	public void dispose() {
 		// TODO Auto-generated method stub
-		System.out.println("CLOSED!");
-		
-		Client.removeClient();
-		
 		r.getBatch().dispose();
 		rayhandler.dispose();
 	}

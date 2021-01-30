@@ -46,7 +46,7 @@ public class JoinScreen extends AbstractScreen {
 
 	//make fonts here
 	BitmapFont font = new BitmapFont(Gdx.files.internal("UI/newlabelfont.fnt"));
-	BitmapFont gameTitleFont = new BitmapFont(Gdx.files.internal("UI/f.fnt"));
+	BitmapFont gameTitleFont = new BitmapFont(Gdx.files.internal("UI/newlabelfont.fnt"));
 	BitmapFont labelFont = new BitmapFont(Gdx.files.internal("UI/labelFont.fnt"));
 
 	static SelectBox<String> rooms;
@@ -66,7 +66,11 @@ public class JoinScreen extends AbstractScreen {
 	public void buildStage() {
 		//sprite batch
 		batch = new SpriteBatch();
-
+		
+		//resizing fonts
+		font.getData().setScale(0.1f);
+		gameTitleFont.getData().setScale(0.2f);
+		
 		//make label styles here
 		LabelStyle lsC = new LabelStyle(font, Color.GREEN);
 		LabelStyle lsI = new LabelStyle(font, Color.RED);
@@ -93,15 +97,15 @@ public class JoinScreen extends AbstractScreen {
 		//add to the table
 		//table items go here
 		table.center().top();
-		table.add(joinRoomLabel).padLeft(50);
+		table.add(joinRoomLabel).padLeft(30).padBottom(30);
 		table.row();
-		table.add(availableRoomsLabel).padLeft(50);
+		table.add(availableRoomsLabel).padLeft(30).padBottom(10);
 		table.row();
 		
-		table.add(rooms).width(150).height(25).padLeft(50);
+		table.add(rooms).width(150).height(25).padLeft(30);
 		
 		table.row();
-		table.add(joinRoom).padLeft(40).padTop(55).padBottom(40);
+		table.add(joinRoom).padLeft(30).padTop(55).padBottom(60);
 		table.row();
 		table.add(backToMain).left();
 		table.add(refresh).right();	

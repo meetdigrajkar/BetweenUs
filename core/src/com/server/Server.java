@@ -60,7 +60,7 @@ public class Server {
 
 				//parse the command
 				parseCommandAndSend(command, dataArray, hostAddress,serverDatagramSocket);
-				
+
 				if(!rooms.isEmpty()) {
 					System.out.println("number of rooms: " + rooms.size());
 				}
@@ -71,6 +71,14 @@ public class Server {
 						sendStartGameCommand(room, serverDatagramSocket);
 					}
 				}
+				
+				ArrayList<Room> roomsToRemove = new ArrayList<Room>();
+				for(Room room: rooms) {
+					if(room.isRoomEmpty()) {
+						roomsToRemove.add(room);
+					}
+				}
+				rooms.removeAll(roomsToRemove);
 			}
 		}
 		catch(IOException e)
@@ -83,7 +91,7 @@ public class Server {
 	public static void sendStartGameCommand(Room room, DatagramSocket serverDatagramSocket) {
 		StringBuilder toAllClients = (new StringBuilder());
 		String toallString = "";
-		
+
 		//appending only crew member for now, but should be the assigned role.
 		toAllClients.append("CrewMember").append(",");
 		toAllClients.append(3);
@@ -91,9 +99,9 @@ public class Server {
 
 		for(Entry<Integer, InetAddress> e : room.connectedPlayers.entrySet()) {
 			InetAddress address = e.getValue();
-			
+
 			DatagramPacket toSend = new DatagramPacket(toallString.getBytes(), toallString.getBytes().length, address, 8000);
-			
+
 			try {
 				serverDatagramSocket.send(toSend);
 			} catch (IOException e1) {
@@ -130,12 +138,13 @@ public class Server {
 
 			for(Room room: rooms) {
 				room.addPlayer(dataArray[1], hostAddress);
+				
 				if(room.getRoomName().equals(roomName)) {
 					for(Entry<Integer,InetAddress> e: room.connectedPlayers.entrySet()) {
 						InetAddress address = e.getValue();
 						int playerID = e.getKey();
 						String name = room.connectedPlayersNames.get(playerID);
-						
+
 						//sending to the client the packet came from
 						if(!name.equals(playerName)) {
 							toLocalc.append(playerID).append(",").append(name).append(",");
@@ -168,9 +177,9 @@ public class Server {
 			for(Room room: rooms) {
 				if(room.getRoomName().equals(roomName)) {
 					System.out.println("found room");
-					
+
 					room.addPlayer(dataArray[1], hostAddress);
-					
+
 					for(int i = 3; i < dataArray.length; i++) {
 						//System.out.println(dataArray[i].trim());
 						toAllClients.append(dataArray[i].trim()).append(",");
@@ -192,22 +201,16 @@ public class Server {
 			toLocal = false;
 			toAll = true;
 
-			roomName = dataArray[2];
+			roomName = dataArray[1];
 
 			toAllClients = (new StringBuilder());
-			String name = dataArray[1];
+			String name = dataArray[2];
 			System.out.println("CLOSED REQUESTED!" + "for @Player: " + name + "in @Room-name: " + roomName);
 
 			for(Room room: rooms) {
-				if(room.getRoomName().equals(dataArray[2])) {
-					for(Entry<Integer,String> entry: room.connectedPlayersNames.entrySet()) {
-						if(entry.getValue().equals(name)) {
-							room.connectedPlayersNames.remove(entry.getKey());
-							room.connectedPlayers.remove(entry.getKey());
-
-							toAllClients.append(name).append(",");
-						}
-					}
+				if(room.getRoomName().equals(roomName)) {
+					room.removePlayer(name);
+					toAllClients.append(name).append(",");
 				}
 			}
 			toAllClients.append(command);
@@ -220,7 +223,7 @@ public class Server {
 			//dataArray[2] = host name
 			//dataArray[3] = num of crew
 			//dataArray[4] = num of imposters
-			
+
 			addRoom(dataArray[2], dataArray[1], Float.parseFloat(dataArray[3]), Float.parseFloat(dataArray[4]), hostAddress);
 
 			//sending the room host the host name, and the room name back
