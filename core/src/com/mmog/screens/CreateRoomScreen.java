@@ -60,7 +60,7 @@ public class CreateRoomScreen extends AbstractScreen {
 		LabelStyle lsC = new LabelStyle(font, Color.GREEN);
 		LabelStyle lsI = new LabelStyle(font, Color.RED);
 		LabelStyle gameTitleFontLabel = new LabelStyle(gameTitleFont, Color.WHITE);
-		LabelStyle labelFontStyle = new LabelStyle(labelFont, Color.BLACK);
+		LabelStyle labelFontStyle = new LabelStyle(font, Color.WHITE);
 
 		//textures go here
 		final TextureRegionDrawable bg = new TextureRegionDrawable(new Texture("UI/background2.png"));
