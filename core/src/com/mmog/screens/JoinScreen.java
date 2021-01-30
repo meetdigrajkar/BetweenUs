@@ -7,9 +7,11 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -43,14 +45,17 @@ public class JoinScreen extends AbstractScreen {
 	final TextureRegionDrawable textbox = new TextureRegionDrawable(new Texture("UI/textbox.png"));
 
 	//make fonts here
-	BitmapFont font = new BitmapFont(Gdx.files.internal("UI/textf.fnt"));
-	BitmapFont gameTitleFont = new BitmapFont(Gdx.files.internal("UI/gameText.fnt"));
+	BitmapFont font = new BitmapFont(Gdx.files.internal("UI/newlabelfont.fnt"));
+	BitmapFont gameTitleFont = new BitmapFont(Gdx.files.internal("UI/f.fnt"));
 	BitmapFont labelFont = new BitmapFont(Gdx.files.internal("UI/labelFont.fnt"));
 
 	static SelectBox<String> rooms;
 	Skin skin =new Skin(Gdx.files.internal("skins/uiskin.json"));
 	
 	String selectedRoom = "";
+	
+	Animation<TextureRegion> animation;
+	float elapsedTime;
 	
 	public JoinScreen() {
 		super();
@@ -71,7 +76,6 @@ public class JoinScreen extends AbstractScreen {
 		//init table and setup background
 		table = new Table();
 		table.setFillParent(true);
-		table.setBackground(bg);
 
 		//table setting sizes
 		float MAX_WIDTH = Gdx.graphics.getWidth();
@@ -89,15 +93,15 @@ public class JoinScreen extends AbstractScreen {
 		//add to the table
 		//table items go here
 		table.center().top();
-		table.add(joinRoomLabel).padLeft(40);
+		table.add(joinRoomLabel).padLeft(50);
 		table.row();
-		table.add(availableRoomsLabel).padLeft(40);
+		table.add(availableRoomsLabel).padLeft(50);
 		table.row();
 		
-		table.add(rooms).width(150).height(25).padLeft(40);
+		table.add(rooms).width(150).height(25).padLeft(50);
 		
 		table.row();
-		table.add(joinRoom).padLeft(40).padTop(55);
+		table.add(joinRoom).padLeft(40).padTop(55).padBottom(40);
 		table.row();
 		table.add(backToMain).left();
 		table.add(refresh).right();	
@@ -155,6 +159,7 @@ public class JoinScreen extends AbstractScreen {
 		});
 		
 		Gdx.input.setInputProcessor(this);
+		animation = MainScreen.createBackgroundAnimation(this.animation);
 		
 		//addActor(rooms);
 		addActor(table);
@@ -168,6 +173,17 @@ public class JoinScreen extends AbstractScreen {
 	public void render(float delta) {
 		Gdx.gl.glClearColor(0, 0, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+		
+		elapsedTime += Gdx.graphics.getDeltaTime();
+		//System.out.println(elapsedTime);
+		
+		if(elapsedTime > 3f) {
+			elapsedTime = 0f;
+		}
+		
+		batch.begin();
+		batch.draw(animation.getKeyFrame(elapsedTime),0,0);
+		batch.end();
 		
 		draw();
 		this.act();

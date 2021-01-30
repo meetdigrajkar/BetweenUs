@@ -6,9 +6,11 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
@@ -34,6 +36,10 @@ public class CreateRoomScreen extends AbstractScreen {
 	TextField roomName,crewMembers,imposters;
 	float numCrew,numImp;
 	SpriteBatch batch;
+	
+	Animation<TextureRegion> animation;
+	float elapsedTime;
+	
 
 	public CreateRoomScreen() {
 		super();
@@ -46,8 +52,8 @@ public class CreateRoomScreen extends AbstractScreen {
 		Gdx.input.setInputProcessor(this);
 
 		//make fonts here
-		BitmapFont font = new BitmapFont(Gdx.files.internal("UI/textf.fnt"));
-		BitmapFont gameTitleFont = new BitmapFont(Gdx.files.internal("UI/gameText.fnt"));
+		BitmapFont font = new BitmapFont(Gdx.files.internal("UI/newlabelfont.fnt"));
+		BitmapFont gameTitleFont = new BitmapFont(Gdx.files.internal("UI/cf.fnt"));
 		BitmapFont labelFont = new BitmapFont(Gdx.files.internal("UI/labelFont.fnt"));
 
 		//make label styles here
@@ -63,7 +69,6 @@ public class CreateRoomScreen extends AbstractScreen {
 		//init table and setup background
 		table = new Table();
 		table.setFillParent(true);
-		table.setBackground(bg);
 
 		//table setting sizes
 		float MAX_WIDTH = Gdx.graphics.getWidth();
@@ -112,7 +117,7 @@ public class CreateRoomScreen extends AbstractScreen {
 		table.add(roomLabel);
 		table.add(roomName).width(100).height(25);
 		table.row();
-		table.add(createRoom).center().padLeft(150);
+		table.add(createRoom).center().padLeft(150).padBottom(60);
 		table.row();
 		table.add(backToMain).left();
 
@@ -152,11 +157,27 @@ public class CreateRoomScreen extends AbstractScreen {
 				ScreenManager.getInstance().showScreen(ScreenEnum.MAIN_MENU);
 			}
 		});
+		
+		animation = MainScreen.createBackgroundAnimation(this.animation);
 	}
 
 	public void render(float delta) {
 		Gdx.gl.glClearColor(0, 0, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+		
+		elapsedTime += Gdx.graphics.getDeltaTime();
+		//System.out.println(elapsedTime);
+		
+		if(elapsedTime > 3f) {
+			elapsedTime = 0f;
+		}
+		
+		batch.begin();
+		batch.draw(animation.getKeyFrame(elapsedTime),0,0);
+		batch.end();
+		
+		
+		
 		draw();
 	}
 

@@ -129,9 +129,8 @@ public class Server {
 			//get the room that the player wants to join
 
 			for(Room room: rooms) {
+				room.addPlayer(dataArray[1], hostAddress);
 				if(room.getRoomName().equals(roomName)) {
-					room.addPlayer(dataArray[1], hostAddress);
-					
 					for(Entry<Integer,InetAddress> e: room.connectedPlayers.entrySet()) {
 						InetAddress address = e.getValue();
 						int playerID = e.getKey();
@@ -251,6 +250,7 @@ public class Server {
 		//refresh available rooms command sent
 		if(command == 6 || command == 5) {
 			try {
+				System.out.println("Sending: " + toLocalc + " to " + "@address:" + hostAddress);
 				serverDatagramSocket.send(toSend);
 			} catch (IOException e) {
 				// TODO Auto-generated catch block

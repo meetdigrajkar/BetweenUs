@@ -14,9 +14,8 @@ public class DesktopLauncher {
         config.height = 1080;
         config.width = 1920;
         
-		Client client = new Client();
-		new LwjglApplication(new MMOG(), config);
-		
+        Client client = new Client();
 		// Start the listening thread...
+		new LwjglApplication(new MMOG(), config);
 	}
 }

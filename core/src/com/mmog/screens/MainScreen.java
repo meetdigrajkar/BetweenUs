@@ -1,13 +1,16 @@
 package com.mmog.screens;
 
+import java.util.ArrayList;
 import java.util.Random;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
@@ -25,6 +28,8 @@ public class MainScreen extends AbstractScreen{
 	Table table1;
 	public static TextField playerName;
 	SpriteBatch batch;
+	Animation<TextureRegion> animation;
+	float elapsedTime;
 
 	public MainScreen() {
 		// TODO Auto-generated constructor stub
@@ -38,10 +43,11 @@ public class MainScreen extends AbstractScreen{
 
 	public void buildStage() {
 		tbs = new TextButtonStyle();
+		batch = new SpriteBatch();
 
 		//make fonts here
-		BitmapFont font = new BitmapFont(Gdx.files.internal("UI/textf.fnt"));
-		BitmapFont gameTitleFont = new BitmapFont(Gdx.files.internal("UI/gameText.fnt"));
+		BitmapFont font = new BitmapFont(Gdx.files.internal("UI/newlabelfont.fnt"));
+		BitmapFont gameTitleFont = new BitmapFont(Gdx.files.internal("UI/f.fnt"));
 		BitmapFont labelFont = new BitmapFont(Gdx.files.internal("UI/labelFont.fnt"));
 
 		//make label styles here
@@ -52,12 +58,11 @@ public class MainScreen extends AbstractScreen{
 		tbs.font = font;
 		joined = false;
 
-		final TextureRegionDrawable bg = new TextureRegionDrawable(new Texture("UI/background2.png"));
+		//final TextureRegionDrawable bg = new TextureRegionDrawable(new Texture("UI/background2.png"));
 		final TextureRegionDrawable textbox = new TextureRegionDrawable(new Texture("UI/textbox.png"));
 
 		table = new Table();
 		table.setFillParent(true);
-		table.setBackground(bg);
 
 		//make labels here
 		Label playerNameLabel = new Label("Player Name", labelFontStyle);
@@ -66,12 +71,19 @@ public class MainScreen extends AbstractScreen{
 		//make text button styles here
 		TextButton.TextButtonStyle textbs = new TextButton.TextButtonStyle();
 		textbs.font = font;
+		textbs.fontColor = Color.GREEN;
+
+		//make text button styles here
+		TextButton.TextButtonStyle textbs2 = new TextButton.TextButtonStyle();
+		textbs2.font = font;
+		textbs2.fontColor = Color.WHITE;
 
 		//make buttons here
 		TextButton button1 = new TextButton("Join Room", textbs);
 		TextButton button2 = new TextButton("Create Room", textbs);
-		TextButton button3 = new TextButton("Settings",textbs);
-		TextButton button4 = new TextButton("About",textbs);
+
+		TextButton button3 = new TextButton("Settings",textbs2);
+		TextButton button4 = new TextButton("About",textbs2);
 
 		TextField.TextFieldStyle tfs = new TextField.TextFieldStyle();
 		tfs.font = font;
@@ -94,9 +106,9 @@ public class MainScreen extends AbstractScreen{
 		table.row();
 		table.add(playerName).width(100).height(25).padBottom(5).padLeft(40);
 		table.row().center();
-		table.add(button1).width(90).padLeft(40);
+		table.add(button1).width(90).padLeft(40).padBottom(25);
 		table.row().center();
-		table.add(button2).width(90).padLeft(40);
+		table.add(button2).width(90).padLeft(40).padBottom(25);
 
 		table.row();
 		table.add(button3).padRight(200);
@@ -104,15 +116,17 @@ public class MainScreen extends AbstractScreen{
 
 		addActor(table);
 
+		animation = createBackgroundAnimation(this.animation);
+
 		//add button listeners here
 		button1.addListener( new ClickListener() {
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
 				System.out.println("Heading to Join Room Screen!");
-				
+
 				if(Client.getPlayer() == null || Client.getPlayers() == null) {
 					//create all the players and the local player
-					Client.createPlayer(MainScreen.playerName.getText());
+					Client.createPlayer(playerName.getText());
 					Client.createPlayers();
 				}
 
@@ -127,13 +141,13 @@ public class MainScreen extends AbstractScreen{
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
 				System.out.println("Heading to Create Room Screen!");
-				
+
 				if(Client.getPlayer() == null || Client.getPlayers() == null) {
 					//create all the players and the local player
-					Client.createPlayer(MainScreen.playerName.getText());
+					Client.createPlayer(playerName.getText());
 					Client.createPlayers();
 				}
-				
+
 				if(!Client.getPlayer().getPlayerName().equals("")) {
 					ScreenManager.getInstance().showScreen(ScreenEnum.CREATE_ROOM);
 				}
@@ -160,12 +174,37 @@ public class MainScreen extends AbstractScreen{
 		Gdx.input.setInputProcessor(this);
 	}
 
+	public static Animation<TextureRegion> createBackgroundAnimation(Animation<TextureRegion> animation) {
+		//animated background
+		TextureRegion[] frames = new TextureRegion[50];
+
+		//get all the frames
+		for(int i = 0; i < 50; i++) {
+			int j = i+1;
+			frames[i] = (new TextureRegion(new Texture("bgFrames/" + j + ".jpg")));
+		}
+
+		animation = new Animation<TextureRegion>(1f/15f,frames);
+
+		return animation;
+	}
+
 	public void render(float delta) {
 		Gdx.gl.glClearColor(0, 0, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-		draw();
+		elapsedTime += Gdx.graphics.getDeltaTime();
+		//System.out.println(elapsedTime);
 
+		if(elapsedTime > 3f) {
+			elapsedTime = 0f;
+		}
+
+		batch.begin();
+		batch.draw(animation.getKeyFrame(elapsedTime),0,0);
+		batch.end();
+
+		draw();
 	}
 
 	public void resize(int width, int height) {
