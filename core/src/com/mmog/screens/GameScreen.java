@@ -102,7 +102,9 @@ public class GameScreen extends AbstractScreen{
 
 		for (Player p: Client.getPlayers())
 		{
-			allPlayers.add(p);
+			if(p.getPlayerID() != -1) {
+				allPlayers.add(p);
+			}
 		}
 
 		//Render Based On Y-Axis to avoid poor sprite overlap.
@@ -153,11 +155,12 @@ public class GameScreen extends AbstractScreen{
 
 		//ray handler
 		rayhandler = new RayHandler(world);
-		rayhandler.setAmbientLight(0.001f);
+		rayhandler.setAmbientLight(0.00001f);
 		RayHandler.useDiffuseLight(true);
 
 		//cone light for the player
-		light = new ConeLight(rayhandler,120,Color.WHITE, 370,Client.getPlayer().getX(), Client.getPlayer().getY(),360,360);
+		//change the light distance when the imposter sends the sabotage request
+		light = new ConeLight(rayhandler,120,Color.WHITE, 50,Client.getPlayer().getX(), Client.getPlayer().getY(),360,360);
 		light.setPosition(Client.getPlayer().getX()+ 17,Client.getPlayer().getY()+ 17);
 	}
 
