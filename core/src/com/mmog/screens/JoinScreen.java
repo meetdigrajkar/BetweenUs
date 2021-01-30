@@ -60,13 +60,12 @@ public class JoinScreen extends AbstractScreen {
 	public JoinScreen() {
 		super();
 		rooms = new SelectBox<String>(skin);
+		//sprite batch
+		batch = new SpriteBatch();
 	}
 
 	@Override
 	public void buildStage() {
-		//sprite batch
-		batch = new SpriteBatch();
-		
 		//resizing fonts
 		font.getData().setScale(0.1f);
 		gameTitleFont.getData().setScale(0.2f);

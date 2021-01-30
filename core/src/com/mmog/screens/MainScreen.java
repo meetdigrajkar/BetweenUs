@@ -37,6 +37,7 @@ public class MainScreen extends AbstractScreen{
 	}
 
 	public void show() {
+		batch = new SpriteBatch();
 		// TODO Auto-generated method stub
 		if(Client.getPlayer() != null) {
 			playerName.setText(Client.getPlayer().getPlayerName());
@@ -47,8 +48,6 @@ public class MainScreen extends AbstractScreen{
 
 	public void buildStage() {
 		tbs = new TextButtonStyle();
-		batch = new SpriteBatch();
-
 		//make fonts here
 		BitmapFont font = new BitmapFont(Gdx.files.internal("UI/newlabelfont.fnt"));
 		BitmapFont gameTitleFont = new BitmapFont(Gdx.files.internal("UI/newlabelfont.fnt"));
@@ -180,6 +179,7 @@ public class MainScreen extends AbstractScreen{
 				//ScreenManager.getInstance().showScreen(ScreenEnum.SETTINGS);=
 			}
 		});
+		Gdx.input.setInputProcessor(this); 
 	}
 
 	public static Animation<TextureRegion> createBackgroundAnimation(Animation<TextureRegion> animation) {
@@ -200,7 +200,8 @@ public class MainScreen extends AbstractScreen{
 	public void render(float delta) {
 		Gdx.gl.glClearColor(0, 0, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-
+		Gdx.input.setInputProcessor(this); 
+		
 		elapsedTime += Gdx.graphics.getDeltaTime();
 		//System.out.println(elapsedTime);
 

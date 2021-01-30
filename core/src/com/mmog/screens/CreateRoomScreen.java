@@ -43,12 +43,12 @@ public class CreateRoomScreen extends AbstractScreen {
 
 	public CreateRoomScreen() {
 		super();
+		//sprite batch
+		batch = new SpriteBatch();
 	}
 
 	@Override
 	public void buildStage() {
-		//sprite batch
-		batch = new SpriteBatch();
 		Gdx.input.setInputProcessor(this);
 
 		//make fonts here

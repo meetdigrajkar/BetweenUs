@@ -160,7 +160,7 @@ public class GameScreen extends AbstractScreen{
 
 		//cone light for the player
 		//change the light distance when the imposter sends the sabotage request
-		light = new ConeLight(rayhandler,120,Color.WHITE, 50,Client.getPlayer().getX(), Client.getPlayer().getY(),360,360);
+		light = new ConeLight(rayhandler,120,Color.WHITE, 350,Client.getPlayer().getX(), Client.getPlayer().getY(),360,360);
 		light.setPosition(Client.getPlayer().getX()+ 17,Client.getPlayer().getY()+ 17);
 	}
 
@@ -330,14 +330,12 @@ public class GameScreen extends AbstractScreen{
 	@Override
 	public void hide() {
 		// TODO Auto-generated method stub
-
+		super.dispose();
 	}
 
 	@Override
 	public void dispose() {
 		// TODO Auto-generated method stub
-		r.getBatch().dispose();
-		rayhandler.dispose();
 	}
 
 	public World getWorld() {
