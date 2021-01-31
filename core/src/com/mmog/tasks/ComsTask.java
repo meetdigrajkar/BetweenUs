@@ -82,6 +82,7 @@ public class ComsTask extends Task {
 		ss.knob = new TextureRegionDrawable(new TextureRegion(leverKnob));
 		
 		Slider lever = new Slider(0f, 100f, 1f, true,ss);
+	
 		
 		
 		Table t = new Table();
