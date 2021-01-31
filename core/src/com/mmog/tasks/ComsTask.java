@@ -1,9 +1,15 @@
 package com.mmog.tasks;
 
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
+import javax.swing.UIDefaults;
+import javax.swing.UIManager;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
@@ -66,7 +72,31 @@ public class ComsTask extends Task {
 		hingeImg.setPosition(stage.getWidth() /2 - 260, stage.getHeight() / 2 - 290);
 		
 		
+		Texture leverBackground = new Texture("TaskUI/Reset Modem/sliderBackground.PNG");
+		Texture leverKnob = new Texture ("TaskUI/Reset Modem/panel_wifi-lever.png");
 		
+		Slider.SliderStyle ss = new Slider.SliderStyle();
+		ss.background = new TextureRegionDrawable(new TextureRegion(leverBackground));
+		//ss.background.setMinHeight(443);
+		//ss.background.setMinWidth(80);
+		ss.knob = new TextureRegionDrawable(new TextureRegion(leverKnob));
+		
+		Slider lever = new Slider(0f, 100f, 1f, true,ss);
+		
+		
+		Table t = new Table();
+		t.add(lever).width(80).height(363);
+		t.setPosition(stage.getWidth() /2 + 65, stage.getHeight() / 2 - 190);
+		t.pack();
+		
+		
+		stage.addActor(t);
+		
+		
+		
+		
+		
+		/*
 		Table table = new Table();
         //crew member slider 
 		final TextureRegionDrawable knob = new TextureRegionDrawable(new Texture("TaskUI/Reset Modem/panel_wifi-lever.png"));
@@ -78,9 +108,11 @@ public class ComsTask extends Task {
         Slider cSlider = new Slider(1f,6f,1f,true,sliderStyle);
         sliderStyle.knob = knob;
         sliderStyle.background = background;
- 
+     
         stage.addActor(table);
         table.setPosition(stage.getWidth() /2 + 100, stage.getHeight() / 2 + 135);
+        
+        */
 
 		//Below is logic for lever 
 		/*
