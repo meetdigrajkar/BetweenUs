@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map.Entry;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -50,10 +51,21 @@ public class LobbyScreen extends AbstractScreen{
 		font = new BitmapFont();
 		font.setColor(Color.RED);
 	}
-	
+
 	@Override
 	public void show() {
 		cameraSetup();
+	}
+
+	public void detectingKeyPresses() {
+		//starting the game.
+		if(Gdx.input.isKeyPressed(Keys.ENTER) && Client.getPlayer().isHost) {
+			try {
+				Client.sendStartCommand();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 
 	@Override
@@ -72,7 +84,9 @@ public class LobbyScreen extends AbstractScreen{
 			button.setDisabled(true);
 			button.setVisible(false);
 		}
-
+		
+		detectingKeyPresses();
+		
 		//if the player role has updated, replace the player with either crew member or imposter
 		Client.replacePlayerByRole();
 
@@ -87,7 +101,7 @@ public class LobbyScreen extends AbstractScreen{
 				p.draw(r.getBatch());
 			}
 		}
-
+		r.getBatch().setColor(Color.WHITE);
 		r.getBatch().end();
 
 		//allow player movement

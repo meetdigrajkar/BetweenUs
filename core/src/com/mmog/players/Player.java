@@ -49,6 +49,8 @@ public class Player extends Sprite{
 	public String role = "none";
 	Sprite p;
 	public String connectedRoomName = "";
+	public boolean isHost;
+	public Color playerColor;
 	
 	public Player(int playerID)
 	{
@@ -56,6 +58,9 @@ public class Player extends Sprite{
 		
 		setSize(32,50);
 		
+		//this.setColor(Color.YELLOW);
+		
+		isHost = false;
 		readyToPlay = false;
 		walkRightAtlas = new TextureAtlas(Gdx.files.internal("Walk.atlas"));
 		walkLeftAtlas = new TextureAtlas(Gdx.files.internal("Walk.atlas"));
@@ -112,6 +117,9 @@ public class Player extends Sprite{
 	public void update(float delta, Batch batch) {
 		//player name
 		f.draw(batch, getPlayerName(), getX() + getWidth()/2 - getPlayerName().length() * 2 - 2, getY() + getHeight() + 20);
+		
+		//set player color here too
+		//batch.setColor(Color.YELLOW);
 
 		elapsedTime += delta;
 
