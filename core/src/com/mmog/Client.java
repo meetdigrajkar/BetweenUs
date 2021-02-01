@@ -202,17 +202,15 @@ public class Client
 		toSend += getPlayer().getPlayerName();
 
 		System.out.println(toSend);
-		
-		ScreenManager.getInstance().showScreen(ScreenEnum.MAIN_MENU);
-		
-		DatagramPacket datagramPacket = new DatagramPacket(toSend.getBytes(), toSend.getBytes().length, address, 7077);	     
+
+		DatagramPacket datagramPacket = new DatagramPacket(toSend.getBytes(), toSend.getBytes().length, address, 7077);
 		try {
 			socket.send(datagramPacket);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+		ScreenManager.getInstance().showScreen(ScreenEnum.MAIN_MENU);
 		return true;
 	}
 
