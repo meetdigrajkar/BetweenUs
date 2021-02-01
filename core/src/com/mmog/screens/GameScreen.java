@@ -254,11 +254,7 @@ public class GameScreen extends AbstractScreen{
 		rayhandler.setCombinedMatrix(cam);
 		rayhandler.updateAndRender();
 		
-		if(Gdx.input.isKeyPressed(Keys.ESCAPE)) {
-			System.out.println("Back To Main Screen!");
-			System.out.println("CLOSED!");
-			Client.removeClient();
-		}
+		detectingKeyPresses();
 		
 		r.getBatch().begin();
 
@@ -307,6 +303,15 @@ public class GameScreen extends AbstractScreen{
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		}
+	}
+	
+	public void detectingKeyPresses() {
+		//exiting the game
+		if(Gdx.input.isKeyPressed(Keys.ESCAPE)) {
+			System.out.println("Back To Main Screen!");
+			System.out.println("CLOSED!");
+			Client.removeClient();
 		}
 	}
 

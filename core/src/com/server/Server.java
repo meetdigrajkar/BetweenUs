@@ -65,13 +65,6 @@ public class Server {
 					System.out.println("number of rooms: " + rooms.size());
 				}
 				
-				for(Room room: rooms) {
-					if(room.isRoomFull() && !room.startGame) {
-						room.startGame = true;
-						sendStartGameCommand(room, serverDatagramSocket);
-					}
-				}
-				
 				ArrayList<Room> roomsToRemove = new ArrayList<Room>();
 				for(Room room: rooms) {
 					if(room.isRoomEmpty()) {
@@ -196,6 +189,17 @@ public class Server {
 			toAllClients.append(playerID).append(",");
 			toAllClients.append(command);
 		}
+		//start command sent by a host of a room
+		else if(command == 3) {
+			String roomname = dataArray[1];
+
+			for(Room room: rooms) {
+				if(room.getRoomName().equals(roomname)) {
+					room.startGame = true;
+					sendStartGameCommand(room, serverDatagramSocket);
+				}
+			}
+		}
 		//the server received a disconnect request from the client
 		else if(command == 4) {
 			toLocal = false;
@@ -237,7 +241,9 @@ public class Server {
 			//dataArray[1] = player name
 
 			for(Room room: rooms) {
-				toLocalc.append(room.getRoomName()).append(",");
+				if(!room.startGame) {
+					toLocalc.append(room.getRoomName()).append(",");
+				}
 			}
 
 			toLocalc.append(command);

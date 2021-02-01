@@ -140,8 +140,11 @@ public class CreateRoomScreen extends AbstractScreen {
 						try {
 							Client.getPlayer().connectedRoomName = roomName.getText();
 							System.out.println("Created a Room with The Room Name: " + roomName.getText() + " c: " + numCrew  + " i: " + numImp);
-							Client.sendCreateRoomCommand(roomName.getText(),numCrew,numImp);
 							
+							//make the local player a host.
+							Client.getPlayer().isHost = true;
+							
+							Client.sendCreateRoomCommand(roomName.getText(),numCrew,numImp);
 							ScreenManager.getInstance().showScreen(ScreenEnum.LOBBY_SCREEN);	
 						} catch (IOException e) {
 							// TODO Auto-generated catch block

@@ -160,7 +160,16 @@ public class Client
 		DatagramPacket datagramPacket = new DatagramPacket(toSend.getBytes(), toSend.getBytes().length, address, 7077);	     
 		socket.send(datagramPacket);
 	}
-
+	
+	public static void sendStartCommand() throws IOException {
+		String toSend = "";
+		toSend += 3 + ",";
+		toSend += Client.getPlayer().connectedRoomName +",";
+		
+		DatagramPacket datagramPacket = new DatagramPacket(toSend.getBytes(), toSend.getBytes().length, address, 7077);	     
+		socket.send(datagramPacket);
+	}
+	
 	public static void sendRefreshCommand() throws IOException {
 		String toSend = "";
 		toSend += 6 + ",";
