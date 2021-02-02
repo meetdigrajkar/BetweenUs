@@ -8,10 +8,8 @@ public class Imposter extends Player{
 
 	public Imposter(int playerID) {
 		super(playerID);
+		super.speed = 2;
 	}
 	
-	@Override
-	public void draw(Batch batch) {
-		super.draw(batch);
-	}
+	
 }

@@ -51,13 +51,14 @@ public class Player extends Sprite{
 	public String connectedRoomName = "";
 	public boolean isHost;
 	public Color playerColor;
+	public int speed;
 	
 	public Player(int playerID)
 	{
 		super(new Sprite (new Texture("idle.png")));
 		
 		setSize(32,50);
-		
+		speed = 4;
 		//this.setColor(Color.YELLOW);
 		
 		isHost = false;
@@ -174,7 +175,7 @@ public class Player extends Sprite{
 	    tileHeight = collisionLayer.getTileHeight();
 	    
 		if(Gdx.input.isKeyPressed(Input.Keys.A)){
-			for(int i = 0; i<8;i++) {
+			for(int i = 0; i<speed;i++) {
 				if(!collisionAtX(-1,"blocked")) {
 					setX(getX() - 1);
 				}
@@ -186,7 +187,7 @@ public class Player extends Sprite{
 		}
 
 		else if(Gdx.input.isKeyPressed(Input.Keys.D)){
-			for(int i = 0; i<8;i++) {
+			for(int i = 0; i<speed;i++) {
 				if(!collisionAtX(1,"blocked")) {
 					setX(getX() + 1);
 				}
@@ -199,7 +200,7 @@ public class Player extends Sprite{
 
 		if (Gdx.input.isKeyPressed(Input.Keys.W))
 		{
-			for(int i = 0; i<8;i++) {
+			for(int i = 0; i<speed;i++) {
 				if(!collisionAtY(1,"blocked")) {
 					setY(getY() + 1);
 				}
@@ -211,7 +212,7 @@ public class Player extends Sprite{
 		
 		if (Gdx.input.isKeyPressed(Input.Keys.S))
 		{
-			for(int i = 0; i<8;i++) {
+			for(int i = 0; i<speed;i++) {
 				if(!collisionAtY(-1,"blocked")) {
 					setY(getY() - 1);
 				}

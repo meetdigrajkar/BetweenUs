@@ -107,15 +107,17 @@ public class Server {
 	public static void sendStartGameCommand(Room room, DatagramSocket serverDatagramSocket) {
 		StringBuilder toAllClients = (new StringBuilder());
 		String toallString = "";
-
-		//appending only crew member for now, but should be the assigned role.
-		toAllClients.append("CrewMember").append(",");
-		toAllClients.append(3);
-		toallString = toAllClients.toString();
-
+		String role = "";
+		
 		for(ServerPlayer player : room.allPlayers) {
 			InetAddress address = player.getAddress();
 
+			//assign a random role from the role list
+			role = room.assignRole();
+			toAllClients.append(role).append(",");
+			toAllClients.append(3);
+			toallString = toAllClients.toString();
+			
 			DatagramPacket toSend = new DatagramPacket(toallString.getBytes(), toallString.getBytes().length, address, 8000);
 
 			try {
@@ -129,7 +131,7 @@ public class Server {
 	}
 
 
-	public static void addRoom(String hostName, String roomName, float numCrew, float numImp, InetAddress hostAddress) {
+	public static void addRoom(String hostName, String roomName, int numCrew, int numImp, InetAddress hostAddress) {
 		Room room = new Room(hostName, roomName, hostAddress,numCrew, numImp);
 		room.addPlayer(hostName, hostAddress);
 		rooms.add(room);
@@ -217,7 +219,6 @@ public class Server {
 			for(Room room: rooms) {
 				if(room.getRoomName().equals(roomname)) {
 					room.startGame = true;
-					createRoleList(roomName);
 					System.out.println(room.printRoleList());
 					sendStartGameCommand(room, serverDatagramSocket);
 				}
@@ -251,7 +252,7 @@ public class Server {
 			//dataArray[3] = num of crew
 			//dataArray[4] = num of imposters
 
-			addRoom(dataArray[2], dataArray[1], Float.parseFloat(dataArray[3]), Float.parseFloat(dataArray[4]), hostAddress);
+			addRoom(dataArray[2], dataArray[1], (int) Float.parseFloat(dataArray[3]), (int) Float.parseFloat(dataArray[4]), hostAddress);
 
 			//sending the room host the host name, and the room name back
 			toLocalc = new StringBuilder();
@@ -367,50 +368,6 @@ public class Server {
 				}
 			}
 		}
-	}
-
-	public static void createRoleList(String roomName) {
-		for(Room room: rooms) {
-			if(room.getRoomName().equals(roomName)) {
-				//populate role list with roles
-				for(int i = 0; i < room.allPlayers.size(); i++) {
-					if(room.allPlayers.size() >= 8 && i < 2) {
-						room.rolelist.add("Imposter");
-					}
-					else if(room.allPlayers.size() < 8 && i == 0 ) {
-						room.rolelist.add("Imposter");
-					}
-					else
-						room.rolelist.add("CrewMember");
-				}
-			}
-		}
-	}
-
-	public static String assignRole(String roomName) {
-		String role = "";
-		//every player has a 50/50 chance of being imposter or crewmember
-		int upperBound = 100;
-
-		for(Room room: rooms) {
-			if(room.getRoomName().equals(roomName)) {
-				int playerTypeSelector = room.getR().nextInt(upperBound);
-				if(playerTypeSelector < 50 && room.rolelist.contains("Imposter")) {
-					role = "Imposter";
-					room.rolelist.remove("Imposter");
-				}
-				else if(playerTypeSelector >= 50 && room.rolelist.contains("CrewMember")) {
-					role = "CrewMember";
-					room.rolelist.remove("CrewMember");
-				}
-				else if (!room.rolelist.contains("Imposter") && room.rolelist.contains("CrewMember")) {
-					role = "CrewMember";
-					room.rolelist.remove("CrewMember");
-				}
-			}
-		}
-
-		return role;
 	}
 
 	public static String[] parseData(String receivedData) throws IOException {

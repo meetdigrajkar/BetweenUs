@@ -284,23 +284,28 @@ public class GameScreen extends AbstractScreen{
 					((ComsTask) task).render(r.getBatch());
 				}
 			}
+			else {
+				Gdx.input.setInputProcessor(this);
+				try {
+					Client.getPlayer().render(Gdx.graphics.getDeltaTime());
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
 		}
 		else if(Client.getPlayer() instanceof Imposter) {
 			light.setDistance(350);
-
+			
+			Gdx.input.setInputProcessor(this);
+			try {
+				Client.getPlayer().render(Gdx.graphics.getDeltaTime());
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		r.getBatch().end();
-
-		try {
-			if(((CrewMember) Client.getPlayer()).getCurrentTask() == null) {
-				Gdx.input.setInputProcessor(this);
-				Client.getPlayer().render(Gdx.graphics.getDeltaTime());
-			}
-
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 	}
 
 	public void detectingKeyPresses() {

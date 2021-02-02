@@ -14,27 +14,36 @@ public class Room {
 
 	//room info
 	public ArrayList<ServerPlayer> allPlayers;
-	
+
 	//public HashMap<Integer,InetAddress> connectedPlayers;
 	//public HashMap<Integer, String> connectedPlayersNames;
 	private static Random r;
 	public ArrayList<String> rolelist;
 	public  boolean startGame = false;
-	public float numCrew, numImp;
+	public int numCrew, numImp;
 	ArrayList<Boolean> reactorTaskCompleted;
 
-	public Room(String hostName, String roomName, InetAddress hostAddres, float numCrew, float numImp) {
+	public Room(String hostName, String roomName, InetAddress hostAddres, int numCrew, int numImp) {
 		this.setHostName(hostName);
 		this.setRoomName(roomName);
 		this.setHostAddress(hostAddress);
 		this.numCrew = numCrew;
 		this.numImp = numImp;
+		rolelist = new ArrayList<>();
+		//populate rolelist
 
+		for(int i = 0; i < numCrew; i++) {
+			rolelist.add("CrewMember");
+		}
+
+		for(int i = 0; i < numImp; i++) {
+			rolelist.add("Imposter");
+		}
 		//reactor task is incomplete by default
 		reactorTaskCompleted = new ArrayList<Boolean>();
 
 		allPlayers = new ArrayList<ServerPlayer>();
-		rolelist = new ArrayList<>();
+
 
 		setR(new Random());
 	}
@@ -47,6 +56,28 @@ public class Room {
 		return false;
 	}
 
+
+	public String assignRole() {
+		String role = "";
+		//every player has a 50/50 chance of being imposter or crewmember
+		int upperBound = 100;
+
+		int playerTypeSelector = r.nextInt(upperBound);
+		
+		if(playerTypeSelector < 50 && rolelist.contains("Imposter")) {
+			role = "Imposter";
+			rolelist.remove("Imposter");
+		}
+		else if(playerTypeSelector >= 50 && rolelist.contains("CrewMember")) {
+			role = "CrewMember";
+			rolelist.remove("CrewMember");
+		}
+		else if (!rolelist.contains("Imposter") && rolelist.contains("CrewMember")) {
+			role = "CrewMember";
+			rolelist.remove("CrewMember");
+		}
+		return role;
+	}
 	public boolean isRoomEmpty() {
 		if(allPlayers.size() == 0) {
 			return true;
@@ -59,7 +90,7 @@ public class Room {
 		allPlayers.add(player);
 		player.setPlayerID(allPlayers.size());
 	}
-	
+
 	public String printRoleList() {
 		String roles = "Role List: ";
 		for(String role: rolelist) {
@@ -67,10 +98,10 @@ public class Room {
 		}
 		return roles;
 	}
-	
+
 	public void removePlayer(String name) {
 		ArrayList<ServerPlayer> playersToRemove = new ArrayList<ServerPlayer>();
-		
+
 		for(ServerPlayer player: allPlayers) {
 			if(player.getPlayerName().equals(name)) {
 				playersToRemove.add(player);

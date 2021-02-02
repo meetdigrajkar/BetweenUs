@@ -34,7 +34,7 @@ import com.mmog.Client;
 public class CreateRoomScreen extends AbstractScreen {
 	Table table;
 	TextField roomName,crewMembers,imposters;
-	float numCrew,numImp;
+	int numCrew,numImp;
 	SpriteBatch batch;
 	
 	Animation<TextureRegion> animation;
@@ -133,8 +133,8 @@ public class CreateRoomScreen extends AbstractScreen {
 			public void clicked(InputEvent event, float x, float y) {
 				if((!roomName.getText().contains(",")) && !roomName.getText().isEmpty()) {
 					System.out.println("Created A Room");
-					numCrew = Float.parseFloat(crewMembers.getText());
-					numImp = Float.parseFloat(imposters.getText());
+					numCrew = Integer.parseInt(crewMembers.getText());
+					numImp = Integer.parseInt(imposters.getText());
 
 					if((numCrew >= 1 && numCrew <= 10) && (numImp >= 0 && numImp <= 2)) {
 						try {
