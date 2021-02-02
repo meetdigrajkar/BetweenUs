@@ -59,20 +59,6 @@ public class Server {
 
 				//parse the command
 				parseCommandAndSend(command, dataArray, hostAddress,serverDatagramSocket);
-
-				//if both reactor tasks are complete send a message to all clients
-				for(Room room: rooms) {
-					if(room.reactorTaskCompleted.size() == 2) {
-						boolean firstr = room.reactorTaskCompleted.get(0);
-						boolean secondr = room.reactorTaskCompleted.get(1);
-						
-						System.out.println("1st reactor task: " + firstr + " 2nd reactor task: " + secondr);
-						if(firstr && secondr) {
-							System.out.println("sending completed: " + "1st reactor task: " + firstr + " 2nd reactor task: " + secondr);
-							sendReactorTaskCompletedCommand(room,serverDatagramSocket);
-						}
-					}
-				}
 				
 				if(!rooms.isEmpty()) {
 					System.out.println("number of rooms: " + rooms.size());
@@ -293,8 +279,21 @@ public class Server {
 					room.reactorTaskCompleted.add(true);
 					break;
 				}
-				//System.out.println("reactor task completed message from @address: " + hostAddress + " size of reactor task list is 2: " + (room.reactorTaskCompleted.size() == 2));
-				
+				//System.out.println("reactor task completed message from @address: " + hostAddress + " size of reactor task list is 2: " + (room.reactorTaskCompleted.size() == 2))
+			}
+			
+			//if both reactor tasks are complete send a message to all clients
+			for(Room room: rooms) {
+				if(room.reactorTaskCompleted.size() == 2) {
+					boolean firstr = room.reactorTaskCompleted.get(0);
+					boolean secondr = room.reactorTaskCompleted.get(1);
+					
+					System.out.println("1st reactor task: " + firstr + " 2nd reactor task: " + secondr);
+					if(firstr && secondr) {
+						System.out.println("sending completed: " + "1st reactor task: " + firstr + " 2nd reactor task: " + secondr);
+						sendReactorTaskCompletedCommand(room,serverDatagramSocket);
+					}
+				}
 			}
 		}
 

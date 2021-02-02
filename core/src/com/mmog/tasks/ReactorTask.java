@@ -367,7 +367,7 @@ public class ReactorTask extends Task {
 
 	public static void setCompletedTask(Boolean isCompleted) {
 		if(isCompleted) {
-			//((CrewMember) Client.getPlayer()).setCurrentTask(null);
+			((CrewMember) Client.getPlayer()).setCurrentTask(null);
 			((CrewMember) Client.getPlayer()).setTaskCompleted(taskName);
 		}
 	}
