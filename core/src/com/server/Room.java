@@ -30,8 +30,6 @@ public class Room {
 		
 		//reactor task is incomplete by default
 		reactorTaskCompleted = new ArrayList<Boolean>();
-		reactorTaskCompleted.add(false);
-		reactorTaskCompleted.add(false);
 		
 		connectedPlayers = new HashMap<Integer,InetAddress>();
 		connectedPlayersNames = new HashMap<Integer,String>();
