@@ -279,7 +279,7 @@ public class GameScreen extends AbstractScreen{
 					//System.out.println(task.getTaskName());
 				}
 				if(task instanceof ElectricalTask) {
-					System.out.println(task.getTaskName());
+					((ElectricalTask) task).render(r.getBatch());
 				}
 				if(task instanceof ComsTask) {
 					((ComsTask) task).render(r.getBatch());
