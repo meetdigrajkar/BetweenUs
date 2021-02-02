@@ -286,6 +286,7 @@ public class GameScreen extends AbstractScreen{
 			}
 		}
 		else if(Client.getPlayer() instanceof Imposter) {
+			light.setDistance(350);
 
 		}
 		r.getBatch().end();

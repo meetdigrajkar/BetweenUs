@@ -88,8 +88,8 @@ public class Server {
 		toAllClients.append(9);
 		toallString = toAllClients.toString();
 		
-		for(Entry<Integer, InetAddress> e : room.connectedPlayers.entrySet()) {
-			InetAddress address = e.getValue();
+		for(ServerPlayer player : room.allPlayers) {
+			InetAddress address = player.getAddress();
 
 			DatagramPacket toSend = new DatagramPacket(toallString.getBytes(), toallString.getBytes().length, address, 8000);
 
@@ -113,8 +113,8 @@ public class Server {
 		toAllClients.append(3);
 		toallString = toAllClients.toString();
 
-		for(Entry<Integer, InetAddress> e : room.connectedPlayers.entrySet()) {
-			InetAddress address = e.getValue();
+		for(ServerPlayer player : room.allPlayers) {
+			InetAddress address = player.getAddress();
 
 			DatagramPacket toSend = new DatagramPacket(toallString.getBytes(), toallString.getBytes().length, address, 8000);
 
@@ -156,10 +156,10 @@ public class Server {
 				room.addPlayer(dataArray[1], hostAddress);
 				
 				if(room.getRoomName().equals(roomName)) {
-					for(Entry<Integer,InetAddress> e: room.connectedPlayers.entrySet()) {
-						InetAddress address = e.getValue();
-						int playerID = e.getKey();
-						String name = room.connectedPlayersNames.get(playerID);
+					for(ServerPlayer player : room.allPlayers) {
+						InetAddress address = player.getAddress();
+						int playerID = player.getPlayerID();
+						String name = player.getPlayerName();
 
 						//sending to the client the packet came from
 						if(!name.equals(playerName)) {
@@ -175,8 +175,6 @@ public class Server {
 					//append the command at the end.
 					toLocalc.append(command);
 					toAllClients.append(command);
-
-					createRoleList(roomName);
 				}
 			}
 		}
@@ -201,9 +199,9 @@ public class Server {
 						toAllClients.append(dataArray[i].trim()).append(",");
 					}
 
-					for(Entry<Integer, String> e: room.connectedPlayersNames.entrySet()) {
-						if(e.getValue().equals(dataArray[1])) {
-							playerID = e.getKey();
+					for(ServerPlayer player : room.allPlayers) {
+						if(player.getPlayerName().equals(dataArray[1])) {
+							playerID = player.getPlayerID();
 						}
 					}
 				}
@@ -219,6 +217,8 @@ public class Server {
 			for(Room room: rooms) {
 				if(room.getRoomName().equals(roomname)) {
 					room.startGame = true;
+					createRoleList(roomName);
+					System.out.println(room.printRoleList());
 					sendStartGameCommand(room, serverDatagramSocket);
 				}
 			}
@@ -318,8 +318,8 @@ public class Server {
 
 		for(Room room: rooms) {
 			if(room.getRoomName().equals(roomName)) {
-				for(Entry<Integer, InetAddress> e : room.connectedPlayers.entrySet()) {
-					InetAddress address = e.getValue();
+				for(ServerPlayer player : room.allPlayers) {
+					InetAddress address = player.getAddress();
 
 					//4 situations------------------------------------------------------
 					//1
@@ -347,7 +347,7 @@ public class Server {
 
 					try {
 						//change the packet to send based on whether to send to local, all (except local), and both
-						System.out.println("Server is sending @command: " + command + " to @ClientID: " + e.getKey() + " @Address: " + hostAddress);
+						System.out.println("Server is sending @command: " + command + " to @ClientID: " + player.getPlayerID() + " @Address: " + hostAddress);
 						if (toLocal && address.equals(hostAddress))
 						{
 							serverDatagramSocket.send(toSend);
@@ -373,11 +373,11 @@ public class Server {
 		for(Room room: rooms) {
 			if(room.getRoomName().equals(roomName)) {
 				//populate role list with roles
-				for(int i = 0; i <room.connectedPlayers.size(); i++) {
-					if(room.connectedPlayers.size() >= 8 && i < 2 ) {
+				for(int i = 0; i < room.allPlayers.size(); i++) {
+					if(room.allPlayers.size() >= 8 && i < 2) {
 						room.rolelist.add("Imposter");
 					}
-					else if(room.connectedPlayers.size() < 8 && i == 0 ) {
+					else if(room.allPlayers.size() < 8 && i == 0 ) {
 						room.rolelist.add("Imposter");
 					}
 					else

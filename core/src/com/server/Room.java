@@ -13,8 +13,10 @@ public class Room {
 	private int hostID;
 
 	//room info
-	public HashMap<Integer,InetAddress> connectedPlayers;
-	public HashMap<Integer, String> connectedPlayersNames;
+	public ArrayList<ServerPlayer> allPlayers;
+	
+	//public HashMap<Integer,InetAddress> connectedPlayers;
+	//public HashMap<Integer, String> connectedPlayersNames;
 	private static Random r;
 	public ArrayList<String> rolelist;
 	public  boolean startGame = false;
@@ -31,8 +33,7 @@ public class Room {
 		//reactor task is incomplete by default
 		reactorTaskCompleted = new ArrayList<Boolean>();
 
-		connectedPlayers = new HashMap<Integer,InetAddress>();
-		connectedPlayersNames = new HashMap<Integer,String>();
+		allPlayers = new ArrayList<ServerPlayer>();
 		rolelist = new ArrayList<>();
 
 		setR(new Random());
@@ -40,37 +41,42 @@ public class Room {
 
 	//checks if the lobby is full so the game can start
 	public boolean isRoomFull() {
-		if(connectedPlayers.size() == (numCrew + numImp)) {
+		if(allPlayers.size() == (numCrew + numImp)) {
 			return true;
 		}
 		return false;
 	}
 
 	public boolean isRoomEmpty() {
-		if(connectedPlayers.size() == 0) {
+		if(allPlayers.size() == 0) {
 			return true;
 		}
 		return false;
 	}
 
 	public void addPlayer(String playerName, InetAddress hostAddress) {		
-
-		connectedPlayers.put(connectedPlayers.size(), hostAddress);
-
-
-
-		connectedPlayersNames.put(connectedPlayersNames.size(), playerName);
-
+		ServerPlayer player = new ServerPlayer(playerName, hostAddress);
+		allPlayers.add(player);
+		player.setPlayerID(allPlayers.size());
 	}
-
+	
+	public String printRoleList() {
+		String roles = "Role List: ";
+		for(String role: rolelist) {
+			roles += role + ",";
+		}
+		return roles;
+	}
+	
 	public void removePlayer(String name) {
-		for(Entry<Integer,String> entry: connectedPlayersNames.entrySet()) {
-			if(entry.getValue().equals(name)) {
-				connectedPlayersNames.remove(entry.getKey());
-				connectedPlayers.remove(entry.getKey());
-				break;
+		ArrayList<ServerPlayer> playersToRemove = new ArrayList<ServerPlayer>();
+		
+		for(ServerPlayer player: allPlayers) {
+			if(player.getPlayerName().equals(name)) {
+				playersToRemove.add(player);
 			}
 		}
+		allPlayers.removeAll(playersToRemove);
 	}
 
 	public String getHostName() {
