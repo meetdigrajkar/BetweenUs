@@ -45,6 +45,7 @@ public class ElectricalTask extends Task {
 	boolean GreenWire = false;
 	boolean YellowWire = false;
 	
+	
 	private String test;
 		
 	public ElectricalTask() {
@@ -125,6 +126,7 @@ public class ElectricalTask extends Task {
 
 				test = "red";
 				System.out.println(test);
+				System.out.println();
 			}
 		});
 		
