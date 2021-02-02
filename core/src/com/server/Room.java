@@ -19,6 +19,7 @@ public class Room {
 	public ArrayList<String> rolelist;
 	public  boolean startGame = false;
 	public float numCrew, numImp;
+	ArrayList<Boolean> reactorTaskCompleted;
 	
 	public Room(String hostName, String roomName, InetAddress hostAddres, float numCrew, float numImp) {
 		this.setHostName(hostName);
@@ -26,6 +27,11 @@ public class Room {
 		this.setHostAddress(hostAddress);
 		this.numCrew = numCrew;
 		this.numImp = numImp;
+		
+		//reactor task is incomplete by default
+		reactorTaskCompleted = new ArrayList<Boolean>();
+		reactorTaskCompleted.add(false);
+		reactorTaskCompleted.add(false);
 		
 		connectedPlayers = new HashMap<Integer,InetAddress>();
 		connectedPlayersNames = new HashMap<Integer,String>();

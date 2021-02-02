@@ -19,6 +19,7 @@ import com.mmog.screens.LobbyScreen;
 import com.mmog.screens.MainScreen;
 import com.mmog.screens.ScreenEnum;
 import com.mmog.screens.ScreenManager;
+import com.mmog.tasks.ReactorTask;
 
 import java.io.*;
 public class Client
@@ -159,6 +160,16 @@ public class Client
 
 		DatagramPacket datagramPacket = new DatagramPacket(toSend.getBytes(), toSend.getBytes().length, address, 7077);	     
 		socket.send(datagramPacket);
+	}
+	
+	public static void sendReactorTaskCompleted() throws IOException {
+		String toSend = "";
+		toSend += 9 + ",";
+		toSend += Client.getPlayer().connectedRoomName;
+		
+		DatagramPacket datagramPacket = new DatagramPacket(toSend.getBytes(), toSend.getBytes().length, address, 7077);	     
+		socket.send(datagramPacket);
+		
 	}
 	
 	public static void sendStartCommand() throws IOException {
@@ -308,6 +319,10 @@ public class Client
 				}
 			}
 		}
+		else if(command == 9) {
+			boolean reactorTaskCompleted = Boolean.parseBoolean(dataArray[0]);
+			ReactorTask.setCompletedTask(reactorTaskCompleted);
+		}
 	}
 
 	public static Player getPlayerWithID(int playerID) {
@@ -340,4 +355,5 @@ public class Client
 		String dataArray[] = receivedData.split(",");
 		return dataArray;
 	}
+
 } 

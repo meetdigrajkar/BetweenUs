@@ -61,6 +61,18 @@ public class Server {
 				//parse the command
 				parseCommandAndSend(command, dataArray, hostAddress,serverDatagramSocket);
 
+				//if both reactor tasks are complete send a message to all clients
+				for(Room room: rooms) {
+					if(room.reactorTaskCompleted.size() == 2) {
+						boolean firstr = room.reactorTaskCompleted.get(0);
+						boolean secondr = room.reactorTaskCompleted.get(1);
+						
+						if(firstr && secondr) {
+							sendReactorTaskCompletedCommand(room,serverDatagramSocket);
+						}
+					}
+				}
+				
 				if(!rooms.isEmpty()) {
 					System.out.println("number of rooms: " + rooms.size());
 				}
@@ -78,6 +90,30 @@ public class Server {
 		{
 			System.out.println(e);
 		}
+	}
+
+	
+	public static void sendReactorTaskCompletedCommand(Room room, DatagramSocket serverDatagramSocket) {
+		StringBuilder toAllClients = (new StringBuilder());
+		String toallString = "";
+		
+		toAllClients.append(true).append(",");
+		toAllClients.append(9);
+		toallString = toAllClients.toString();
+		
+		for(Entry<Integer, InetAddress> e : room.connectedPlayers.entrySet()) {
+			InetAddress address = e.getValue();
+
+			DatagramPacket toSend = new DatagramPacket(toallString.getBytes(), toallString.getBytes().length, address, 8000);
+
+			try {
+				serverDatagramSocket.send(toSend);
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		}
+		return;
 	}
 
 	//sends the command to all the clients in the room to start the game
@@ -247,6 +283,15 @@ public class Server {
 			}
 
 			toLocalc.append(command);
+		}
+		//1/2 reactor task was completed
+		else if(command == 9) {
+			String roomname = dataArray[1];
+			for(Room room: rooms) {
+				if(room.getRoomName().equals(roomname)) {
+					room.reactorTaskCompleted.add(true);
+				}
+			}
 		}
 
 		//send the command
