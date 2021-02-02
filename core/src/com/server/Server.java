@@ -67,7 +67,9 @@ public class Server {
 						boolean firstr = room.reactorTaskCompleted.get(0);
 						boolean secondr = room.reactorTaskCompleted.get(1);
 						
+						System.out.println("1st reactor task: " + firstr + " 2nd reactor task: " + secondr);
 						if(firstr && secondr) {
+							System.out.println("sending completed: " + "1st reactor task: " + firstr + " 2nd reactor task: " + secondr);
 							sendReactorTaskCompletedCommand(room,serverDatagramSocket);
 						}
 					}
@@ -290,7 +292,10 @@ public class Server {
 			for(Room room: rooms) {
 				if(room.getRoomName().equals(roomname)) {
 					room.reactorTaskCompleted.add(true);
+					break;
 				}
+				System.out.println("reactor task completed message from @address: " + hostAddress + " size of reactor task list is 2: " + (room.reactorTaskCompleted.size() == 2));
+				
 			}
 		}
 

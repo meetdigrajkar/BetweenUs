@@ -356,29 +356,29 @@ public class ReactorTask extends Task {
 		}
 		return false;
 	}
-	
+
 	public static void setCompletedTask(Boolean isCompleted) {
-		completed = isCompleted;
+		if(isCompleted) {
+			((CrewMember) Client.getPlayer()).setCurrentTask(null);
+			((CrewMember) Client.getPlayer()).setTaskCompleted(taskName);
+		}
 	}
 
 	public void render(Batch batch){
 		((CrewMember) Client.getPlayer()).draw(batch);
 		Gdx.input.setInputProcessor(stage);
-		
+
 		stage.draw();
 
 		if(completed) {
-			
 			System.out.println("SUCCESS!");
+			
 			try {
 				Client.sendReactorTaskCompleted();
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			
-			((CrewMember) Client.getPlayer()).setCurrentTask(null);
-			((CrewMember) Client.getPlayer()).setTaskCompleted(taskName);
 		}
 	}
 
