@@ -85,10 +85,20 @@ public class Room {
 		return false;
 	}
 
-	public void addPlayer(String playerName, InetAddress hostAddress) {		
-		ServerPlayer player = new ServerPlayer(playerName, hostAddress);
-		allPlayers.add(player);
-		player.setPlayerID(allPlayers.size());
+	public void addPlayer(String playerName, InetAddress hostAddress) {
+		if(allPlayers.isEmpty()) {
+			ServerPlayer player = new ServerPlayer(playerName, hostAddress);
+			allPlayers.add(player);
+			player.setPlayerID(allPlayers.size());
+		}
+		
+		for(ServerPlayer p: allPlayers) {
+			if(!p.getAddress().equals(hostAddress)) {
+				ServerPlayer player = new ServerPlayer(playerName, hostAddress);
+				allPlayers.add(player);
+				player.setPlayerID(allPlayers.size());
+			}
+		}
 	}
 
 	public String printRoleList() {

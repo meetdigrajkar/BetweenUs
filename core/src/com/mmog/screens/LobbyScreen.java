@@ -87,9 +87,12 @@ public class LobbyScreen extends AbstractScreen{
 		
 		detectingKeyPresses();
 		
+		r.getBatch().begin();
 		//if the player role has updated, replace the player with either crew member or imposter
-		Client.replacePlayerByRole();
-
+		Client.replacePlayerByRole(r.getBatch());
+		r.getBatch().end();
+		
+		
 		r.getBatch().begin();
 
 		Client.getPlayer().draw(r.getBatch());

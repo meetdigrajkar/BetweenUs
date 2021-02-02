@@ -8,6 +8,7 @@ import java.util.Stack;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.mmog.players.CrewMember;
 import com.mmog.players.Imposter;
@@ -16,6 +17,7 @@ import com.mmog.screens.GameScreen;
 import com.mmog.screens.JoinScreen;
 import com.mmog.screens.LobbyScreen;
 import com.mmog.screens.MainScreen;
+import com.mmog.screens.RoleUI;
 import com.mmog.screens.ScreenEnum;
 import com.mmog.screens.ScreenManager;
 import com.mmog.tasks.ReactorTask;
@@ -59,17 +61,18 @@ public class Client
 		return players;
 	}
 
-	public static void replacePlayerByRole() {
+	public static void replacePlayerByRole(Batch batch) {
 		if(!player.role.equals("none")) {
 			System.out.println("NOW ENTERING GAME!");
 			String name = getPlayer().getPlayerName();
 			String roomName = getPlayer().connectedRoomName;
-			
+
 			if(player.role.equals("CrewMember")) {
 				player = new CrewMember(getPlayer().getPlayerID());
 				player.setPlayerName(name);
 				player.connectedRoomName = roomName;
 				//start the game, roles are assigned.
+				//draw the banner for crew member
 				
 				ScreenManager.getInstance().showScreen(ScreenEnum.GAME);
 			}
@@ -78,7 +81,7 @@ public class Client
 				player.setPlayerName(name);
 				player.connectedRoomName = roomName;
 				//start the game, roles are assigned.
-				
+
 				ScreenManager.getInstance().showScreen(ScreenEnum.GAME);
 			}
 
@@ -160,26 +163,26 @@ public class Client
 		DatagramPacket datagramPacket = new DatagramPacket(toSend.getBytes(), toSend.getBytes().length, address, 7077);	     
 		socket.send(datagramPacket);
 	}
-	
+
 	public static void sendReactorTaskCompleted() throws IOException {
 		String toSend = "";
 		toSend += 9 + ",";
 		toSend += Client.getPlayer().connectedRoomName;
-		
+
 		DatagramPacket datagramPacket = new DatagramPacket(toSend.getBytes(), toSend.getBytes().length, address, 7077);	     
 		socket.send(datagramPacket);
-		
+
 	}
-	
+
 	public static void sendStartCommand() throws IOException {
 		String toSend = "";
 		toSend += 3 + ",";
 		toSend += Client.getPlayer().connectedRoomName +",";
-		
+
 		DatagramPacket datagramPacket = new DatagramPacket(toSend.getBytes(), toSend.getBytes().length, address, 7077);	     
 		socket.send(datagramPacket);
 	}
-	
+
 	public static void sendRefreshCommand() throws IOException {
 		String toSend = "";
 		toSend += 6 + ",";
@@ -305,7 +308,7 @@ public class Client
 			//server has returned the created room's host name and the room name
 			String roomName = dataArray[0];
 			String hostName = dataArray[1];
-			
+
 			System.out.println("Server added @Room:" + roomName + " @host:" + hostName);
 		}
 		else if(command == 6) {
