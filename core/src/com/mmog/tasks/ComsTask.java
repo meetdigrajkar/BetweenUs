@@ -111,6 +111,7 @@ public class ComsTask extends Task {
 					while (timeLeft > 0) {
 						modemLabel.setText("Please wait " + timeLeft + " seconds.");
 						System.out.println("Please wait " + timeLeft + " seconds.");
+						System.out.println(" ");
 						timeLeft = timeLeft -1;
 						try {
 							TimeUnit.SECONDS.sleep(1);
@@ -133,8 +134,6 @@ public class ComsTask extends Task {
 		stage.draw();
 		
 	
-		
-		
 		if(completed) {
 			System.out.println("SUCCESS!");
 			((CrewMember) Client.getPlayer()).setCurrentTask(null);
