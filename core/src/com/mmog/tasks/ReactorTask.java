@@ -344,6 +344,14 @@ public class ReactorTask extends Task {
 
 	public static Boolean lastNumber(){
 		if(current == 10){
+			System.out.println("SUCCESS!");
+
+			try {
+				Client.sendReactorTaskCompleted();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			return true;
 		}
 		return false;
@@ -359,7 +367,7 @@ public class ReactorTask extends Task {
 
 	public static void setCompletedTask(Boolean isCompleted) {
 		if(isCompleted) {
-			((CrewMember) Client.getPlayer()).setCurrentTask(null);
+			//((CrewMember) Client.getPlayer()).setCurrentTask(null);
 			((CrewMember) Client.getPlayer()).setTaskCompleted(taskName);
 		}
 	}
@@ -369,17 +377,6 @@ public class ReactorTask extends Task {
 		Gdx.input.setInputProcessor(stage);
 
 		stage.draw();
-
-		if(completed) {
-			System.out.println("SUCCESS!");
-			
-			try {
-				Client.sendReactorTaskCompleted();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
 	}
 
 	public void enableAll(){

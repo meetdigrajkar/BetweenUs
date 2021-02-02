@@ -117,7 +117,7 @@ public class GameScreen extends AbstractScreen{
 		});
 		return allPlayers;
 	}
-	
+
 	@Override
 	public void show() {
 		width = Gdx.graphics.getWidth();
@@ -128,11 +128,10 @@ public class GameScreen extends AbstractScreen{
 		this.setViewport(vp);
 
 		if(Client.getPlayer() instanceof CrewMember) {
-			((CrewMember) Client.getPlayer()).addTask(new
-					AdminTask()); ((CrewMember) Client.getPlayer()).addTask(new ReactorTask()); ((CrewMember)
-							Client.getPlayer()).addTask(new ComsTask()); ((CrewMember) Client.getPlayer()).addTask(new
-									LabTask()); ((CrewMember) Client.getPlayer()).addTask(new ElectricalTask());
-
+			((CrewMember) Client.getPlayer()).addTask(new AdminTask()); 
+			((CrewMember) Client.getPlayer()).addTask(new ReactorTask());
+			((CrewMember) Client.getPlayer()).addTask(new ComsTask()); 
+			((CrewMember) Client.getPlayer()).addTask(new ElectricalTask());
 		}
 
 		map = new TmxMapLoader().load("MapAreas/mapfiles/map.tmx");
@@ -249,13 +248,13 @@ public class GameScreen extends AbstractScreen{
 		}
 
 		r.getBatch().end();
-		
+
 		light.setPosition(Client.getPlayer().getX() + 17, Client.getPlayer().getY() + 17);
 		rayhandler.setCombinedMatrix(cam);
 		rayhandler.updateAndRender();
-		
+
 		detectingKeyPresses();
-		
+
 		r.getBatch().begin();
 
 		//if the player is a crew member, call setCurrentTask() on the player which sets the players current task if they have tried to start a task
@@ -264,8 +263,9 @@ public class GameScreen extends AbstractScreen{
 			if(Gdx.input.isKeyPressed(Keys.SPACE)) {
 				((CrewMember) Client.getPlayer()).setCurrentTaskIfCollided();
 			}
-			((CrewMember) Client.getPlayer()).drawTasks(r.getBatch());
 			
+			((CrewMember) Client.getPlayer()).drawTasks(r.getBatch());
+
 			//if the player has a current task, render the task screen ui
 			if(((CrewMember) Client.getPlayer()).getCurrentTask() != null) {
 				//based on the task the player is doing, render the appropriate task 
@@ -276,16 +276,12 @@ public class GameScreen extends AbstractScreen{
 				}
 				if(task instanceof ReactorTask) {
 					((ReactorTask) task).render(r.getBatch());
-					//System.out.println(task.getTaskName());
 				}
 				if(task instanceof ElectricalTask) {
 					((ElectricalTask) task).render(r.getBatch());
 				}
 				if(task instanceof ComsTask) {
 					((ComsTask) task).render(r.getBatch());
-				}
-				if(task instanceof LabTask) {
-					System.out.println(task.getTaskName());
 				}
 			}
 		}
@@ -305,12 +301,11 @@ public class GameScreen extends AbstractScreen{
 			e.printStackTrace();
 		}
 	}
-	
+
 	public void detectingKeyPresses() {
 		//exiting the game
 		if(Gdx.input.isKeyPressed(Keys.ESCAPE)) {
 			System.out.println("Back To Main Screen!");
-			System.out.println("CLOSED!");
 			Client.removeClient();
 		}
 	}

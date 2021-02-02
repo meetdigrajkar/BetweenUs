@@ -1,7 +1,6 @@
 package com.server;
 
 import java.net.*;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -294,7 +293,7 @@ public class Server {
 					room.reactorTaskCompleted.add(true);
 					break;
 				}
-				System.out.println("reactor task completed message from @address: " + hostAddress + " size of reactor task list is 2: " + (room.reactorTaskCompleted.size() == 2));
+				//System.out.println("reactor task completed message from @address: " + hostAddress + " size of reactor task list is 2: " + (room.reactorTaskCompleted.size() == 2));
 				
 			}
 		}
