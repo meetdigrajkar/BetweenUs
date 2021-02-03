@@ -40,23 +40,37 @@ public class RoleUI extends AbstractScreen{
 		LabelStyle labelFontStyle = new LabelStyle(font, Color.BLACK);
 		font.getData().setScale(0.08f);
 		
-		TextureRegionDrawable bg = new TextureRegionDrawable(new Texture("UI/killBG.png"));
+		TextureRegionDrawable crewbg = new TextureRegionDrawable(new Texture("UI/crewmate.jpg"));
+		TextureRegionDrawable impbg = new TextureRegionDrawable(new Texture("UI/imposter.jpg"));
 
-		Label imp = new Label("You're an Imposter! Sabotage and Kill.", labelFontStyle);
-		Label crew = new Label("You're a Crew Member! Complete Tasks and Find the Imposters.", labelFontStyle);
+		//Label imp = new Label("You're an Imposter! Sabotage and Kill.", labelFontStyle);
+		//Label crew = new Label("You're a Crew Member! Complete Tasks and Find the Imposters.", labelFontStyle);
 		Label p = new Label("Press P to Continue..", labelFontStyle);
 		
-		table.background(bg);
-		
+		table.center();
 		if(Client.getPlayer() instanceof CrewMember) {
-			table.add(crew).center();
+			table.background(crewbg);
+			
+			BitmapFont f = new BitmapFont(Gdx.files.internal("UI/newlabelfont.fnt"));
+			f.getData().setScale(0.2f);
+			LabelStyle lsf = new LabelStyle(f, Color.GREEN);
+			Label c = new Label("Crew Mate!", lsf);
+			
+			table.add(c);
 		}
 		else if(Client.getPlayer() instanceof Imposter) {
-			table.add(imp).center();
+			table.background(impbg);
+			
+			BitmapFont fl = new BitmapFont(Gdx.files.internal("UI/newlabelfont.fnt"));
+			fl.getData().setScale(0.2f);
+			LabelStyle lsfl = new LabelStyle(fl, Color.RED);
+			Label i = new Label("Imposter!", lsfl);
+			
+			table.add(i);
 		}
 		
 		table.row();
-		table.add(p).padTop(10);
+		table.add(p).padTop(50);
 		addActor(table);
 	}
 	
@@ -66,7 +80,7 @@ public class RoleUI extends AbstractScreen{
 		
 		draw();
 		
-		if(Gdx.input.isKeyPressed(Keys.P)) {
+		if(Gdx.input.isKeyPressed(Keys.P) && Client.getPlayer() != null) {
 			System.out.println("ENTERING GAME!");
 			ScreenManager.getInstance().showScreen(ScreenEnum.GAME);
 		}

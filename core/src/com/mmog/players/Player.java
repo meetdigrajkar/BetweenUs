@@ -103,6 +103,9 @@ public class Player extends Sprite{
 	
 	public void setCollisionLayer(TiledMapTileLayer collisionLayer) {
 		this.collisionLayer = collisionLayer;
+		
+		tileWidth = collisionLayer.getTileWidth();
+	    tileHeight = collisionLayer.getTileHeight();
 	}
 
 	public TiledMapTileLayer getCollisionLayer() {
@@ -171,8 +174,6 @@ public class Player extends Sprite{
 
 	public void render(float delta) throws Exception
 	{
-		tileWidth = collisionLayer.getTileWidth();
-	    tileHeight = collisionLayer.getTileHeight();
 	    
 		if(Gdx.input.isKeyPressed(Input.Keys.A)){
 			for(int i = 0; i<speed;i++) {

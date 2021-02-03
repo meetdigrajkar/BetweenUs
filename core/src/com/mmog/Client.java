@@ -78,19 +78,18 @@ public class Client
 				player.setPlayerName(name);
 				player.connectedRoomName = roomName;
 				//start the game, roles are assigned.
-				//draw the banner for crew member		
+				//draw the banner for crew member	
+				ScreenManager.getInstance().showScreen(ScreenEnum.ROLE_UI);
 			}
 			else if(Client.getPlayer().role.equals("Imposter")) {
 				player = new Imposter(getPlayer().getPlayerID());
 				player.setPlayerName(name);
 				player.connectedRoomName = roomName;
 				//start the game, roles are assigned.
+				ScreenManager.getInstance().showScreen(ScreenEnum.ROLE_UI);
 			}
 
 			player.setPlayerName(player.getPlayerName());
-			
-			//show the player's role to the screen
-			ScreenManager.getInstance().showScreen(ScreenEnum.ROLE_UI);
 		}
 	}
 
