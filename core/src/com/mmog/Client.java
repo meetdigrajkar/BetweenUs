@@ -7,9 +7,13 @@ import java.util.Map.Entry;
 import java.util.Stack;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.mmog.players.CrewMember;
 import com.mmog.players.Imposter;
 import com.mmog.players.Player;
@@ -30,7 +34,8 @@ public class Client
 	static InetAddress address;
 	private static Player player;
 	private static ArrayList<Player> players;
-
+	static float waitTime = 0;
+	
 	public Client() throws IOException {
 		players = new ArrayList<Player>();
 		initSockets();
@@ -64,28 +69,28 @@ public class Client
 	public static void replacePlayerByRole(Batch batch) {
 		if(!player.role.equals("none")) {
 			System.out.println("NOW ENTERING GAME!");
+			
 			String name = getPlayer().getPlayerName();
 			String roomName = getPlayer().connectedRoomName;
-
+			
 			if(player.role.equals("CrewMember")) {
 				player = new CrewMember(getPlayer().getPlayerID());
 				player.setPlayerName(name);
 				player.connectedRoomName = roomName;
 				//start the game, roles are assigned.
-				//draw the banner for crew member
-				
-				ScreenManager.getInstance().showScreen(ScreenEnum.GAME);
+				//draw the banner for crew member		
 			}
 			else if(Client.getPlayer().role.equals("Imposter")) {
 				player = new Imposter(getPlayer().getPlayerID());
 				player.setPlayerName(name);
 				player.connectedRoomName = roomName;
 				//start the game, roles are assigned.
-
-				ScreenManager.getInstance().showScreen(ScreenEnum.GAME);
 			}
 
 			player.setPlayerName(player.getPlayerName());
+			
+			//show the player's role to the screen
+			ScreenManager.getInstance().showScreen(ScreenEnum.ROLE_UI);
 		}
 	}
 

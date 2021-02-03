@@ -26,6 +26,10 @@ public class CrewMember extends Player {
 		f.draw(batch, tasksToString(), getX() - (Gdx.graphics.getWidth()/6) + 50  , getY() + Gdx.graphics.getHeight()/6 + 35);
 	}
 	
+	public void drawLabel(Batch batch) {
+		
+	}
+	
 	public void addTask(Task task) {
 		tasks.add(task);
 	}

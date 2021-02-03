@@ -12,6 +12,11 @@ public enum ScreenEnum {
             return new LobbyScreen();
         }
     },
+	ROLE_UI {
+        public AbstractScreen getScreen(Object... params) {
+            return new RoleUI();
+        }
+    },
 	JOIN_SCREEN {
         public AbstractScreen getScreen(Object... params) {
             return new JoinScreen();

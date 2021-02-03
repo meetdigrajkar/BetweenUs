@@ -89,6 +89,11 @@ public class GameScreen extends AbstractScreen{
 	BodyDef bodydef;
 	Body body;
 	Light light;
+	
+	BitmapFont f = new BitmapFont(Gdx.files.internal("UI/newlabelfont.fnt"));
+	LabelStyle labelFontStyle = new LabelStyle(f, Color.WHITE);
+	Label crewLabel = new Label("YOU'RE A CREW MEMBER! COMPLETE TASKS TO WIN", labelFontStyle);
+	Label impLabel = new Label("YOU'RE AN IMPOSTER! SABOTAGE AND KILL TO WIN", labelFontStyle);
 
 	public static final float TILE_SIZE = 1;
 
@@ -265,7 +270,8 @@ public class GameScreen extends AbstractScreen{
 			}
 			
 			((CrewMember) Client.getPlayer()).drawTasks(r.getBatch());
-
+			
+			
 			//if the player has a current task, render the task screen ui
 			if(((CrewMember) Client.getPlayer()).getCurrentTask() != null) {
 				//based on the task the player is doing, render the appropriate task 
