@@ -58,6 +58,7 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.mmog.Client;
 import com.mmog.players.CrewMember;
+import com.mmog.players.DeadPlayer;
 import com.mmog.players.Imposter;
 import com.mmog.players.Player;
 
@@ -101,6 +102,8 @@ public class GameScreen extends AbstractScreen{
 	FrameBuffer shadowBuffer,worldBuffer;
 
 	public static final float TILE_SIZE = 1;
+	
+	public ArrayList<DeadPlayer> deadPlayers;
 
 	public GameScreen() {
 		super();
@@ -145,7 +148,8 @@ public class GameScreen extends AbstractScreen{
 		cam.zoom = 0.38f;
 		vp = new FitViewport(1920, 1080,cam);
 		this.setViewport(vp);
-
+		deadPlayers = new ArrayList<DeadPlayer>();
+		
 		if(Client.getPlayer() instanceof CrewMember) {
 			((CrewMember) Client.getPlayer()).addTask(new AdminTask()); 
 			((CrewMember) Client.getPlayer()).addTask(new ReactorTask());
@@ -245,18 +249,25 @@ public class GameScreen extends AbstractScreen{
 		//map renderer
 		r.setView(cam);
 		r.render();
-
+		
 		r.getBatch().begin();
+		//draw all the dead bodies
+		for(DeadPlayer dp: deadPlayers) {
+			dp.draw(r.getBatch());
+		}
 		
 		//draw all the other players
 		for (Player p : getYBasedSortedPlayers())
 		{
-			if(p.isDead) {
-				p.drawDeadSprite(r.getBatch());
+			if(p.isDead && !p.addedToDead) {
+				deadPlayers.add(new DeadPlayer((int)p.getX(),(int)p.getY()));
+				p.addedToDead = true;
+				
 			}
 			//ghosts players can see everyone
 			if(Client.getPlayer().isDead) {
 				p.draw(r.getBatch());
+				
 			}
 			//alive players can see ONLY alive players 
 			else if(!Client.getPlayer().isDead) {
@@ -265,9 +276,8 @@ public class GameScreen extends AbstractScreen{
 				}
 			}
 		}
-
 		r.getBatch().end();
-
+		
 		light.setPosition(Client.getPlayer().getX() + 17, Client.getPlayer().getY() + 17);
 		rayhandler.setCombinedMatrix(cam);
 		rayhandler.updateAndRender();
@@ -311,20 +321,23 @@ public class GameScreen extends AbstractScreen{
 
 			//check if the local player overlapped any players
 			for(Player p: getYBasedSortedPlayers()) {
-				if(!Client.getPlayer().isDead && Client.getPlayer().playerRec.overlaps(p.playerRec)) {
-					if(Gdx.input.isKeyPressed(Keys.SPACE)) {
-						try {
-							p.isDead = true;
-							Client.sendPlayerKilled(p.getPlayerName());
-						} catch (IOException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
+				if(!Client.getPlayer().getPlayerName().equals(p.getPlayerName())) {
+					if(!Client.getPlayer().isDead && Client.getPlayer().playerRec.overlaps(p.playerRec)) {
+						if(Gdx.input.isKeyPressed(Keys.SPACE)) {
+							try {
+								p.isDead = true;
+								System.out.println("PLAYER KILELD: " + p.getPlayerName());
+								Client.sendPlayerKilled(p.getPlayerName());
+							} catch (IOException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
 						}
 					}
 				}
 			}
 		}
-	
+		
 		try {
 			Client.getPlayer().render(Gdx.graphics.getDeltaTime());
 		} catch (Exception e) {

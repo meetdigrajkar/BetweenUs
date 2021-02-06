@@ -57,12 +57,15 @@ public class Player extends Sprite{
 	Animation<TextureRegion> animation;
 	//animated background
 	TextureRegion[] frames = new TextureRegion[33];
+	public boolean addedToDead;
 
 	public Player(int playerID)
 	{
 		super(new Sprite (new Texture("idle.png")));
 		ghostSet = false;
 		speed = 4;
+		setSize(32,50);
+		addedToDead = false;
 		//this.setColor(Color.YELLOW);
 		justKilled = false;
 		//player collison rectangle
@@ -134,16 +137,17 @@ public class Player extends Sprite{
 	@Override
 	public void draw(Batch batch)
 	{
-
 		update(Gdx.graphics.getDeltaTime(), batch);
-
 	}
 
 	public void drawDeadSprite(Batch batch) {
 		float x = getX();
 		float y = getY();
 		
-		Sprite deadSprite = new Sprite((new Texture("Among Us - Player Base/Individual Sprites/Death/Dead0033.png")),(int) x,(int) y,(int) 32,(int) 45);
+		Sprite deadSprite = new Sprite((new Texture("Among Us - Player Base/Individual Sprites/Death/Dead0033.png")));
+		setSize(32,45);
+		setPosition(x,y);
+		
 		deadSprite.draw(batch);
 	}
 
@@ -156,11 +160,11 @@ public class Player extends Sprite{
 		//batch.setColor(Color.YELLOW);
 
 		elapsedTime += delta;
-		if (isFlipped && !isIdle)
+		if (isFlipped && !isIdle && !isDead)
 		{
 			batch.draw(walkLeft.getKeyFrame(elapsedTime, true), getX(), getY(),32,50);
 		}
-		else if (!isFlipped && !isIdle)
+		else if (!isFlipped && !isIdle && !isDead)
 		{
 			batch.draw(walkRight.getKeyFrame(elapsedTime, true), getX(), getY(),32,50);
 		}
