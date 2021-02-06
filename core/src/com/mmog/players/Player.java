@@ -35,7 +35,7 @@ public class Player extends Sprite{
 	private TextureAtlas walkLeftAtlas;
 	private Animation<TextureRegion> walkLeft;
 	private Animation<TextureRegion> walkRight;
-	private float elapsedTime = 0;
+	public float elapsedTime = 0;
 	private String playerName;
 	public boolean isFlipped, isDead, isIdle;
 	private int playerID;
@@ -53,7 +53,10 @@ public class Player extends Sprite{
 	public Color playerColor;
 	public int speed;
 	public Rectangle playerRec;
-	public boolean ghostSet;
+	public boolean ghostSet,justKilled;
+	Animation<TextureRegion> animation;
+	//animated background
+	TextureRegion[] frames = new TextureRegion[33];
 	
 	public Player(int playerID)
 	{
@@ -62,10 +65,10 @@ public class Player extends Sprite{
 		setSize(32,50);
 		speed = 4;
 		//this.setColor(Color.YELLOW);
-		
+		justKilled = false;
 		//player collison rectangle
 		playerRec = new Rectangle(getX(),getY(),getWidth(),getHeight());
-				
+		createDeadAnim();
 		isHost = false;
 		readyToPlay = false;
 		walkRightAtlas = new TextureAtlas(Gdx.files.internal("Walk.atlas"));
@@ -92,6 +95,11 @@ public class Player extends Sprite{
 				tr.flip(true, false);
 			}
 		}
+	}
+	
+	public void setDead() {
+		set(new Sprite((new Texture("Among Us - Player Base/Individual Sprites/Ghost/ghostbob0001.png")),(int) getX(),(int) getY(),(int) getWidth(),(int) getHeight()));
+		ghostSet = true;
 	}
 	
 	public boolean getIsIdle() {
@@ -141,6 +149,14 @@ public class Player extends Sprite{
 		{
 			batch.draw(walkRight.getKeyFrame(elapsedTime, true), getX(), getY(),32,50);
 		}
+		else if(justKilled) {
+			batch.draw(animation.getKeyFrame(elapsedTime),getX(),getY(),32,50);
+			
+			if(elapsedTime > 5) {
+				//setDead();
+				justKilled = false;
+			}
+		}
 
 		if (isIdle)
 		{
@@ -150,6 +166,21 @@ public class Player extends Sprite{
 			}
 			super.draw(batch);
 		}
+	}
+	
+	public void createDeadAnim() {
+		//get all the frames
+		for(int i = 0; i < 33; i++) {
+			int j = i + 1;
+			if(j < 10) {
+				frames[i] = (new TextureRegion(new Texture("Among Us - Player Base/Individual Sprites/Death/Dead000" + j + ".png")));
+			}
+			else {
+				frames[i] = (new TextureRegion(new Texture("Among Us - Player Base/Individual Sprites/Death/Dead00" + j + ".png")));
+			}
+		}
+
+		animation = new Animation<TextureRegion>(1f/15f,frames);
 	}
 
 	public boolean collisionAtX(int x, String key) {

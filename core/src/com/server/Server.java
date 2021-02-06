@@ -105,26 +105,31 @@ public class Server {
 
 	//sends the command to all the clients in the room to start the game
 	public static void sendStartGameCommand(Room room, DatagramSocket serverDatagramSocket) {
-		StringBuilder toAllClients = (new StringBuilder());
 		String toallString = "";
 		String role = "";
 		
 		for(ServerPlayer player : room.allPlayers) {
 			InetAddress address = player.getAddress();
-
-			//assign a random role from the role list
-			role = room.assignRole();
-			toAllClients.append(role).append(",");
-			toAllClients.append(3);
-			toallString = toAllClients.toString();
+			StringBuilder toAllClients = (new StringBuilder());
 			
-			DatagramPacket toSend = new DatagramPacket(toallString.getBytes(), toallString.getBytes().length, address, 8000);
+			//assign a random role from the role list
+			System.out.println(room.printRoleList());
+			
+			if(room.rolelist.size() > 0) {
+				role = room.assignRole();
+				toAllClients.append(role).append(",");
+				toAllClients.append(3);
+				toallString = toAllClients.toString();
+				
+				System.out.println("Sending role: " + role + " to address: " + address);
+				DatagramPacket toSend = new DatagramPacket(toallString.getBytes(), toallString.getBytes().length, address, 8000);
 
-			try {
-				serverDatagramSocket.send(toSend);
-			} catch (IOException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
+				try {
+					serverDatagramSocket.send(toSend);
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
 			}
 		}
 		return;
@@ -194,7 +199,7 @@ public class Server {
 				if(room.getRoomName().equals(roomName)) {
 					System.out.println("found room");
 
-					room.addPlayer(dataArray[1], hostAddress);
+					//room.addPlayer(dataArray[1], hostAddress);
 
 					for(int i = 3; i < dataArray.length; i++) {
 						//System.out.println(dataArray[i].trim());
@@ -353,7 +358,7 @@ public class Server {
 					if((command == 0) && address.equals(hostAddress)) {
 						toSend = new DatagramPacket(toLocalc.getBytes(), toLocalc.getBytes().length, hostAddress, 8000);
 					}
-					else if((command == 0 || command == 1 || command == 4 ) && !address.equals(hostAddress)) {
+					else if((command == 0 || command == 1 || command == 4 || command == 10) && !address.equals(hostAddress)) {
 						toSend = new DatagramPacket(toAllClients.getBytes(), toAllClients.getBytes().length, address, 8000);
 					}
 

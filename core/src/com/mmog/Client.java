@@ -342,10 +342,14 @@ public class Client
 		else if(command == 10) {
 			String pname = dataArray[0];
 			if(getPlayer().getPlayerName().equals(pname)) {
+				getPlayer().justKilled = true;
+				getPlayer().elapsedTime = 0;
 				getPlayer().isDead = true;
 			}else {
 				for(Player p: players) {
 					if(p.getPlayerName().equals(pname)) {
+						p.elapsedTime = 0;
+						p.justKilled = true;
 						p.isDead = true;
 					}
 				}

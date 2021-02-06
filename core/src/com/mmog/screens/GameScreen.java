@@ -238,7 +238,7 @@ public class GameScreen extends AbstractScreen{
 		Gdx.gl.glClearColor(0, 0, 0, 0);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		world.step(1/60f, 6, 2);
-
+		Gdx.input.setInputProcessor(this);
 		//updates the camera position
 		update(delta);
 
@@ -247,18 +247,20 @@ public class GameScreen extends AbstractScreen{
 		r.render();
 
 		r.getBatch().begin();
+		
 		//draw all the other players
 		for (Player p : getYBasedSortedPlayers())
 		{
-			//draw the player based on whether he is a crew member or imposter
-			if(p instanceof CrewMember) {
-				((CrewMember) p).draw(r.getBatch());
+			//if the local player is alive, ONLY draw alive players
+			if(!Client.getPlayer().isDead) {
+				if(!p.isDead) {
+					p.draw(r.getBatch());
+				}
 			}
-			else if(p instanceof Imposter) {
-				((Imposter) p).draw(r.getBatch());
-			}
-			else
+			//if the local player is dead, draw both ALIVE and DEAD players
+			else if(Client.getPlayer().isDead) {
 				p.draw(r.getBatch());
+			}
 		}
 
 		r.getBatch().end();
@@ -309,6 +311,7 @@ public class GameScreen extends AbstractScreen{
 				if(!Client.getPlayer().isDead && Client.getPlayer().playerRec.overlaps(p.playerRec)) {
 					if(Gdx.input.isKeyPressed(Keys.SPACE)) {
 						try {
+							p.isDead = true;
 							Client.sendPlayerKilled(p.getPlayerName());
 						} catch (IOException e) {
 							// TODO Auto-generated catch block
@@ -318,14 +321,8 @@ public class GameScreen extends AbstractScreen{
 				}
 			}
 		}
-		
-		if(Client.getPlayer().isDead && !Client.getPlayer().ghostSet) {
-			Client.getPlayer().set(new Sprite(new Texture("Among Us - Player Base/Individual Sprites/Ghost/ghostbob0001.png")));
-			Client.getPlayer().ghostSet = true;
-		}
 	
 		try {
-			Gdx.input.setInputProcessor(this);
 			Client.getPlayer().render(Gdx.graphics.getDeltaTime());
 		} catch (Exception e) {
 			// TODO Auto-generated catch block

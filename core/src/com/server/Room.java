@@ -55,7 +55,7 @@ public class Room {
 		}
 		return false;
 	}
-	
+
 	public InetAddress getAddressOfPlayer(String playerName) {
 		InetAddress address = null;
 		for(ServerPlayer p: allPlayers) {
@@ -68,23 +68,18 @@ public class Room {
 
 	public String assignRole() {
 		String role = "";
-		//every player has a 50/50 chance of being imposter or crewmember
-		int upperBound = 100;
-
-		int playerTypeSelector = r.nextInt(upperBound);
-		
-		if(playerTypeSelector < 50 && rolelist.contains("Imposter")) {
-			role = "Imposter";
-			rolelist.remove("Imposter");
+		if(rolelist.size() > 1) {
+			int upperBound = rolelist.size();
+			int playerTypeSelector = r.nextInt(upperBound - 1) + 1;
+			
+			role = rolelist.get(playerTypeSelector - 1);
+			rolelist.remove(playerTypeSelector - 1);
 		}
-		else if(playerTypeSelector >= 50 && rolelist.contains("CrewMember")) {
-			role = "CrewMember";
-			rolelist.remove("CrewMember");
+		else {
+			role = rolelist.get(0);
+			rolelist.remove(0);
 		}
-		else if (!rolelist.contains("Imposter") && rolelist.contains("CrewMember")) {
-			role = "CrewMember";
-			rolelist.remove("CrewMember");
-		}
+	
 		return role;
 	}
 	public boolean isRoomEmpty() {
@@ -95,19 +90,9 @@ public class Room {
 	}
 
 	public void addPlayer(String playerName, InetAddress hostAddress) {
-		if(allPlayers.isEmpty()) {
-			ServerPlayer player = new ServerPlayer(playerName, hostAddress);
-			allPlayers.add(player);
-			player.setPlayerID(allPlayers.size());
-		}
-		
-		for(ServerPlayer p: allPlayers) {
-			if(!p.getAddress().equals(hostAddress)) {
-				ServerPlayer player = new ServerPlayer(playerName, hostAddress);
-				allPlayers.add(player);
-				player.setPlayerID(allPlayers.size());
-			}
-		}
+		ServerPlayer player = new ServerPlayer(playerName, hostAddress);
+		allPlayers.add(player);
+		player.setPlayerID(allPlayers.size());
 	}
 
 	public String printRoleList() {
