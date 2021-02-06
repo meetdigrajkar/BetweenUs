@@ -57,7 +57,7 @@ public class Player extends Sprite{
 	Animation<TextureRegion> animation;
 	//animated background
 	TextureRegion[] frames = new TextureRegion[33];
-	
+
 	public Player(int playerID)
 	{
 		super(new Sprite (new Texture("idle.png")));
@@ -67,7 +67,8 @@ public class Player extends Sprite{
 		//this.setColor(Color.YELLOW);
 		justKilled = false;
 		//player collison rectangle
-		playerRec = new Rectangle(getX(),getY(),getWidth(),getHeight());
+		playerRec = new Rectangle(getX(),getY(),32,50);
+
 		createDeadAnim();
 		isHost = false;
 		readyToPlay = false;
@@ -80,12 +81,12 @@ public class Player extends Sprite{
 		isIdle = false;
 
 		this.setPlayerID(playerID);
-	
+
 		this.playerName = "";
 
 		f = new BitmapFont();
-	
-		
+
+
 		for (float i = 0; i < 1; i += 0.01f)
 		{
 			TextureRegion tr = walkLeft.getKeyFrame(i,true);
@@ -96,29 +97,29 @@ public class Player extends Sprite{
 			}
 		}
 	}
-	
+
 	public void setDead() {
-		set(new Sprite((new Texture("Among Us - Player Base/Individual Sprites/Ghost/ghostbob0001.png")),(int) getX(),(int) getY(),(int) getWidth(),(int) getHeight()));
+		set(new Sprite((new Texture("Among Us - Player Base/Individual Sprites/Death/Dead0033.png")),(int) getX(),(int) getY(),(int) getWidth(),(int) getHeight()));
 		ghostSet = true;
 	}
-	
+
 	public boolean getIsIdle() {
 		return isIdle;
 	}
-	
+
 	public void setBody(Body body) {
 		this.body = body;
 	}
-	
+
 	public Body getBody() {
 		return this.body;
 	}
-	
+
 	public void setCollisionLayer(TiledMapTileLayer collisionLayer) {
 		this.collisionLayer = collisionLayer;
-		
+
 		tileWidth = collisionLayer.getTileWidth();
-	    tileHeight = collisionLayer.getTileHeight();
+		tileHeight = collisionLayer.getTileHeight();
 	}
 
 	public TiledMapTileLayer getCollisionLayer() {
@@ -128,19 +129,25 @@ public class Player extends Sprite{
 	@Override
 	public void draw(Batch batch)
 	{
+
 		update(Gdx.graphics.getDeltaTime(), batch);
+
+	}
+
+	public void drawDeadSprite(Batch batch) {
+		Sprite deadSprite = new Sprite((new Texture("Among Us - Player Base/Individual Sprites/Death/Dead0033.png")),(int) getX(),(int) getY(),(int) 32,(int) 50);
+		deadSprite.draw(batch);
 	}
 
 	public void update(float delta, Batch batch) {
 		//player name
 		f.draw(batch, getPlayerName(), getX() + getWidth()/2 - getPlayerName().length() * 2 - 2, getY() + getHeight() + 20);
 		playerRec.setPosition(getX(), getY());
-		
+
 		//set player color here too
 		//batch.setColor(Color.YELLOW);
 
 		elapsedTime += delta;
-
 		if (isFlipped && !isIdle)
 		{
 			batch.draw(walkLeft.getKeyFrame(elapsedTime, true), getX(), getY(),32,50);
@@ -149,17 +156,23 @@ public class Player extends Sprite{
 		{
 			batch.draw(walkRight.getKeyFrame(elapsedTime, true), getX(), getY(),32,50);
 		}
+		
+		/*
 		else if(justKilled) {
 			batch.draw(animation.getKeyFrame(elapsedTime),getX(),getY(),32,50);
-			
+
 			if(elapsedTime > 5) {
 				//setDead();
 				justKilled = false;
 			}
 		}
-
+		*/
+		
 		if (isIdle)
 		{
+			if(!ghostSet) {
+				setDead();
+			}
 			if(isFlipped && !isFlipX() || !isFlipped && isFlipX())
 			{
 				flip(true, false);
@@ -167,7 +180,7 @@ public class Player extends Sprite{
 			super.draw(batch);
 		}
 	}
-	
+
 	public void createDeadAnim() {
 		//get all the frames
 		for(int i = 0; i < 33; i++) {
@@ -205,7 +218,7 @@ public class Player extends Sprite{
 		collisionY |= collisionLayer.getCell((int) (getX()/tileWidth), (int) ((getY() + y + getHeight()) / tileHeight)).getTile().getProperties().containsKey(key);
 		collisionY |= collisionLayer.getCell((int) ((getX()+ getWidth() /2) /tileWidth), (int) ((getY()+ y  + getHeight()) / tileHeight)).getTile().getProperties().containsKey(key);
 		collisionY |= collisionLayer.getCell((int) ((getX()+ getWidth()) /tileWidth), (int) ((getY()+ y  + getHeight()) / tileHeight)).getTile().getProperties().containsKey(key);
-		
+
 		return collisionY;
 	}
 
@@ -217,7 +230,7 @@ public class Player extends Sprite{
 					setX(getX() - 1);
 				}
 			}
-			
+
 			isFlipped = true;
 			isIdle=false;
 			playerMoved = true;
@@ -229,7 +242,7 @@ public class Player extends Sprite{
 					setX(getX() + 1);
 				}
 			}
-			
+
 			isFlipped = false;
 			isIdle=false;
 			playerMoved = true;
@@ -246,7 +259,7 @@ public class Player extends Sprite{
 			isIdle = false;
 			playerMoved = true;
 		}
-		
+
 		if (Gdx.input.isKeyPressed(Input.Keys.S))
 		{
 			for(int i = 0; i<speed;i++) {
@@ -264,12 +277,12 @@ public class Player extends Sprite{
 			Client.sendUpdate(getX(), getY(), isFlipped, isDead, isIdle);
 			playerMoved = false;
 		}
-		
+
 		if(playerMoved) {
 			Client.sendUpdate(getX(), getY(), isFlipped, isDead, isIdle);
 		}
 	}
-	
+
 	public int getPlayerID() {
 		return playerID;
 	}
@@ -277,7 +290,7 @@ public class Player extends Sprite{
 	public void setPlayerID(int playerID) {
 		this.playerID = playerID;
 	}
-	
+
 	public void setAll(float x, float y, boolean isFlipped, boolean isDead, boolean isIdle) {
 		setX(x);
 		setY(y);
@@ -285,20 +298,20 @@ public class Player extends Sprite{
 		this.isDead = isDead;
 		this.isIdle = isIdle;
 	}
-	
+
 	public ArrayList<String> getAll(){
 		ArrayList<String> allInfo = new ArrayList<>();
-		
+
 		allInfo.add(playerName);
 		allInfo.add(getX() + "");
 		allInfo.add(getY() + "");
 		allInfo.add(isFlipped + "");
 		allInfo.add(isDead + "");
 		allInfo.add(isIdle + "");
-		
+
 		return allInfo;
 	}
-	
+
 	public String getPlayerName() {
 		return playerName;
 	}

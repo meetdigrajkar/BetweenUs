@@ -251,14 +251,13 @@ public class GameScreen extends AbstractScreen{
 		//draw all the other players
 		for (Player p : getYBasedSortedPlayers())
 		{
-			//if the local player is alive, ONLY draw alive players
-			if(!Client.getPlayer().isDead) {
-				if(!p.isDead) {
-					p.draw(r.getBatch());
-				}
+			if(Client.getPlayer().getPlayerName().equals(p.getPlayerName())) {
+				p.draw(r.getBatch());
 			}
-			//if the local player is dead, draw both ALIVE and DEAD players
-			else if(Client.getPlayer().isDead) {
+			if(p.isDead) {
+				p.drawDeadSprite(r.getBatch());
+			}
+			else {
 				p.draw(r.getBatch());
 			}
 		}
