@@ -251,14 +251,18 @@ public class GameScreen extends AbstractScreen{
 		//draw all the other players
 		for (Player p : getYBasedSortedPlayers())
 		{
-			if(Client.getPlayer().getPlayerName().equals(p.getPlayerName())) {
-				p.draw(r.getBatch());
-			}
 			if(p.isDead) {
 				p.drawDeadSprite(r.getBatch());
 			}
-			else {
+			//ghosts players can see everyone
+			if(Client.getPlayer().isDead) {
 				p.draw(r.getBatch());
+			}
+			//alive players can see ONLY alive players 
+			else if(!Client.getPlayer().isDead) {
+				if(!p.isDead) {
+					p.draw(r.getBatch());
+				}
 			}
 		}
 

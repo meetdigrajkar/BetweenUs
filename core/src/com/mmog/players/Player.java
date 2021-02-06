@@ -62,7 +62,6 @@ public class Player extends Sprite{
 	{
 		super(new Sprite (new Texture("idle.png")));
 		ghostSet = false;
-		setSize(32,50);
 		speed = 4;
 		//this.setColor(Color.YELLOW);
 		justKilled = false;
@@ -99,7 +98,13 @@ public class Player extends Sprite{
 	}
 
 	public void setDead() {
-		set(new Sprite((new Texture("Among Us - Player Base/Individual Sprites/Death/Dead0033.png")),(int) getX(),(int) getY(),(int) getWidth(),(int) getHeight()));
+		float x = getX();
+		float y = getY();
+		
+		set(new Sprite((new Texture("Among Us - Player Base/Individual Sprites/Ghost/ghostbob0048.png"))));
+		setSize(32,45);
+		setPosition(x,y);
+		
 		ghostSet = true;
 	}
 
@@ -135,7 +140,10 @@ public class Player extends Sprite{
 	}
 
 	public void drawDeadSprite(Batch batch) {
-		Sprite deadSprite = new Sprite((new Texture("Among Us - Player Base/Individual Sprites/Death/Dead0033.png")),(int) getX(),(int) getY(),(int) 32,(int) 50);
+		float x = getX();
+		float y = getY();
+		
+		Sprite deadSprite = new Sprite((new Texture("Among Us - Player Base/Individual Sprites/Death/Dead0033.png")),(int) x,(int) y,(int) 32,(int) 45);
 		deadSprite.draw(batch);
 	}
 
@@ -170,7 +178,7 @@ public class Player extends Sprite{
 		
 		if (isIdle)
 		{
-			if(!ghostSet) {
+			if(!ghostSet && isDead) {
 				setDead();
 			}
 			if(isFlipped && !isFlipX() || !isFlipped && isFlipX())
