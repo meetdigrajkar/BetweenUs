@@ -297,7 +297,18 @@ public class Server {
 				}
 			}
 		}
-
+		//player was killed command was sent
+		else if(command == 10)
+		{
+			toAll = true;
+			toLocal = false;
+			
+			roomName = dataArray[1];
+			String pname = dataArray[2];
+			
+			toAllClients = (new StringBuilder());
+			toAllClients.append(pname).append(",").append(command);
+		}
 		//send the command
 		sendCommand(toLocalc.toString(),toAllClients.toString(),serverDatagramSocket, command, toLocal, toAll, hostAddress, roomName);
 	}

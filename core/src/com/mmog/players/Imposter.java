@@ -8,7 +8,6 @@ public class Imposter extends Player{
 
 	public Imposter(int playerID) {
 		super(playerID);
-		super.speed = 2;
 	}
 	
 	

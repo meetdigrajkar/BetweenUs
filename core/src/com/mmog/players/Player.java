@@ -15,6 +15,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -36,8 +37,7 @@ public class Player extends Sprite{
 	private Animation<TextureRegion> walkRight;
 	private float elapsedTime = 0;
 	private String playerName;
-	private Label playerNameLabel;
-	private boolean isFlipped, isDead, isIdle;
+	public boolean isFlipped, isDead, isIdle;
 	private int playerID;
 	private TiledMapTileLayer collisionLayer;
 	boolean collisionX = false, collisionY = false;
@@ -52,15 +52,20 @@ public class Player extends Sprite{
 	public boolean isHost;
 	public Color playerColor;
 	public int speed;
+	public Rectangle playerRec;
+	public boolean ghostSet;
 	
 	public Player(int playerID)
 	{
 		super(new Sprite (new Texture("idle.png")));
-		
+		ghostSet = false;
 		setSize(32,50);
 		speed = 4;
 		//this.setColor(Color.YELLOW);
 		
+		//player collison rectangle
+		playerRec = new Rectangle(getX(),getY(),getWidth(),getHeight());
+				
 		isHost = false;
 		readyToPlay = false;
 		walkRightAtlas = new TextureAtlas(Gdx.files.internal("Walk.atlas"));
@@ -121,6 +126,7 @@ public class Player extends Sprite{
 	public void update(float delta, Batch batch) {
 		//player name
 		f.draw(batch, getPlayerName(), getX() + getWidth()/2 - getPlayerName().length() * 2 - 2, getY() + getHeight() + 20);
+		playerRec.setPosition(getX(), getY());
 		
 		//set player color here too
 		//batch.setColor(Color.YELLOW);
@@ -174,7 +180,6 @@ public class Player extends Sprite{
 
 	public void render(float delta) throws Exception
 	{
-	    
 		if(Gdx.input.isKeyPressed(Input.Keys.A)){
 			for(int i = 0; i<speed;i++) {
 				if(!collisionAtX(-1,"blocked")) {

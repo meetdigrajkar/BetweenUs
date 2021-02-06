@@ -1,6 +1,7 @@
 package com.mmog.screens;
 
 import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -16,11 +17,13 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.maps.MapObject;
@@ -89,11 +92,13 @@ public class GameScreen extends AbstractScreen{
 	BodyDef bodydef;
 	Body body;
 	Light light;
-	
+
 	BitmapFont f = new BitmapFont(Gdx.files.internal("UI/newlabelfont.fnt"));
 	LabelStyle labelFontStyle = new LabelStyle(f, Color.WHITE);
 	Label crewLabel = new Label("YOU'RE A CREW MEMBER! COMPLETE TASKS TO WIN", labelFontStyle);
 	Label impLabel = new Label("YOU'RE AN IMPOSTER! SABOTAGE AND KILL TO WIN", labelFontStyle);
+
+	FrameBuffer shadowBuffer,worldBuffer;
 
 	public static final float TILE_SIZE = 1;
 
@@ -121,6 +126,15 @@ public class GameScreen extends AbstractScreen{
 			}
 		});
 		return allPlayers;
+	}
+
+	public void createFrameBuffer() {
+		shadowBuffer = new FrameBuffer(Format.RGB888, (int) width, (int) height, false);
+		worldBuffer = new FrameBuffer(Format.RGB888, (int) width, (int) height, false);
+
+		cam = new OrthographicCamera(worldBuffer.getWidth(), worldBuffer.getHeight());
+		cam.setToOrtho(true);
+		cam.update();
 	}
 
 	@Override
@@ -159,13 +173,15 @@ public class GameScreen extends AbstractScreen{
 
 		//ray handler
 		rayhandler = new RayHandler(world);
-		rayhandler.setAmbientLight(0.00001f);
+		rayhandler.setAmbientLight(0.01f);
 		RayHandler.useDiffuseLight(true);
 
 		//cone light for the player
 		//change the light distance when the imposter sends the sabotage request
 		light = new ConeLight(rayhandler,120,Color.WHITE, 350,Client.getPlayer().getX(), Client.getPlayer().getY(),360,360);
 		light.setPosition(Client.getPlayer().getX()+ 17,Client.getPlayer().getY()+ 17);
+
+		//createFrameBuffer();
 	}
 
 	private void buildBuildingsBodies() {
@@ -219,7 +235,7 @@ public class GameScreen extends AbstractScreen{
 	@Override
 	public void render(float delta) {
 		//clear the previous screen
-		Gdx.gl.glClearColor(0, 0, 0, 1);
+		Gdx.gl.glClearColor(0, 0, 0, 0);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		world.step(1/60f, 6, 2);
 
@@ -229,8 +245,8 @@ public class GameScreen extends AbstractScreen{
 		//map renderer
 		r.setView(cam);
 		r.render();
-		r.getBatch().begin();
 
+		r.getBatch().begin();
 		//draw all the other players
 		for (Player p : getYBasedSortedPlayers())
 		{
@@ -239,13 +255,6 @@ public class GameScreen extends AbstractScreen{
 				((CrewMember) p).draw(r.getBatch());
 			}
 			else if(p instanceof Imposter) {
-				Gdx.input.setInputProcessor(this);
-				try {
-					((Imposter) p).render(Gdx.graphics.getDeltaTime());
-				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
 				((Imposter) p).draw(r.getBatch());
 			}
 			else
@@ -268,10 +277,10 @@ public class GameScreen extends AbstractScreen{
 			if(Gdx.input.isKeyPressed(Keys.SPACE)) {
 				((CrewMember) Client.getPlayer()).setCurrentTaskIfCollided();
 			}
-			
+
 			((CrewMember) Client.getPlayer()).drawTasks(r.getBatch());
-			
-			
+
+
 			//if the player has a current task, render the task screen ui
 			if(((CrewMember) Client.getPlayer()).getCurrentTask() != null) {
 				//based on the task the player is doing, render the appropriate task 
@@ -290,27 +299,39 @@ public class GameScreen extends AbstractScreen{
 					((ComsTask) task).render(r.getBatch());
 				}
 			}
-			else {
-				Gdx.input.setInputProcessor(this);
-				try {
-					Client.getPlayer().render(Gdx.graphics.getDeltaTime());
-				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+			
+		}
+		else if(Client.getPlayer() instanceof Imposter) {
+			light.setDistance(550);
+
+			//check if the local player overlapped any players
+			for(Player p: getYBasedSortedPlayers()) {
+				if(!Client.getPlayer().isDead && Client.getPlayer().playerRec.overlaps(p.playerRec)) {
+					if(Gdx.input.isKeyPressed(Keys.SPACE)) {
+						try {
+							Client.sendPlayerKilled(p.getPlayerName());
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}
 				}
 			}
 		}
-		else if(Client.getPlayer() instanceof Imposter) {
-			light.setDistance(350);
-			
-			Gdx.input.setInputProcessor(this);
-			try {
-				Client.getPlayer().render(Gdx.graphics.getDeltaTime());
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+		
+		if(Client.getPlayer().isDead && !Client.getPlayer().ghostSet) {
+			Client.getPlayer().set(new Sprite(new Texture("Among Us - Player Base/Individual Sprites/Ghost/ghostbob0001.png")));
+			Client.getPlayer().ghostSet = true;
 		}
+	
+		try {
+			Gdx.input.setInputProcessor(this);
+			Client.getPlayer().render(Gdx.graphics.getDeltaTime());
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 		r.getBatch().end();
 	}
 

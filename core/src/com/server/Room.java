@@ -55,7 +55,16 @@ public class Room {
 		}
 		return false;
 	}
-
+	
+	public InetAddress getAddressOfPlayer(String playerName) {
+		InetAddress address = null;
+		for(ServerPlayer p: allPlayers) {
+			if(p.getPlayerName().equals(playerName)) {
+				address =  p.getAddress();
+			}
+		}
+		return address;
+	}
 
 	public String assignRole() {
 		String role = "";

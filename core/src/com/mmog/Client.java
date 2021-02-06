@@ -177,7 +177,17 @@ public class Client
 		socket.send(datagramPacket);
 
 	}
+	
+	public static void sendPlayerKilled(String playerName) throws IOException {
+		String toSend = "";
+		toSend += 10 + ",";
+		toSend += Client.getPlayer().connectedRoomName + ",";
+		toSend += playerName;
 
+		DatagramPacket datagramPacket = new DatagramPacket(toSend.getBytes(), toSend.getBytes().length, address, 7077);	     
+		socket.send(datagramPacket);
+	}
+	
 	public static void sendStartCommand() throws IOException {
 		String toSend = "";
 		toSend += 3 + ",";
@@ -328,6 +338,18 @@ public class Client
 		else if(command == 9) {
 			boolean reactorTaskCompleted = Boolean.parseBoolean(dataArray[0]);
 			ReactorTask.setCompletedTask(reactorTaskCompleted);
+		}
+		else if(command == 10) {
+			String pname = dataArray[0];
+			if(getPlayer().getPlayerName().equals(pname)) {
+				getPlayer().isDead = true;
+			}else {
+				for(Player p: players) {
+					if(p.getPlayerName().equals(pname)) {
+						p.isDead = true;
+					}
+				}
+			}
 		}
 	}
 
