@@ -78,12 +78,6 @@ public class LobbyScreen extends AbstractScreen{
 		//map renderer
 		r.setView(cam);
 		r.render();
-
-		//if the player is ready, disable the ready button 
-		if(Client.getPlayer().readyToPlay) {
-			button.setDisabled(true);
-			button.setVisible(false);
-		}
 		
 		detectingKeyPresses();
 		
@@ -91,7 +85,6 @@ public class LobbyScreen extends AbstractScreen{
 		//if the player role has updated, replace the player with either crew member or imposter
 		Client.replacePlayerByRole(r.getBatch());
 		r.getBatch().end();
-		
 		
 		r.getBatch().begin();
 

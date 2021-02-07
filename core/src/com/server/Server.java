@@ -234,7 +234,7 @@ public class Server {
 			toAll = true;
 
 			roomName = dataArray[1];
-
+			
 			toAllClients = (new StringBuilder());
 			String name = dataArray[2];
 			System.out.println("CLOSED REQUESTED!" + "for @Player: " + name + "in @Room-name: " + roomName);

@@ -82,6 +82,7 @@ public class Room {
 	
 		return role;
 	}
+	
 	public boolean isRoomEmpty() {
 		if(allPlayers.size() == 0) {
 			return true;

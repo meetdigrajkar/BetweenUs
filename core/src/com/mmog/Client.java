@@ -201,7 +201,8 @@ public class Client
 		String toSend = "";
 		toSend += 6 + ",";
 		toSend += player.getPlayerName();
-
+		
+		System.out.println(toSend);
 		DatagramPacket datagramPacket = new DatagramPacket(toSend.getBytes(), toSend.getBytes().length, address, 7077);	     
 		socket.send(datagramPacket);
 	}
@@ -238,7 +239,12 @@ public class Client
 		toSend += getPlayer().getPlayerName();
 
 		System.out.println(toSend);
-
+		
+		//clears all the local players information from last game
+		for(Player p: players) {
+			p.clearAll();
+		}
+	
 		DatagramPacket datagramPacket = new DatagramPacket(toSend.getBytes(), toSend.getBytes().length, address, 7077);
 		try {
 			socket.send(datagramPacket);
@@ -284,10 +290,12 @@ public class Client
 				{
 					break;
 				}
-
+				
+				System.out.println("about to set player...");
 				if(p.getPlayerID() == -1) {
 					p.setPlayerID(playerIDs.pop());
 					p.setPlayerName(playerNames.pop());
+					System.out.println("Settting player: @playerID: " + p.getPlayerID() + "@playerName: " + p.getPlayerName());
 				}
 			}
 		}
@@ -381,6 +389,7 @@ public class Client
 
 	public static void removePlayerWithID(int playerID) {
 		getPlayerWithID(playerID).setPlayerID(-1);
+		getPlayerWithID(playerID).isDead = false;
 	}
 
 	public static String[] parseData(String receivedData) throws IOException {

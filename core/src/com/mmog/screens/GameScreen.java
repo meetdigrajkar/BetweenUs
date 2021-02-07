@@ -262,7 +262,6 @@ public class GameScreen extends AbstractScreen{
 			if(p.isDead && !p.addedToDead) {
 				deadPlayers.add(new DeadPlayer((int)p.getX(),(int)p.getY()));
 				p.addedToDead = true;
-				
 			}
 			//ghosts players can see everyone
 			if(Client.getPlayer().isDead) {

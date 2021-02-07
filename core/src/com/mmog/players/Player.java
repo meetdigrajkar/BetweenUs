@@ -73,7 +73,6 @@ public class Player extends Sprite{
 		isDead = false;
 		createDeadAnim();
 		isHost = false;
-		readyToPlay = false;
 		walkRightAtlas = new TextureAtlas(Gdx.files.internal("Walk.atlas"));
 		walkLeftAtlas = new TextureAtlas(Gdx.files.internal("Walk.atlas"));
 
@@ -99,7 +98,20 @@ public class Player extends Sprite{
 			}
 		}
 	}
-
+	
+	public void clearAll() {
+		ghostSet = false;
+		addedToDead = false;
+		justKilled = false;
+		isDead = false;
+		isHost = false;
+		isFlipped = false;
+		isIdle = false;
+		this.playerName = "";
+		this.playerID = -1;
+	}
+	
+	
 	public void setDead() {
 		float x = getX();
 		float y = getY();
@@ -191,6 +203,8 @@ public class Player extends Sprite{
 		}else if(!isDead) {
 			setAlive();
 		}
+		
+		//System.out.println("ghostSet:" + ghostSet);
 		
 		if(ghostSet) {
 			setDead();
