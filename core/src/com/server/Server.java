@@ -158,7 +158,8 @@ public class Server {
 			String playerName = dataArray[1].trim();
 			roomName = dataArray[2];
 			//get the room that the player wants to join
-
+			
+			System.out.print("connection from: " + playerName);
 			for(Room room: rooms) {
 				room.addPlayer(dataArray[1], hostAddress);
 				
@@ -198,8 +199,6 @@ public class Server {
 			for(Room room: rooms) {
 				if(room.getRoomName().equals(roomName)) {
 					System.out.println("found room");
-
-					//room.addPlayer(dataArray[1], hostAddress);
 
 					for(int i = 3; i < dataArray.length; i++) {
 						//System.out.println(dataArray[i].trim());

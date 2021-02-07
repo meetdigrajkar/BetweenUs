@@ -39,6 +39,8 @@ public class MainScreen extends AbstractScreen{
 	public void show() {
 		batch = new SpriteBatch();
 		// TODO Auto-generated method stub
+		Client.createPlayer("");
+		
 		if(Client.getPlayer() != null) {
 			playerName.setText(Client.getPlayer().getPlayerName());
 		}
@@ -131,7 +133,7 @@ public class MainScreen extends AbstractScreen{
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
 				System.out.println("Heading to Join Room Screen!");
-				
+
 				if(!playerName.getText().equals("") && !playerName.getText().contains(",")) {
 					//create all the players and the local player
 					Client.createPlayer(playerName.getText());

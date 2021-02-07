@@ -70,7 +70,7 @@ public class Player extends Sprite{
 		justKilled = false;
 		//player collison rectangle
 		playerRec = new Rectangle(getX(),getY(),32,50);
-
+		isDead = false;
 		createDeadAnim();
 		isHost = false;
 		readyToPlay = false;
@@ -107,8 +107,6 @@ public class Player extends Sprite{
 		set(new Sprite((new Texture("Among Us - Player Base/Individual Sprites/Ghost/ghostbob0048.png"))));
 		setSize(32,45);
 		setPosition(x,y);
-		
-		ghostSet = true;
 	}
 
 	public boolean getIsIdle() {
@@ -180,11 +178,16 @@ public class Player extends Sprite{
 		}
 		*/
 		
+		if(isDead) {
+			ghostSet = true;
+		}
+		
+		if(ghostSet) {
+			setDead();
+		}
+		
 		if (isIdle)
 		{
-			if(!ghostSet && isDead) {
-				setDead();
-			}
 			if(isFlipped && !isFlipX() || !isFlipped && isFlipX())
 			{
 				flip(true, false);

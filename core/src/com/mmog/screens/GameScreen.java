@@ -322,11 +322,11 @@ public class GameScreen extends AbstractScreen{
 			//check if the local player overlapped any players
 			for(Player p: getYBasedSortedPlayers()) {
 				if(!Client.getPlayer().getPlayerName().equals(p.getPlayerName())) {
-					if(!Client.getPlayer().isDead && Client.getPlayer().playerRec.overlaps(p.playerRec)) {
+					if(!p.isDead && !Client.getPlayer().isDead && Client.getPlayer().playerRec.overlaps(p.playerRec)) {
 						if(Gdx.input.isKeyPressed(Keys.SPACE)) {
 							try {
 								p.isDead = true;
-								System.out.println("PLAYER KILELD: " + p.getPlayerName());
+								System.out.println("PLAYER KILLED: " + p.getPlayerName());
 								Client.sendPlayerKilled(p.getPlayerName());
 							} catch (IOException e) {
 								// TODO Auto-generated catch block
@@ -377,12 +377,13 @@ public class GameScreen extends AbstractScreen{
 	@Override
 	public void hide() {
 		// TODO Auto-generated method stub
-		super.dispose();
+		dispose();
 	}
 
 	@Override
 	public void dispose() {
 		// TODO Auto-generated method stub
+		super.dispose();
 	}
 
 	public World getWorld() {
