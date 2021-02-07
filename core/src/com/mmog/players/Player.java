@@ -108,6 +108,14 @@ public class Player extends Sprite{
 		setSize(32,45);
 		setPosition(x,y);
 	}
+	
+	public void setAlive() {
+		float x = getX();
+		float y = getY();
+		set((new Sprite (new Texture("idle.png"))));
+		setSize(32,45);
+		setPosition(x,y);
+	}
 
 	public boolean getIsIdle() {
 		return isIdle;
@@ -180,6 +188,8 @@ public class Player extends Sprite{
 		
 		if(isDead) {
 			ghostSet = true;
+		}else if(!isDead) {
+			setAlive();
 		}
 		
 		if(ghostSet) {
