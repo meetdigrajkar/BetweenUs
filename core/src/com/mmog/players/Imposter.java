@@ -59,8 +59,8 @@ public class Imposter extends Player{
 		lightsButton = new ImageButton(lights);
 		reactorButton = new ImageButton(reactor);
 
-		//reportButton.setVisible(false);
-		//ventButton.setVisible(false);
+		reportButton.setVisible(false);
+		ventButton.setVisible(false);
 		lightsButton.setVisible(false);
 		reactorButton.setVisible(false);
 
