@@ -140,7 +140,11 @@ public class LobbyScreen extends AbstractScreen{
 		r.getBatch().setProjectionMatrix(cam.combined);
 	}
 
-
+	public void hide() {
+		// TODO Auto-generated method stub
+		super.dispose();
+	}
+	
 	@Override
 	public void dispose() {
 		// TODO Auto-generated method stub

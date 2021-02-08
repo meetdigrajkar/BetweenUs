@@ -236,7 +236,7 @@ public class MainScreen extends AbstractScreen{
 
 	public void hide() {
 		// TODO Auto-generated method stub
-
+		super.dispose();
 	}
 
 	public void dispose() {

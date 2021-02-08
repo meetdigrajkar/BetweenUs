@@ -13,6 +13,7 @@ public class ServerPlayer {
 	public ServerPlayer(String playerName, InetAddress address) {
 		this.setPlayerName(playerName);
 		this.setAddress(address);
+		role = "";
 	}
 	
 	public void setRole(String role) {

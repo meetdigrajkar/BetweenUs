@@ -118,7 +118,9 @@ public class Server {
 			
 			if(room.rolelist.size() > 0) {
 				role = room.assignRole();
+				
 				player.setRole(role);
+				System.out.println("Player: " + player.getPlayerName() + " was assigned: " + player.getRole());
 				
 				toAllClients.append(role).append(",");
 				toAllClients.append(3);
@@ -342,6 +344,7 @@ public class Server {
 		
 		for(Room room: rooms) {
 			if(room.getRoomName().equals(roomName)) {
+				System.out.println("OK-----------------");
 				crew = room.getCrewMembers();
 				
 				for(ServerPlayer p: crew) {

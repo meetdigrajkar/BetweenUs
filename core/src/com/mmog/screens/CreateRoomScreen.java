@@ -187,6 +187,11 @@ public class CreateRoomScreen extends AbstractScreen {
 		
 		draw();
 	}
+	
+	public void hide() {
+		// TODO Auto-generated method stub
+		super.dispose();
+	}
 
 	public void resize(int width, int height) {
 	}

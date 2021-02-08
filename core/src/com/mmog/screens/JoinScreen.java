@@ -197,4 +197,5 @@ public class JoinScreen extends AbstractScreen {
 
 	public void dispose() {
 	}
+
 }

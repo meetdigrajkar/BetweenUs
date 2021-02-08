@@ -2,6 +2,7 @@ package com.server;
 
 import java.net.InetAddress;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Random;
 import java.util.Map.Entry;
@@ -39,11 +40,13 @@ public class Room {
 		for(int i = 0; i < numImp; i++) {
 			rolelist.add("Imposter");
 		}
+		
+		Collections.shuffle(rolelist);
+		
 		//reactor task is incomplete by default
 		reactorTaskCompleted = new ArrayList<Boolean>();
 
 		allPlayers = new ArrayList<ServerPlayer>();
-
 
 		setR(new Random());
 	}
@@ -55,7 +58,7 @@ public class Room {
 		}
 		return false;
 	}
-	
+
 	public boolean hostLeft() {
 		//loop through the list of players and check if the host is still in the list
 		//if the host is not in the list return true
@@ -64,10 +67,10 @@ public class Room {
 				return false;
 			}
 		}
-		
+
 		return true;
 	}
-	
+
 	public void transferHost(ServerPlayer p) {
 		//loop through all players
 		//check if the next player exist
@@ -93,42 +96,43 @@ public class Room {
 
 	public String assignRole() {
 		String role = "";
-		if(rolelist.size() > 1) {
-			int upperBound = rolelist.size();
-			int playerTypeSelector = r.nextInt(upperBound - 1) + 1;
-			
-			role = rolelist.get(playerTypeSelector - 1);
-			rolelist.remove(playerTypeSelector - 1);
-		}
-		else {
+		int upperBound = rolelist.size() - 1;
+		
+		if(rolelist.size() == 1) {
 			role = rolelist.get(0);
 			rolelist.remove(0);
+		}else {
+			int playerTypeSelector = r.nextInt(upperBound);
+
+			role = rolelist.get(playerTypeSelector);
+			rolelist.remove(playerTypeSelector);
 		}
-	
+
 		return role;
 	}
-	
+
 	public boolean isRoomEmpty() {
 		if(allPlayers.size() == 0) {
 			return true;
 		}
 		return false;
 	}
-	
+
 	public ArrayList<ServerPlayer> getCrewMembers(){
 		ArrayList<ServerPlayer> crew = new ArrayList<ServerPlayer>();
-		
+
 		for(ServerPlayer p: allPlayers) {
 			if(p.getRole().equals("CrewMember")) {
 				crew.add(p);
+				System.out.println(p.getPlayerName() + "IS A CREW MEMBER-------------------------------------------------------------------------");
 			}
 		}
 		return crew;
 	}
-	
+
 	public void addPlayer(String playerName, InetAddress hostAddress) {
 		boolean isIn = false;
-		
+
 		if(allPlayers.isEmpty()) {
 			ServerPlayer player = new ServerPlayer(playerName, hostAddress);
 			allPlayers.add(player);
@@ -139,13 +143,13 @@ public class Room {
 			//if the player in list, isIn is true
 			for(int i = 0; i < allPlayers.size();i++) {
 				ServerPlayer p = allPlayers.get(i);	
-				
+
 				if(p.getPlayerName().equals(playerName)) {
 					isIn = true;
 				}
 			}
 		}
-		
+
 		if(!isIn) {
 			ServerPlayer player = new ServerPlayer(playerName, hostAddress);
 			allPlayers.add(player);
@@ -172,7 +176,7 @@ public class Room {
 		}
 		ServerPlayer playerRemoved = playersToRemove.get(0);
 		allPlayers.removeAll(playersToRemove);
-		
+
 		return playerRemoved;
 	}
 
