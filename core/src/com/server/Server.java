@@ -62,8 +62,9 @@ public class Server {
 				
 				if(!rooms.isEmpty()) {
 					System.out.println("number of rooms: " + rooms.size());
-				}
+				}	
 				
+				//if the room is empty, remove room
 				ArrayList<Room> roomsToRemove = new ArrayList<Room>();
 				for(Room room: rooms) {
 					if(room.isRoomEmpty()) {
@@ -197,9 +198,11 @@ public class Server {
 			toAllClients = (new StringBuilder());
 
 			for(Room room: rooms) {
+				
 				if(room.getRoomName().equals(roomName)) {
 					System.out.println("found room");
-
+					room.addPlayer(dataArray[1], hostAddress);
+					
 					for(int i = 3; i < dataArray.length; i++) {
 						//System.out.println(dataArray[i].trim());
 						toAllClients.append(dataArray[i].trim()).append(",");
@@ -241,7 +244,13 @@ public class Server {
 
 			for(Room room: rooms) {
 				if(room.getRoomName().equals(roomName)) {
-					room.removePlayer(name);
+					ServerPlayer p = room.removePlayer(name);
+					
+					//check if the host has disconnected
+					if(room.hostLeft()) {
+						room.transferHost(p);
+					}
+			
 					toAllClients.append(name).append(",");
 				}
 			}
@@ -363,7 +372,7 @@ public class Server {
 
 					try {
 						//change the packet to send based on whether to send to local, all (except local), and both
-						System.out.println("Server is sending @command: " + command + " to @ClientID: " + player.getPlayerID() + " @Address: " + hostAddress);
+						System.out.println("Server is sending @command: " + command + " to @ClientID: " + player.getPlayerID() + " @Address: " + address);
 						if (toLocal && address.equals(hostAddress))
 						{
 							serverDatagramSocket.send(toSend);

@@ -244,7 +244,7 @@ public class Client
 		for(Player p: players) {
 			p.clearAll();
 		}
-	
+		
 		DatagramPacket datagramPacket = new DatagramPacket(toSend.getBytes(), toSend.getBytes().length, address, 7077);
 		try {
 			socket.send(datagramPacket);
@@ -334,6 +334,7 @@ public class Client
 			System.out.println("Server added @Room:" + roomName + " @host:" + hostName);
 		}
 		else if(command == 6) {
+			System.out.println("Room Response");
 			if(dataArray.length == 1) {
 				System.out.println("Reply from Server: No Rooms Available");
 			}
@@ -389,7 +390,6 @@ public class Client
 
 	public static void removePlayerWithID(int playerID) {
 		getPlayerWithID(playerID).setPlayerID(-1);
-		getPlayerWithID(playerID).isDead = false;
 	}
 
 	public static String[] parseData(String receivedData) throws IOException {

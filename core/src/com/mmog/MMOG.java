@@ -15,5 +15,8 @@ public class MMOG extends Game {
 	
 	@Override
 	public void dispose() {
+		if(!Client.getPlayer().getPlayerName().equals("")) {
+			Client.removeClient();
+		}
 	}
 }

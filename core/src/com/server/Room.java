@@ -55,6 +55,31 @@ public class Room {
 		}
 		return false;
 	}
+	
+	public boolean hostLeft() {
+		//loop through the list of players and check if the host is still in the list
+		//if the host is not in the list return true
+		for(ServerPlayer p: allPlayers) {
+			if(p.getAddress().equals(hostAddress)) {
+				return false;
+			}
+		}
+		
+		return true;
+	}
+	
+	public void transferHost(ServerPlayer p) {
+		//loop through all players
+		//check if the next player exist
+		for(int i = 1; i < allPlayers.size(); i++) {
+			//if the next player exists, transfer host
+			if(allPlayers.get(p.getPlayerID() + i) != null) {
+				this.hostID = p.getPlayerID() + i;
+				this.hostAddress = allPlayers.get(p.getPlayerID() + i).getAddress();
+				this.hostName = allPlayers.get(p.getPlayerID() + i).getPlayerName();
+			}
+		}
+	}
 
 	public InetAddress getAddressOfPlayer(String playerName) {
 		InetAddress address = null;
@@ -91,9 +116,31 @@ public class Room {
 	}
 
 	public void addPlayer(String playerName, InetAddress hostAddress) {
-		ServerPlayer player = new ServerPlayer(playerName, hostAddress);
-		allPlayers.add(player);
-		player.setPlayerID(allPlayers.size());
+		boolean isIn = false;
+		
+		if(allPlayers.isEmpty()) {
+			ServerPlayer player = new ServerPlayer(playerName, hostAddress);
+			allPlayers.add(player);
+			player.setPlayerID(1);
+			return;
+		}else {
+			//loop through all players and check if the player exists in the list
+			//if the player in list, isIn is true
+			for(int i = 0; i < allPlayers.size();i++) {
+				ServerPlayer p = allPlayers.get(i);	
+				
+				if(p.getPlayerName().equals(playerName)) {
+					isIn = true;
+				}
+			}
+		}
+		
+		if(!isIn) {
+			ServerPlayer player = new ServerPlayer(playerName, hostAddress);
+			allPlayers.add(player);
+			player.setPlayerID(allPlayers.size());
+			return;
+		}
 	}
 
 	public String printRoleList() {
@@ -104,7 +151,7 @@ public class Room {
 		return roles;
 	}
 
-	public void removePlayer(String name) {
+	public ServerPlayer removePlayer(String name) {
 		ArrayList<ServerPlayer> playersToRemove = new ArrayList<ServerPlayer>();
 
 		for(ServerPlayer player: allPlayers) {
@@ -112,7 +159,10 @@ public class Room {
 				playersToRemove.add(player);
 			}
 		}
+		ServerPlayer playerRemoved = playersToRemove.get(0);
 		allPlayers.removeAll(playersToRemove);
+		
+		return playerRemoved;
 	}
 
 	public String getHostName() {
