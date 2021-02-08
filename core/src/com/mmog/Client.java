@@ -155,7 +155,16 @@ public class Client
 		DatagramPacket datagramPacket = new DatagramPacket(toSend.getBytes(), toSend.getBytes().length, address, 7077);	     
 		socket.send(datagramPacket);	      	      
 	}
-
+	
+	public static void sendLightsCommand() throws IOException{
+		String toSend = "";
+		toSend += 11 + ",";
+		toSend += player.connectedRoomName +",";
+		
+		DatagramPacket datagramPacket = new DatagramPacket(toSend.getBytes(), toSend.getBytes().length, address, 7077);	     
+		socket.send(datagramPacket);
+	}
+	
 	public static void sendCreateRoomCommand(String roomName, float numCrew, float numImp) throws IOException {
 		String toSend = "";
 		toSend += 5 + ",";
@@ -363,6 +372,10 @@ public class Client
 					}
 				}
 			}
+		}
+		//reduce vision for crew member player
+		else if(command == 11) {
+			GameScreen.light.setDistance(50);
 		}
 	}
 

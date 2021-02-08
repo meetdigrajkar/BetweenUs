@@ -92,7 +92,7 @@ public class GameScreen extends AbstractScreen{
 
 	BodyDef bodydef;
 	Body body;
-	Light light;
+	public static Light light;
 
 	BitmapFont f = new BitmapFont(Gdx.files.internal("UI/newlabelfont.fnt"));
 	LabelStyle labelFontStyle = new LabelStyle(f, Color.WHITE);
@@ -100,6 +100,7 @@ public class GameScreen extends AbstractScreen{
 	Label impLabel = new Label("YOU'RE AN IMPOSTER! SABOTAGE AND KILL TO WIN", labelFontStyle);
 
 	FrameBuffer shadowBuffer,worldBuffer;
+	String tasksString;
 
 	public static final float TILE_SIZE = 1;
 	
@@ -145,15 +146,15 @@ public class GameScreen extends AbstractScreen{
 		width = Gdx.graphics.getWidth();
 		height = Gdx.graphics.getHeight();
 		cam = new OrthographicCamera(width, height);
-		cam.zoom = 0.38f;
+		cam.zoom = 0.45f;
 		vp = new FitViewport(1920, 1080,cam);
 		this.setViewport(vp);
 		deadPlayers = new ArrayList<DeadPlayer>();
 		
 		if(Client.getPlayer() instanceof CrewMember) {
-			((CrewMember) Client.getPlayer()).addTask(new AdminTask()); 
-			((CrewMember) Client.getPlayer()).addTask(new ReactorTask());
+			((CrewMember) Client.getPlayer()).addTask(new AdminTask());
 			((CrewMember) Client.getPlayer()).addTask(new ComsTask()); 
+			((CrewMember) Client.getPlayer()).addTask(new ReactorTask());
 			((CrewMember) Client.getPlayer()).addTask(new ElectricalTask());
 		}
 
@@ -260,9 +261,13 @@ public class GameScreen extends AbstractScreen{
 		for (Player p : getYBasedSortedPlayers())
 		{
 			if(p.isDead && !p.addedToDead) {
-				deadPlayers.add(new DeadPlayer((int)p.getX(),(int)p.getY()));
+				DeadPlayer dp = new DeadPlayer((int)p.getX(),(int)p.getY());
+				dp.setName(p.getPlayerName());
+				
+				deadPlayers.add(dp);
 				p.addedToDead = true;
 			}
+			
 			//ghosts players can see everyone
 			if(Client.getPlayer().isDead) {
 				p.draw(r.getBatch());
@@ -284,16 +289,21 @@ public class GameScreen extends AbstractScreen{
 		detectingKeyPresses();
 
 		r.getBatch().begin();
-
+		
 		//if the player is a crew member, call setCurrentTask() on the player which sets the players current task if they have tried to start a task
 		if(Client.getPlayer() instanceof CrewMember) {
-			//if the player presses space, check the task they want to do and check if the task is not completed then set that task to the current task
-			if(Gdx.input.isKeyPressed(Keys.SPACE)) {
-				((CrewMember) Client.getPlayer()).setCurrentTaskIfCollided();
+			light.setDistance(180);
+			
+			//check for collision on a dead body
+			for(DeadPlayer dp: deadPlayers) {
+				if(Client.getPlayer().playerRec.overlaps(dp.getDeadPlayerRec())) {
+					System.out.println("FOUND DEAD BODY: @name: " + dp.getName());
+					
+					((CrewMember) Client.getPlayer()).reportButton.setVisible(true);
+				}
 			}
 
 			((CrewMember) Client.getPlayer()).drawTasks(r.getBatch());
-
 
 			//if the player has a current task, render the task screen ui
 			if(((CrewMember) Client.getPlayer()).getCurrentTask() != null) {
@@ -318,6 +328,8 @@ public class GameScreen extends AbstractScreen{
 		else if(Client.getPlayer() instanceof Imposter) {
 			light.setDistance(550);
 
+			((Imposter) Client.getPlayer()).drawUI(r.getBatch());
+			
 			//check if the local player overlapped any players
 			for(Player p: getYBasedSortedPlayers()) {
 				if(!Client.getPlayer().getPlayerName().equals(p.getPlayerName())) {
@@ -333,6 +345,15 @@ public class GameScreen extends AbstractScreen{
 							}
 						}
 					}
+				}
+			}
+			
+			//check for collision on a dead body
+			for(DeadPlayer dp: deadPlayers) {
+				if(Client.getPlayer().playerRec.overlaps(dp.getDeadPlayerRec())) {
+					System.out.println("FOUND DEAD BODY: @name: " + dp.getName());
+					
+					((Imposter) Client.getPlayer()).reportButton.setVisible(true);
 				}
 			}
 		}

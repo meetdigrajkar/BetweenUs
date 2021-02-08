@@ -26,6 +26,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.mmog.Client;
 import com.mmog.players.CrewMember;
+import com.mmog.screens.GameScreen;
 import com.mmog.screens.MainScreen;
 
 public class ElectricalTask extends Task {
@@ -285,6 +286,7 @@ public class ElectricalTask extends Task {
 		
 		if(done) {
 			System.out.println("SUCCESS!");
+			GameScreen.light.setDistance(180);
 			((CrewMember) Client.getPlayer()).setCurrentTask(null);
 			((CrewMember) Client.getPlayer()).setTaskCompleted(taskName);
 		}

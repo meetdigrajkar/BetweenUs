@@ -118,6 +118,8 @@ public class Server {
 			
 			if(room.rolelist.size() > 0) {
 				role = room.assignRole();
+				player.setRole(role);
+				
 				toAllClients.append(role).append(",");
 				toAllClients.append(3);
 				toallString = toAllClients.toString();
@@ -322,8 +324,40 @@ public class Server {
 			toAllClients = (new StringBuilder());
 			toAllClients.append(pname).append(",").append(command);
 		}
+		//imposter's sent the lights command
+		else if(command == 11) {
+			sendTurnOffLightsToCrew(dataArray[1],serverDatagramSocket);
+		}
 		//send the command
 		sendCommand(toLocalc.toString(),toAllClients.toString(),serverDatagramSocket, command, toLocal, toAll, hostAddress, roomName);
+	}
+	
+	public static void sendTurnOffLightsToCrew(String roomName,DatagramSocket serverDatagramSocket) {
+		ArrayList<ServerPlayer> crew = new ArrayList<ServerPlayer>();
+		String toallString = "";
+		
+		StringBuilder toAllClients = (new StringBuilder());
+		toAllClients.append(11);
+		toallString = toAllClients.toString();
+		
+		for(Room room: rooms) {
+			if(room.getRoomName().equals(roomName)) {
+				crew = room.getCrewMembers();
+				
+				for(ServerPlayer p: crew) {
+					InetAddress address = p.getAddress();
+	
+					DatagramPacket toSend = new DatagramPacket(toallString.getBytes(), toallString.getBytes().length, address, 8000);
+
+					try {
+						serverDatagramSocket.send(toSend);
+					} catch (IOException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+				}
+			}
+		}
 	}
 
 	public static void sendCommand(String toLocalc, String toAllClients, DatagramSocket serverDatagramSocket, int command, boolean toLocal, boolean toAll, InetAddress hostAddress, String roomName) {

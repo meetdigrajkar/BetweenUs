@@ -13,6 +13,7 @@ public class DesktopLauncher {
 		config.title = "Between Us";
         config.height = 1080;
         config.width = 1920;
+        //config.fullscreen = true;
         
         Client client = new Client();
 		// Start the listening thread...

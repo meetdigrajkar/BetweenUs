@@ -114,7 +114,18 @@ public class Room {
 		}
 		return false;
 	}
-
+	
+	public ArrayList<ServerPlayer> getCrewMembers(){
+		ArrayList<ServerPlayer> crew = new ArrayList<ServerPlayer>();
+		
+		for(ServerPlayer p: allPlayers) {
+			if(p.getRole().equals("CrewMember")) {
+				crew.add(p);
+			}
+		}
+		return crew;
+	}
+	
 	public void addPlayer(String playerName, InetAddress hostAddress) {
 		boolean isIn = false;
 		
