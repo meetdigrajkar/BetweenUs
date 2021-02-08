@@ -60,7 +60,7 @@ public class CrewMember extends Player {
 		useButton = new ImageButton(use);
 		reportButton = new ImageButton(report);
 		
-		reportButton.setVisible(false);
+		//reportButton.setVisible(false);
 
 		//labels
 		tasksLabel = new Label(tasksToString(), labelFontStyle);
@@ -68,10 +68,9 @@ public class CrewMember extends Player {
 		//add items to the table
 		table.left().top();
 		table.add(tasksLabel);
-
-		table.row();
-		table.add(reportButton).padRight(-MAX_WIDTH - 1100).padTop(650);
-		table.add(useButton).padRight(-MAX_WIDTH - 1100).padTop(650);
+		table.row().padTop((Gdx.graphics.getHeight()/2) + 100);
+		table.add(reportButton);
+		table.add(useButton);
 
 		//add table as an actor to the stage
 		stage.addActor(table);

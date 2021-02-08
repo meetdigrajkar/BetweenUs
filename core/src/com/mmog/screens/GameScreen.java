@@ -183,7 +183,7 @@ public class GameScreen extends AbstractScreen{
 
 		//cone light for the player
 		//change the light distance when the imposter sends the sabotage request
-		light = new ConeLight(rayhandler,120,Color.WHITE, 350,Client.getPlayer().getX(), Client.getPlayer().getY(),360,360);
+		light = new ConeLight(rayhandler,120,Color.WHITE, 180,Client.getPlayer().getX(), Client.getPlayer().getY(),360,360);
 		light.setPosition(Client.getPlayer().getX()+ 17,Client.getPlayer().getY()+ 17);
 
 		//createFrameBuffer();
@@ -292,7 +292,6 @@ public class GameScreen extends AbstractScreen{
 		
 		//if the player is a crew member, call setCurrentTask() on the player which sets the players current task if they have tried to start a task
 		if(Client.getPlayer() instanceof CrewMember) {
-			light.setDistance(180);
 			
 			//check for collision on a dead body
 			for(DeadPlayer dp: deadPlayers) {

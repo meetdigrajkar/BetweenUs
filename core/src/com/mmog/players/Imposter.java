@@ -59,8 +59,8 @@ public class Imposter extends Player{
 		lightsButton = new ImageButton(lights);
 		reactorButton = new ImageButton(reactor);
 
-		reportButton.setVisible(false);
-		ventButton.setVisible(false);
+		//reportButton.setVisible(false);
+		//ventButton.setVisible(false);
 		lightsButton.setVisible(false);
 		reactorButton.setVisible(false);
 
@@ -70,12 +70,16 @@ public class Imposter extends Player{
 		//add items to the table
 		table.left().top();
 		table.add(tasksLabel);
-		table.row();
-		table.add(lightsButton).padRight(-MAX_WIDTH - 1350).padTop(500);
-		table.add(reactorButton).padRight(-MAX_WIDTH - 1450).padTop(500);
-		table.add(ventButton).padRight(-MAX_WIDTH - 850).padTop(700);
-		table.add(reportButton).padRight(-MAX_WIDTH - 1150).padTop(700);
-		table.add(sabotageButton).padRight(-MAX_WIDTH - 1450).padTop(700);
+		table.row().padTop((Gdx.graphics.getHeight()/2) + 100);
+		
+		table.add(lightsButton);
+		table.add(reactorButton);
+		
+		table.row().padTop(40);
+		
+		table.add(ventButton);
+		table.add(reportButton);
+		table.add(sabotageButton);
 
 		//add table as an actor to the stage
 		stage.addActor(table);
