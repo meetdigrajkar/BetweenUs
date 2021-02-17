@@ -35,6 +35,7 @@ public class ComsTask extends Task {
 	float oldY[] = new float[0];
 	int timeLeft = 10;
 	boolean completed = false;
+	boolean updatingLabel = false;
 	Stage stage;
 	Sprite wifiLever, wifiPanel, sideLid, hinge;
 	final Image wifiLeverImg, wifiPanelImg, sideLidImg, hingeImg;  
@@ -108,24 +109,30 @@ public class ComsTask extends Task {
 				super.touchUp(event, x, y, pointer, button);
 				if (lever.getPercent() == 1.0) {
 					lever.setDisabled(true);
-					while (timeLeft > 0) {
-						modemLabel.setText("Please wait " + timeLeft + " seconds.");
-						System.out.println("Please wait " + timeLeft + " seconds.");
-						System.out.println(" ");
-						timeLeft = timeLeft -1;
+					long timeCompleted = System.currentTimeMillis()/ 1000;
+					
+					while ((System.currentTimeMillis()/1000)  - timeCompleted  < 5) {
+						if (updatingLabel == false) {
+							modemLabel.setText("Please wait 5 seconds");
+							updatingLabel = true;
+						}
+						
+						//timeLeft = timeLeft -1;
+						/*
 						try {
 							TimeUnit.SECONDS.sleep(1);
 						} catch (InterruptedException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
-						}
+						}*/
 					}	
+					completed = true;
 				}
-				completed = true;
+				
 			}
 		});
-		
 	}
+		
 	
 	
 	public void render(Batch batch) {
