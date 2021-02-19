@@ -165,6 +165,26 @@ public class Client
 		socket.send(datagramPacket);
 	}
 	
+	public static void sendInVent() throws IOException{
+		String toSend = "";
+		toSend += 12 + ",";
+		toSend += player.connectedRoomName +",";
+		toSend += player.getPlayerName();
+				
+		DatagramPacket datagramPacket = new DatagramPacket(toSend.getBytes(), toSend.getBytes().length, address, 7077);	     
+		socket.send(datagramPacket);
+	}
+	
+	public static void sendOutVent() throws IOException{
+		String toSend = "";
+		toSend += 13 + ",";
+		toSend += player.connectedRoomName +",";
+		toSend += player.getPlayerName();
+				
+		DatagramPacket datagramPacket = new DatagramPacket(toSend.getBytes(), toSend.getBytes().length, address, 7077);	     
+		socket.send(datagramPacket);
+	}
+	
 	public static void sendCreateRoomCommand(String roomName, float numCrew, float numImp) throws IOException {
 		String toSend = "";
 		toSend += 5 + ",";
@@ -376,6 +396,28 @@ public class Client
 		//reduce vision for crew member player
 		else if(command == 11) {
 			GameScreen.light.setDistance(50);
+		}
+		//vent command
+		else if(command == 12) {
+			String ventedPlayer = dataArray[0];
+			Boolean vented = Boolean.parseBoolean(dataArray[1]);
+			
+			for(Player p: players) {
+				if(p.getPlayerName().equals(ventedPlayer)) {
+					p.inVent = vented;
+				}
+			}
+		}
+		//vent out command
+		else if(command == 13) {
+			String ventedPlayer = dataArray[0];
+			Boolean vented = Boolean.parseBoolean(dataArray[1]);
+			
+			for(Player p: players) {
+				if(p.getPlayerName().equals(ventedPlayer)) {
+					p.inVent = vented;
+				}
+			}
 		}
 	}
 

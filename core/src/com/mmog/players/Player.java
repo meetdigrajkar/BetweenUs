@@ -14,6 +14,10 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.maps.MapObject;
+import com.badlogic.gdx.maps.MapObjects;
+import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector;
@@ -26,6 +30,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.mmog.Client;
+import com.mmog.screens.GameScreen;
 
 import box2dLight.Light;
 
@@ -51,13 +56,21 @@ public class Player extends Sprite{
 	public String connectedRoomName = "";
 	public boolean isHost;
 	public Color playerColor;
-	public int speed;
+	public float speed = 0.005f;
 	public Rectangle playerRec;
 	public boolean ghostSet,justKilled;
 	Animation<TextureRegion> animation;
 	//animated background
 	TextureRegion[] frames = new TextureRegion[33];
 	public boolean addedToDead;
+	public boolean inVent = false;
+	public MapObjects inGameWalls;
+	public boolean inGame = false;
+	Rectangle leftRec, rightRec, upRec, downRec, topRight, topLeft, bottomRight, bottomLeft;
+	boolean leftBlocked = false, rightBlocked = false, upBlocked = false, downBlocked =  false,
+			topRightBlocked = false, topLeftBlocked = false, bottomLeftBlocked = false, bottomRightBlocked = false;
+	SpriteBatch batch = new SpriteBatch();
+	ShapeRenderer shapeRenderer = new ShapeRenderer();
 
 	public Player(int playerID)
 	{
@@ -98,7 +111,7 @@ public class Player extends Sprite{
 			}
 		}
 	}
-	
+
 	public void clearAll() {
 		ghostSet = false;
 		addedToDead = false;
@@ -107,24 +120,18 @@ public class Player extends Sprite{
 		isHost = false;
 		isFlipped = false;
 		isIdle = false;
+		inVent = false;
+		inGame = false;
 		this.playerName = "";
 		this.playerID = -1;
 	}
-	
-	
+
+
 	public void setDead() {
 		float x = getX();
 		float y = getY();
-		
+
 		set(new Sprite((new Texture("Among Us - Player Base/Individual Sprites/Ghost/ghostbob0048.png"))));
-		setSize(32,45);
-		setPosition(x,y);
-	}
-	
-	public void setAlive() {
-		float x = getX();
-		float y = getY();
-		set((new Sprite (new Texture("idle.png"))));
 		setSize(32,45);
 		setPosition(x,y);
 	}
@@ -148,6 +155,21 @@ public class Player extends Sprite{
 		tileHeight = collisionLayer.getTileHeight();
 	}
 
+	public void setWalls(MapObjects walls) {
+		inGameWalls = walls;
+	}
+
+	public ArrayList<Rectangle> getWallsRec() {
+		ArrayList<Rectangle> walls = new ArrayList<Rectangle>();
+
+		for(MapObject mo: inGameWalls) {
+			Rectangle rectangle = ((RectangleMapObject)mo).getRectangle();
+			walls.add(rectangle);
+		}
+
+		return walls;
+	}
+
 	public TiledMapTileLayer getCollisionLayer() {
 		return collisionLayer;
 	}
@@ -161,11 +183,11 @@ public class Player extends Sprite{
 	public void drawDeadSprite(Batch batch) {
 		float x = getX();
 		float y = getY();
-		
+
 		Sprite deadSprite = new Sprite((new Texture("Among Us - Player Base/Individual Sprites/Death/Dead0033.png")));
 		setSize(32,45);
 		setPosition(x,y);
-		
+
 		deadSprite.draw(batch);
 	}
 
@@ -186,7 +208,7 @@ public class Player extends Sprite{
 		{
 			batch.draw(walkRight.getKeyFrame(elapsedTime, true), getX(), getY(),32,50);
 		}
-		
+
 		/*
 		else if(justKilled) {
 			batch.draw(animation.getKeyFrame(elapsedTime),getX(),getY(),32,50);
@@ -196,20 +218,16 @@ public class Player extends Sprite{
 				justKilled = false;
 			}
 		}
-		*/
-		
+		 */
+
 		if(isDead) {
 			ghostSet = true;
-		}else if(!isDead) {
-			setAlive();
 		}
-		
-		//System.out.println("ghostSet:" + ghostSet);
-		
+
 		if(ghostSet) {
 			setDead();
 		}
-		
+
 		if (isIdle)
 		{
 			if(isFlipped && !isFlipX() || !isFlipped && isFlipX())
@@ -262,63 +280,100 @@ public class Player extends Sprite{
 	}
 
 	public void render(float delta) throws Exception
-	{
-		if(Gdx.input.isKeyPressed(Input.Keys.A)){
-			for(int i = 0; i<speed;i++) {
-				if(!collisionAtX(-1,"blocked")) {
-					setX(getX() - 1);
+	{	
+		for(Rectangle wall: getWallsRec()) {
+
+			leftRec = new Rectangle(playerRec.x - 16, playerRec.y, playerRec.width, playerRec.height);
+			rightRec = new Rectangle(playerRec.x + 16, playerRec.y, playerRec.width, playerRec.height);
+			upRec = new Rectangle(playerRec.x, playerRec.y + 25, playerRec.width, playerRec.height);
+			downRec = new Rectangle(playerRec.x, playerRec.y - 25, playerRec.width, playerRec.height);
+
+			//diagonals
+			topRight = new Rectangle(playerRec.x + 16, playerRec.y + 25, playerRec.width, playerRec.height);
+			topLeft = new Rectangle(playerRec.x - 16, playerRec.y + 25, playerRec.width, playerRec.height);
+			bottomRight = new Rectangle(playerRec.x + 16, playerRec.y - 25, playerRec.width, playerRec.height);
+			bottomLeft = new Rectangle(playerRec.x - 16, playerRec.y - 25, playerRec.width, playerRec.height);
+
+			if(leftRec.overlaps(wall)) {
+				leftBlocked = true;
+			}
+			if(rightRec.overlaps(wall)) {
+				rightBlocked = true;
+			}
+			if(upRec.overlaps(wall)) {
+				upBlocked = true;
+			}
+			if(downRec.overlaps(wall)) {
+				downBlocked = true;
+			}
+			System.out.println("left: " + leftBlocked + " right:" + rightBlocked + " up:" + upBlocked + " down:" + downBlocked);
+
+			if(Gdx.input.isKeyPressed(Input.Keys.A)){	
+				if(!leftBlocked) {
+					setX(getX() - speed);
 				}
+
+				isFlipped = true;
+				isIdle=false;
+				playerMoved = true;
+
+				rightBlocked = false;
+				upBlocked = false;
+				downBlocked = false;
 			}
 
-			isFlipped = true;
-			isIdle=false;
-			playerMoved = true;
-		}
-
-		else if(Gdx.input.isKeyPressed(Input.Keys.D)){
-			for(int i = 0; i<speed;i++) {
-				if(!collisionAtX(1,"blocked")) {
-					setX(getX() + 1);
+			else if(Gdx.input.isKeyPressed(Input.Keys.D)){
+				if(!rightBlocked) {
+					setX(getX() + speed);
 				}
+
+				isFlipped = false;
+				isIdle=false;
+				playerMoved = true;
+
+				leftBlocked = false;
+				upBlocked = false;
+				downBlocked = false;
 			}
 
-			isFlipped = false;
-			isIdle=false;
-			playerMoved = true;
-		}
-
-		if (Gdx.input.isKeyPressed(Input.Keys.W))
-		{
-			for(int i = 0; i<speed;i++) {
-				if(!collisionAtY(1,"blocked")) {
-					setY(getY() + 1);
+			else if (Gdx.input.isKeyPressed(Input.Keys.W))
+			{	
+				if(!upBlocked) {
+					setY(getY() + speed);
 				}
+
+				isIdle = false;
+				playerMoved = true;
+
+				downBlocked = false;
+				leftBlocked = false;
+				rightBlocked = false;
 			}
 
-			isIdle = false;
-			playerMoved = true;
-		}
-
-		if (Gdx.input.isKeyPressed(Input.Keys.S))
-		{
-			for(int i = 0; i<speed;i++) {
-				if(!collisionAtY(-1,"blocked")) {
-					setY(getY() - 1);
+			else if (Gdx.input.isKeyPressed(Input.Keys.S))
+			{
+				if(!downBlocked) {
+					setY(getY() - speed);
 				}
+
+				isIdle = false;
+				playerMoved = true;
+
+				upBlocked = false;
+				leftBlocked = false;
+				rightBlocked = false;
 			}
-			isIdle = false;
-			playerMoved = true;
-		}
 
-		if (!isIdle && !Gdx.input.isKeyPressed(Input.Keys.W) && !Gdx.input.isKeyPressed(Input.Keys.A) && !Gdx.input.isKeyPressed(Input.Keys.S) && !Gdx.input.isKeyPressed(Input.Keys.D) )
-		{               	
-			isIdle = true;
-			Client.sendUpdate(getX(), getY(), isFlipped, isDead, isIdle);
-			playerMoved = false;
-		}
+			if (!isIdle && !Gdx.input.isKeyPressed(Input.Keys.W) && !Gdx.input.isKeyPressed(Input.Keys.A) && !Gdx.input.isKeyPressed(Input.Keys.S) && !Gdx.input.isKeyPressed(Input.Keys.D) )
+			{               	
+				isIdle = true;
+				Client.sendUpdate(getX(), getY(), isFlipped, isDead, isIdle);
+				playerMoved = false;
+			}
 
-		if(playerMoved) {
-			Client.sendUpdate(getX(), getY(), isFlipped, isDead, isIdle);
+			if(playerMoved) {
+				Client.sendUpdate(getX(), getY(), isFlipped, isDead, isIdle);
+			}
 		}
 	}
 

@@ -17,19 +17,23 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
+import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.MapObjects;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
+import com.badlogic.gdx.maps.tiled.TiledMapRenderer;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
@@ -54,6 +58,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.mmog.Client;
@@ -69,6 +74,8 @@ import box2dLight.RayHandler;
 
 import com.mmog.tasks.*;
 
+import Misc.Vent;
+
 public class GameScreen extends AbstractScreen{
 
 	TextButtonStyle tbs;
@@ -80,9 +87,9 @@ public class GameScreen extends AbstractScreen{
 	Table table;
 
 	//tiled map
-	private TiledMap map;
+	private static TiledMap map;
 	private OrthogonalTiledMapRenderer r;
-	private MapObjects mapObjects;
+	private static MapObjects mapObjects, wallObjects;
 
 	Task task;
 
@@ -96,15 +103,15 @@ public class GameScreen extends AbstractScreen{
 
 	BitmapFont f = new BitmapFont(Gdx.files.internal("UI/newlabelfont.fnt"));
 	LabelStyle labelFontStyle = new LabelStyle(f, Color.WHITE);
-	Label crewLabel = new Label("YOU'RE A CREW MEMBER! COMPLETE TASKS TO WIN", labelFontStyle);
-	Label impLabel = new Label("YOU'RE AN IMPOSTER! SABOTAGE AND KILL TO WIN", labelFontStyle);
-
-	FrameBuffer shadowBuffer,worldBuffer;
 	String tasksString;
+	public static ArrayList<Vent> vents;
 
 	public static final float TILE_SIZE = 1;
-	
+	public boolean moving = false;
+
 	public ArrayList<DeadPlayer> deadPlayers;
+	ShapeRenderer shapeRenderer = new ShapeRenderer();
+
 
 	public GameScreen() {
 		super();
@@ -113,6 +120,7 @@ public class GameScreen extends AbstractScreen{
 	private ArrayList<Player> getYBasedSortedPlayers() {
 		ArrayList<Player> allPlayers = new ArrayList();
 		allPlayers.add(Client.getPlayer());
+
 
 		for (Player p: Client.getPlayers())
 		{
@@ -132,13 +140,49 @@ public class GameScreen extends AbstractScreen{
 		return allPlayers;
 	}
 
-	public void createFrameBuffer() {
-		shadowBuffer = new FrameBuffer(Format.RGB888, (int) width, (int) height, false);
-		worldBuffer = new FrameBuffer(Format.RGB888, (int) width, (int) height, false);
+	public void initVents() {
+		//create vents
+		vents.add(new Vent(5,24));
+		vents.add(new Vent(21,20));
+		vents.add(new Vent(16,35));
+		vents.add(new Vent(40,56));
+		vents.add(new Vent(43,57));
+		vents.add(new Vent(51,22));
+		vents.add(new Vent(65,29));
+		vents.add(new Vent(27,44));
+		vents.add(new Vent(45,30));
+		vents.add(new Vent(35,45));
 
-		cam = new OrthographicCamera(worldBuffer.getWidth(), worldBuffer.getHeight());
-		cam.setToOrtho(true);
-		cam.update();
+		//set connected vents
+		vents.get(0).addConnectedVent(1);
+		vents.get(0).addConnectedVent(2);
+
+		vents.get(1).addConnectedVent(0);
+		vents.get(1).addConnectedVent(5);
+
+		vents.get(2).addConnectedVent(0);
+		vents.get(2).addConnectedVent(7);
+
+		vents.get(3).addConnectedVent(7);
+		vents.get(3).addConnectedVent(4);
+
+		vents.get(4).addConnectedVent(3);
+		vents.get(4).addConnectedVent(9);
+
+		vents.get(5).addConnectedVent(8);
+		vents.get(5).addConnectedVent(1);
+
+		vents.get(6).addConnectedVent(5);
+		vents.get(6).addConnectedVent(8);
+
+		vents.get(7).addConnectedVent(2);
+		vents.get(7).addConnectedVent(3);
+
+		vents.get(8).addConnectedVent(5);
+		vents.get(8).addConnectedVent(7);
+
+		vents.get(9).addConnectedVent(7);
+		vents.get(9).addConnectedVent(3);
 	}
 
 	@Override
@@ -149,7 +193,11 @@ public class GameScreen extends AbstractScreen{
 		cam.zoom = 0.45f;
 		vp = new FitViewport(1920, 1080,cam);
 		this.setViewport(vp);
+
 		deadPlayers = new ArrayList<DeadPlayer>();
+		
+		Client.getPlayer().inGame = true;
+		Client.getPlayer().speed = 0.01f;
 		
 		if(Client.getPlayer() instanceof CrewMember) {
 			((CrewMember) Client.getPlayer()).addTask(new AdminTask());
@@ -174,7 +222,15 @@ public class GameScreen extends AbstractScreen{
 		this.world = new World(new Vector2(0,0),false);
 
 		//map objects
+		mapObjects = map.getLayers().get("light layer").getObjects();
+		wallObjects = map.getLayers().get("wall layer").getObjects();
+		
+		Client.getPlayer().setWalls(wallObjects);
+		
 		buildBuildingsBodies();
+
+		vents = new ArrayList<Vent>();
+		initVents();
 
 		//ray handler
 		rayhandler = new RayHandler(world);
@@ -186,12 +242,9 @@ public class GameScreen extends AbstractScreen{
 		light = new ConeLight(rayhandler,120,Color.WHITE, 180,Client.getPlayer().getX(), Client.getPlayer().getY(),360,360);
 		light.setPosition(Client.getPlayer().getX()+ 17,Client.getPlayer().getY()+ 17);
 
-		//createFrameBuffer();
 	}
 
 	private void buildBuildingsBodies() {
-		mapObjects = map.getLayers().get("wall layer").getObjects();
-
 		for(MapObject mo: mapObjects) {
 			//System.out.println(mo.getColor());
 			Rectangle rectangle = ((RectangleMapObject)mo).getRectangle();
@@ -256,26 +309,26 @@ public class GameScreen extends AbstractScreen{
 		for(DeadPlayer dp: deadPlayers) {
 			dp.draw(r.getBatch());
 		}
-		
+
 		//draw all the other players
 		for (Player p : getYBasedSortedPlayers())
 		{
 			if(p.isDead && !p.addedToDead) {
 				DeadPlayer dp = new DeadPlayer((int)p.getX(),(int)p.getY());
 				dp.setName(p.getPlayerName());
-				
+
 				deadPlayers.add(dp);
 				p.addedToDead = true;
 			}
-			
+
 			//ghosts players can see everyone
-			if(Client.getPlayer().isDead) {
+			if(Client.getPlayer().isDead && !p.inVent) {
 				p.draw(r.getBatch());
-				
+
 			}
 			//alive players can see ONLY alive players 
 			else if(!Client.getPlayer().isDead) {
-				if(!p.isDead) {
+				if(!p.isDead  && !p.inVent) {
 					p.draw(r.getBatch());
 				}
 			}
@@ -287,18 +340,19 @@ public class GameScreen extends AbstractScreen{
 		rayhandler.updateAndRender();
 
 		detectingKeyPresses();
-
-		r.getBatch().begin();
 		
+		r.getBatch().begin();
 		//if the player is a crew member, call setCurrentTask() on the player which sets the players current task if they have tried to start a task
 		if(Client.getPlayer() instanceof CrewMember) {
-			
 			//check for collision on a dead body
 			for(DeadPlayer dp: deadPlayers) {
 				if(Client.getPlayer().playerRec.overlaps(dp.getDeadPlayerRec())) {
 					System.out.println("FOUND DEAD BODY: @name: " + dp.getName());
-					
+
 					((CrewMember) Client.getPlayer()).reportButton.setVisible(true);
+				}
+				else {
+					((CrewMember) Client.getPlayer()).reportButton.setVisible(false);
 				}
 			}
 
@@ -322,13 +376,33 @@ public class GameScreen extends AbstractScreen{
 					((ComsTask) task).render(r.getBatch());
 				}
 			}
-			
+
 		}
 		else if(Client.getPlayer() instanceof Imposter) {
-			light.setDistance(550);
-
+			light.setDistance(500);
 			((Imposter) Client.getPlayer()).drawUI(r.getBatch());
-			
+
+			//if the player is in the vent allow the player to move to other vents
+			for(Vent v: vents) {
+				//find the vent the imposter is in
+				if(v.hasImposter((Imposter) Client.getPlayer())) {
+					if(Gdx.input.isKeyJustPressed(Keys.LEFT)) {
+						System.out.println("MOVING LEFT");
+						vents.get(v.getConnectedVents().get(0)).addImposter((Imposter) Client.getPlayer());
+						Client.getPlayer().setPosition(vents.get(v.getConnectedVents().get(0)).getX(), vents.get(v.getConnectedVents().get(0)).getY());
+						v.removeImposter((Imposter) Client.getPlayer());
+						break;
+					}
+					else if(Gdx.input.isKeyJustPressed(Keys.RIGHT)) {
+						System.out.println("MOVING RIGHT");
+						vents.get(v.getConnectedVents().get(1)).addImposter((Imposter) Client.getPlayer());
+						Client.getPlayer().setPosition(vents.get(v.getConnectedVents().get(1)).getX(), vents.get(v.getConnectedVents().get(1)).getY());
+						v.removeImposter((Imposter) Client.getPlayer());
+						break;
+					}
+				}
+			}
+
 			//check if the local player overlapped any players
 			for(Player p: getYBasedSortedPlayers()) {
 				if(!Client.getPlayer().getPlayerName().equals(p.getPlayerName())) {
@@ -346,24 +420,29 @@ public class GameScreen extends AbstractScreen{
 					}
 				}
 			}
-			
+
 			//check for collision on a dead body
 			for(DeadPlayer dp: deadPlayers) {
 				if(Client.getPlayer().playerRec.overlaps(dp.getDeadPlayerRec())) {
 					System.out.println("FOUND DEAD BODY: @name: " + dp.getName());
-					
 					((Imposter) Client.getPlayer()).reportButton.setVisible(true);
+				}
+				else {
+					((Imposter) Client.getPlayer()).reportButton.setVisible(false);
 				}
 			}
 		}
-		
+
 		try {
-			Client.getPlayer().render(Gdx.graphics.getDeltaTime());
+			//if the player is an imposter and is NOT in the vent, allow movement
+			if(!Client.getPlayer().inVent) {
+				Client.getPlayer().render(Gdx.graphics.getDeltaTime());
+			}
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 		r.getBatch().end();
 	}
 

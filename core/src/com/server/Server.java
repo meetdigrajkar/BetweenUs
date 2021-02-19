@@ -330,6 +330,27 @@ public class Server {
 		else if(command == 11) {
 			sendTurnOffLightsToCrew(dataArray[1],serverDatagramSocket);
 		}
+		//imposter's vent command
+		else if(command == 12) {
+			toLocal = false;
+			toAll = true;
+			
+			roomName = dataArray[1];
+			String pn = dataArray[2];
+			
+			toAllClients = (new StringBuilder());
+			toAllClients.append(pn).append(",").append("true").append(",").append(command);
+		}
+		else if(command == 13) {
+			toLocal = false;
+			toAll = true;
+			
+			roomName = dataArray[1];
+			String pn = dataArray[2];
+			
+			toAllClients = (new StringBuilder());
+			toAllClients.append(pn).append(",").append("false").append(",").append(command);
+		}
 		//send the command
 		sendCommand(toLocalc.toString(),toAllClients.toString(),serverDatagramSocket, command, toLocal, toAll, hostAddress, roomName);
 	}
@@ -403,7 +424,7 @@ public class Server {
 					if((command == 0) && address.equals(hostAddress)) {
 						toSend = new DatagramPacket(toLocalc.getBytes(), toLocalc.getBytes().length, hostAddress, 8000);
 					}
-					else if((command == 0 || command == 1 || command == 4 || command == 10) && !address.equals(hostAddress)) {
+					else if((command == 0 || command == 1 || command == 4 || command == 10 || command == 12) && !address.equals(hostAddress)) {
 						toSend = new DatagramPacket(toAllClients.getBytes(), toAllClients.getBytes().length, address, 8000);
 					}
 

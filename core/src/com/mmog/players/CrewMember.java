@@ -60,7 +60,7 @@ public class CrewMember extends Player {
 		useButton = new ImageButton(use);
 		reportButton = new ImageButton(report);
 		
-		//reportButton.setVisible(false);
+		reportButton.setVisible(false);
 
 		//labels
 		tasksLabel = new Label(tasksToString(), labelFontStyle);

@@ -198,4 +198,8 @@ public class JoinScreen extends AbstractScreen {
 	public void dispose() {
 	}
 
+	public void hide() {
+		// TODO Auto-generated method stub
+		super.dispose();
+	}
 }

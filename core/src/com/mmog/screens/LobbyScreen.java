@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.maps.MapObjects;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
@@ -55,6 +56,7 @@ public class LobbyScreen extends AbstractScreen{
 	@Override
 	public void show() {
 		cameraSetup();
+		Client.getPlayer().speed = 0.5f;
 	}
 
 	public void detectingKeyPresses() {
@@ -122,7 +124,10 @@ public class LobbyScreen extends AbstractScreen{
 
 		map = new TmxMapLoader().load("MapAreas/mapfiles/lobby.tmx");
 		r = new OrthogonalTiledMapRenderer(map);
-
+		
+		MapObjects walls = map.getLayers().get("wall layer").getObjects();
+		Client.getPlayer().setWalls(walls);
+		
 		Client.getPlayer().setCollisionLayer((TiledMapTileLayer) map.getLayers().get(0));
 		Client.getPlayer().setPosition(12 * Client.getPlayer().getCollisionLayer().getTileWidth(), (Client.getPlayer().getCollisionLayer().getHeight() - 9) * Client.getPlayer().getCollisionLayer().getTileHeight());
 

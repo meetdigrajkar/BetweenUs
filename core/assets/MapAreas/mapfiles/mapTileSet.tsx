@@ -5111,16 +5111,6 @@
    <property name="blocked" type="bool" value="false"/>
   </properties>
  </tile>
- <tile id="3896">
-  <properties>
-   <property name="hole" type="bool" value="false"/>
-  </properties>
- </tile>
- <tile id="3897">
-  <properties>
-   <property name="hole" type="bool" value="false"/>
-  </properties>
- </tile>
  <tile id="3904">
   <properties>
    <property name="blocked" type="bool" value="false"/>
@@ -5296,14 +5286,9 @@
    <property name="blocked" type="bool" value="false"/>
   </properties>
  </tile>
- <tile id="3986">
-  <properties>
-   <property name="hole" type="bool" value="false"/>
-  </properties>
- </tile>
  <tile id="3987">
   <properties>
-   <property name="hole" type="bool" value="false"/>
+   <property name="Hole" type="bool" value="false"/>
   </properties>
  </tile>
  <tile id="3994">
@@ -5389,6 +5374,11 @@
  <tile id="4084">
   <properties>
    <property name="blocked" type="bool" value="false"/>
+  </properties>
+ </tile>
+ <tile id="4085">
+  <properties>
+   <property name="Hole" type="bool" value="false"/>
   </properties>
  </tile>
  <tile id="4104">

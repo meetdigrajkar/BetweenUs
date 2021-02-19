@@ -12,7 +12,7 @@ public class DeadPlayer extends Sprite{
 	
 	public DeadPlayer(int x, int y) {
 		super(new Sprite(new Texture("Among Us - Player Base/Individual Sprites/Death/Dead0033.png")));
-		setSize(32,45);
+		setSize(20,25);
 		setPosition(x,y);
 		deadPlayerRec = new Rectangle(getX(),getY(),32,50);
 	}

@@ -17,7 +17,10 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.mmog.Client;
+import com.mmog.screens.GameScreen;
 import com.mmog.tasks.Task;
+
+import Misc.Vent;
 
 public class Imposter extends Player{
 	private Table table;
@@ -28,6 +31,7 @@ public class Imposter extends Player{
 	BitmapFont labelFont = new BitmapFont(Gdx.files.internal("UI/newlabelfont.fnt"));
 	Label tasksLabel;
 	public boolean sabotageClicked;
+	public boolean enteringVent = false;
 
 	public Imposter(int playerID) {
 		super(playerID);
@@ -105,6 +109,7 @@ public class Imposter extends Player{
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
 				System.out.println("REACTOR CLICKED: " + isOver());
+				
 			}
 		});
 		
@@ -112,7 +117,19 @@ public class Imposter extends Player{
 		ventButton.addListener(new ClickListener() {
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
-				System.out.println("VENT CLICKED: " + isOver());
+				if(!inVent) {
+					System.out.println("TRYING TO ENTER VENT: ");
+					enteringVent = true;
+				}
+				else {
+					inVent = false;
+					try {
+						Client.sendOutVent();
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
 			}
 		});
 
@@ -142,7 +159,16 @@ public class Imposter extends Player{
 			}
 		});
 	}
-
+	
+	public boolean checkCollisionOnVent() {
+		if((collisionAtX(1,"Hole") || collisionAtY(1,"Hole"))){
+			ventButton.setVisible(true);
+			return true;
+		}
+		//ventButton.setVisible(false);
+		return false;
+	}
+	
 	public String tasksToString() {
 		String tasksString = "-Fake Tasks-\n";
 
@@ -152,6 +178,30 @@ public class Imposter extends Player{
 
 	public void drawUI(Batch batch) {
 		Gdx.input.setInputProcessor(this.stage);
+		checkCollisionOnVent();
+		
+		if(enteringVent) {
+			//enter vent
+			for(Vent v: GameScreen.vents) {
+				if((v.getX() >= (getX() - 50)) && ((v.getX() <= (getX() + 50))) && (v.getY() >= (getY() - 50)) && ((v.getY() <= (getY() + 50)))) {
+					System.out.println("ENTERING VENT!");
+					v.addImposter((Imposter) Client.getPlayer());
+					
+					super.inVent = true;
+					
+					//send invent to all the other players
+					try {
+						Client.sendInVent();
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					
+					enteringVent = false;
+				}
+			}
+		}
+		
 		stage.act();
 		stage.draw();
 	}
