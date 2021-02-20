@@ -356,7 +356,7 @@ public class Server {
 			toAllClients.append(dataArray[4]).append(",");
 			toAllClients.append(dataArray[5]).append(",");
 			toAllClients.append(dataArray[6]).append(",");
-			toAllClients.append(dataArray[7]);
+			toAllClients.append(dataArray[7]).append(",");
 			
 			toAllClients.append(command);
 		}

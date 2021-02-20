@@ -178,8 +178,8 @@ public class Client
 	public static void sendOutVent(float x, float y, boolean isFlipped, boolean isDead, boolean isIdle) throws IOException{
 		String toSend = "";
 		toSend += 13 + ",";
-		toSend += player.connectedRoomName +",";
-		toSend += player.getPlayerName();
+		toSend += player.connectedRoomName + ",";
+		toSend += player.getPlayerName() + ",";
 		toSend +=  x +","; 
 		toSend +=  y +",";
 		toSend +=  isFlipped + ","; 
