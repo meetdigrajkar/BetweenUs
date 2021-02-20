@@ -56,7 +56,7 @@ public class Player extends Sprite{
 	public String connectedRoomName = "";
 	public boolean isHost;
 	public Color playerColor;
-	public float speed = 0.005f;
+	public float speed;
 	public Rectangle playerRec;
 	public boolean ghostSet,justKilled;
 	Animation<TextureRegion> animation;
@@ -306,7 +306,7 @@ public class Player extends Sprite{
 			if(downRec.overlaps(wall)) {
 				downBlocked = true;
 			}
-			System.out.println("left: " + leftBlocked + " right:" + rightBlocked + " up:" + upBlocked + " down:" + downBlocked);
+			//System.out.println("left: " + leftBlocked + " right:" + rightBlocked + " up:" + upBlocked + " down:" + downBlocked);
 
 			if(Gdx.input.isKeyPressed(Input.Keys.A)){	
 				if(!leftBlocked) {
@@ -336,7 +336,7 @@ public class Player extends Sprite{
 				downBlocked = false;
 			}
 
-			else if (Gdx.input.isKeyPressed(Input.Keys.W))
+			if (Gdx.input.isKeyPressed(Input.Keys.W))
 			{	
 				if(!upBlocked) {
 					setY(getY() + speed);
@@ -350,7 +350,7 @@ public class Player extends Sprite{
 				rightBlocked = false;
 			}
 
-			else if (Gdx.input.isKeyPressed(Input.Keys.S))
+			if (Gdx.input.isKeyPressed(Input.Keys.S))
 			{
 				if(!downBlocked) {
 					setY(getY() - speed);
@@ -374,6 +374,7 @@ public class Player extends Sprite{
 			if(playerMoved) {
 				Client.sendUpdate(getX(), getY(), isFlipped, isDead, isIdle);
 			}
+			Client.sendUpdate(getX(), getY(), isFlipped, isDead, isIdle);
 		}
 	}
 
