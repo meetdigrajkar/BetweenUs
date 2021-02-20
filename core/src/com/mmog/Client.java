@@ -175,11 +175,16 @@ public class Client
 		socket.send(datagramPacket);
 	}
 	
-	public static void sendOutVent() throws IOException{
+	public static void sendOutVent(float x, float y, boolean isFlipped, boolean isDead, boolean isIdle) throws IOException{
 		String toSend = "";
 		toSend += 13 + ",";
 		toSend += player.connectedRoomName +",";
 		toSend += player.getPlayerName();
+		toSend +=  x +","; 
+		toSend +=  y +",";
+		toSend +=  isFlipped + ","; 
+		toSend +=  isDead + ",";  
+		toSend +=  isIdle;
 				
 		DatagramPacket datagramPacket = new DatagramPacket(toSend.getBytes(), toSend.getBytes().length, address, 7077);	     
 		socket.send(datagramPacket);
@@ -416,6 +421,7 @@ public class Client
 			for(Player p: players) {
 				if(p.getPlayerName().equals(ventedPlayer)) {
 					p.inVent = vented;
+					p.setAll(Float.parseFloat(dataArray[2]),Float.parseFloat(dataArray[3]), Boolean.parseBoolean(dataArray[4]), Boolean.parseBoolean(dataArray[5]), Boolean.parseBoolean(dataArray[6]));
 				}
 			}
 		}

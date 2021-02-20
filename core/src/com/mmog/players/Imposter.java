@@ -130,7 +130,7 @@ public class Imposter extends Player{
 
 					//sends message to all other players that the player has vented OUT
 					try {
-						Client.sendOutVent();
+						Client.sendOutVent(getX(), getY(), isFlipped, isDead, isIdle);
 					} catch (IOException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -182,7 +182,7 @@ public class Imposter extends Player{
 			if(v.getRec().overlaps(Client.getPlayer().getBoundingRectangle())) {
 				v.addImposter((Imposter) Client.getPlayer());
 
-				//send invent to all the other players
+				//send invent to all the other playerss
 				try {
 					Client.sendInVent();
 				} catch (IOException e) {
