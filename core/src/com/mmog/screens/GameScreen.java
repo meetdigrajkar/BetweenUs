@@ -142,16 +142,16 @@ public class GameScreen extends AbstractScreen{
 
 	public void initVents() {
 		//create vents
-		vents.add(new Vent(5,24));
-		vents.add(new Vent(21,20));
-		vents.add(new Vent(16,35));
-		vents.add(new Vent(40,56));
-		vents.add(new Vent(43,57));
-		vents.add(new Vent(51,22));
-		vents.add(new Vent(65,29));
-		vents.add(new Vent(27,44));
-		vents.add(new Vent(45,30));
-		vents.add(new Vent(35,45));
+		vents.add(new Vent(22,98));
+		vents.add(new Vent(85,82));
+		vents.add(new Vent(63,138));
+		vents.add(new Vent(108,175));
+		vents.add(new Vent(161,224));
+		vents.add(new Vent(143,180));
+		vents.add(new Vent(172,229));
+		vents.add(new Vent(252,115));
+		vents.add(new Vent(204,88));
+		vents.add(new Vent(279,98));
 
 		//set connected vents
 		vents.get(0).addConnectedVent(1);
@@ -197,7 +197,7 @@ public class GameScreen extends AbstractScreen{
 		deadPlayers = new ArrayList<DeadPlayer>();
 		
 		Client.getPlayer().inGame = true;
-		Client.getPlayer().speed = 0.01f;
+		Client.getPlayer().speed = 2f;
 		
 		if(Client.getPlayer() instanceof CrewMember) {
 			((CrewMember) Client.getPlayer()).addTask(new AdminTask());
@@ -206,11 +206,11 @@ public class GameScreen extends AbstractScreen{
 			((CrewMember) Client.getPlayer()).addTask(new ElectricalTask());
 		}
 
-		map = new TmxMapLoader().load("MapAreas/mapfiles/map.tmx");
+		map = new TmxMapLoader().load("map/map.tmx");
 		r = new OrthogonalTiledMapRenderer(map);
 
 		Client.getPlayer().setCollisionLayer((TiledMapTileLayer) map.getLayers().get(0));
-		Client.getPlayer().setPosition(35 * Client.getPlayer().getCollisionLayer().getTileWidth(), (Client.getPlayer().getCollisionLayer().getHeight() - 10) * Client.getPlayer().getCollisionLayer().getTileHeight());
+		Client.getPlayer().setPosition(143 * Client.getPlayer().getCollisionLayer().getTileWidth(), (Client.getPlayer().getCollisionLayer().getHeight() - 39) * Client.getPlayer().getCollisionLayer().getTileHeight());
 
 		cam.setToOrtho(false);
 		cam.position.set(Client.getPlayer().getX() + (Client.getPlayer().getWidth() * 2), Client.getPlayer().getY() + (Client.getPlayer().getHeight()), 0);
@@ -223,9 +223,6 @@ public class GameScreen extends AbstractScreen{
 
 		//map objects
 		mapObjects = map.getLayers().get("light layer").getObjects();
-		wallObjects = map.getLayers().get("wall layer").getObjects();
-		
-		Client.getPlayer().setWalls(wallObjects);
 		
 		buildBuildingsBodies();
 
@@ -387,6 +384,7 @@ public class GameScreen extends AbstractScreen{
 				//find the vent the imposter is in
 				if(v.hasImposter((Imposter) Client.getPlayer())) {
 					if(Gdx.input.isKeyJustPressed(Keys.LEFT)) {
+						((Imposter)Client.getPlayer()).ventButton.setVisible(true);
 						System.out.println("MOVING LEFT");
 						vents.get(v.getConnectedVents().get(0)).addImposter((Imposter) Client.getPlayer());
 						Client.getPlayer().setPosition(vents.get(v.getConnectedVents().get(0)).getX(), vents.get(v.getConnectedVents().get(0)).getY());
@@ -394,6 +392,7 @@ public class GameScreen extends AbstractScreen{
 						break;
 					}
 					else if(Gdx.input.isKeyJustPressed(Keys.RIGHT)) {
+						((Imposter)Client.getPlayer()).ventButton.setVisible(true);
 						System.out.println("MOVING RIGHT");
 						vents.get(v.getConnectedVents().get(1)).addImposter((Imposter) Client.getPlayer());
 						Client.getPlayer().setPosition(vents.get(v.getConnectedVents().get(1)).getX(), vents.get(v.getConnectedVents().get(1)).getY());

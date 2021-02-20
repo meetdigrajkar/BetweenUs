@@ -56,7 +56,7 @@ public class LobbyScreen extends AbstractScreen{
 	@Override
 	public void show() {
 		cameraSetup();
-		Client.getPlayer().speed = 0.5f;
+		Client.getPlayer().speed = 2f;
 	}
 
 	public void detectingKeyPresses() {
@@ -118,18 +118,15 @@ public class LobbyScreen extends AbstractScreen{
 		width = Gdx.graphics.getWidth();
 		height = Gdx.graphics.getHeight();
 		cam = new OrthographicCamera(width, height);
-		cam.zoom = 0.30f;
+		cam.zoom = 0.5f;
 		vp = new FitViewport(1920, 1080,cam);
 		this.setViewport(vp);
 
-		map = new TmxMapLoader().load("MapAreas/mapfiles/lobby.tmx");
+		map = new TmxMapLoader().load("map/lobby.tmx");
 		r = new OrthogonalTiledMapRenderer(map);
 		
-		MapObjects walls = map.getLayers().get("wall layer").getObjects();
-		Client.getPlayer().setWalls(walls);
-		
 		Client.getPlayer().setCollisionLayer((TiledMapTileLayer) map.getLayers().get(0));
-		Client.getPlayer().setPosition(12 * Client.getPlayer().getCollisionLayer().getTileWidth(), (Client.getPlayer().getCollisionLayer().getHeight() - 9) * Client.getPlayer().getCollisionLayer().getTileHeight());
+		Client.getPlayer().setPosition(38 * Client.getPlayer().getCollisionLayer().getTileWidth(), (Client.getPlayer().getCollisionLayer().getHeight() - 30) * Client.getPlayer().getCollisionLayer().getTileHeight());
 
 		cam.setToOrtho(false);
 		cam.position.set(Client.getPlayer().getX() + (Client.getPlayer().getWidth() * 2), Client.getPlayer().getY() + (Client.getPlayer().getHeight()), 0);

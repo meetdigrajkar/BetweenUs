@@ -66,12 +66,6 @@ public class Player extends Sprite{
 	public boolean inVent = false;
 	public MapObjects inGameWalls;
 	public boolean inGame = false;
-	Rectangle leftRec, rightRec, upRec, downRec, topRight, topLeft, bottomRight, bottomLeft;
-	boolean leftBlocked = false, rightBlocked = false, upBlocked = false, downBlocked =  false,
-			topRightBlocked = false, topLeftBlocked = false, bottomLeftBlocked = false, bottomRightBlocked = false;
-	SpriteBatch batch = new SpriteBatch();
-	ShapeRenderer shapeRenderer = new ShapeRenderer();
-
 	public Player(int playerID)
 	{
 		super(new Sprite (new Texture("idle.png")));
@@ -154,22 +148,7 @@ public class Player extends Sprite{
 		tileWidth = collisionLayer.getTileWidth();
 		tileHeight = collisionLayer.getTileHeight();
 	}
-
-	public void setWalls(MapObjects walls) {
-		inGameWalls = walls;
-	}
-
-	public ArrayList<Rectangle> getWallsRec() {
-		ArrayList<Rectangle> walls = new ArrayList<Rectangle>();
-
-		for(MapObject mo: inGameWalls) {
-			Rectangle rectangle = ((RectangleMapObject)mo).getRectangle();
-			walls.add(rectangle);
-		}
-
-		return walls;
-	}
-
+	
 	public TiledMapTileLayer getCollisionLayer() {
 		return collisionLayer;
 	}
@@ -253,12 +232,13 @@ public class Player extends Sprite{
 
 	public boolean collisionAtX(int x, String key) {
 		//collision detection in x
-		collisionX = collisionLayer.getCell((int)((getX()+ x) /tileWidth), (int) ((getY() + getHeight()) / tileHeight)).getTile().getProperties().containsKey(key);
-		collisionX |= collisionLayer.getCell((int)((getX()+ x) /tileWidth), (int) ((getY() + getHeight()/2) / tileHeight)).getTile().getProperties().containsKey(key);
-		collisionX |= collisionLayer.getCell((int)((getX()+ x) /tileWidth), (int) (getY() / tileHeight)).getTile().getProperties().containsKey(key);
+		
+		//collisionX = collisionLayer.getCell((int)((getX()+ x) /tileWidth), (int) ((getY() + getHeight()) / tileHeight)).getTile().getProperties().containsKey(key);
+		//collisionX |= collisionLayer.getCell((int)((getX()+ x) /tileWidth), (int) ((getY() + getHeight()/2) / tileHeight)).getTile().getProperties().containsKey(key);
+		collisionX = collisionLayer.getCell((int)((getX()+ x) /tileWidth), (int) (getY() / tileHeight)).getTile().getProperties().containsKey(key);
 
-		collisionX |= collisionLayer.getCell((int)((getX()+ x + getWidth()) /tileWidth), (int) ((getY() + getHeight()) / tileHeight)).getTile().getProperties().containsKey(key);
-		collisionX |= collisionLayer.getCell((int)((getX()+ x + getWidth()) /tileWidth), (int) ((getY() + getWidth()/2) / tileHeight)).getTile().getProperties().containsKey(key);
+		//collisionX |= collisionLayer.getCell((int)((getX()+ x + getWidth()) /tileWidth), (int) ((getY() + getHeight()) / tileHeight)).getTile().getProperties().containsKey(key);
+		//collisionX |= collisionLayer.getCell((int)((getX()+ x + getWidth()) /tileWidth), (int) ((getY() + getWidth()/2) / tileHeight)).getTile().getProperties().containsKey(key);
 		collisionX |= collisionLayer.getCell((int)((getX()+ x + getWidth()) /tileWidth), (int) (getY() / tileHeight)).getTile().getProperties().containsKey(key);
 
 		return collisionX;
@@ -270,108 +250,71 @@ public class Player extends Sprite{
 		collisionY |= collisionLayer.getCell((int) ((getX()+ getWidth() /2) /tileWidth), (int) ((getY()+ y)  / tileHeight)).getTile().getProperties().containsKey(key);
 		collisionY |= collisionLayer.getCell((int) ((getX()+ getWidth()) /tileWidth), (int) ((getY()+ y)  / tileHeight)).getTile().getProperties().containsKey(key);
 
-		collisionY |= collisionLayer.getCell((int) (getX()/tileWidth), (int) ((getY() + y + getHeight()) / tileHeight)).getTile().getProperties().containsKey(key);
-		collisionY |= collisionLayer.getCell((int) ((getX()+ getWidth() /2) /tileWidth), (int) ((getY()+ y  + getHeight()) / tileHeight)).getTile().getProperties().containsKey(key);
-		collisionY |= collisionLayer.getCell((int) ((getX()+ getWidth()) /tileWidth), (int) ((getY()+ y  + getHeight()) / tileHeight)).getTile().getProperties().containsKey(key);
+		//collisionY |= collisionLayer.getCell((int) (getX()/tileWidth), (int) ((getY() + y + getHeight()) / tileHeight)).getTile().getProperties().containsKey(key);
+		//collisionY |= collisionLayer.getCell((int) ((getX()+ getWidth() /2) /tileWidth), (int) ((getY()+ y  + getHeight()) / tileHeight)).getTile().getProperties().containsKey(key);
+		//collisionY |= collisionLayer.getCell((int) ((getX()+ getWidth()) /tileWidth), (int) ((getY()+ y  + getHeight()) / tileHeight)).getTile().getProperties().containsKey(key);
 
 		return collisionY;
 	}
 
 	public void render(float delta) throws Exception
 	{	
-		for(Rectangle wall: getWallsRec()) {
-			playerRec.setPosition(getX(), getY());
-			leftRec = new Rectangle(playerRec.x - 16, playerRec.y, playerRec.width, playerRec.height);
-			rightRec = new Rectangle(playerRec.x + 16, playerRec.y, playerRec.width, playerRec.height);
-			upRec = new Rectangle(playerRec.x, playerRec.y + 25, playerRec.width, playerRec.height);
-			downRec = new Rectangle(playerRec.x, playerRec.y - 25, playerRec.width, playerRec.height);
-
-			//diagonals
-			topRight = new Rectangle(playerRec.x + 16, playerRec.y + 25, playerRec.width, playerRec.height);
-			topLeft = new Rectangle(playerRec.x - 16, playerRec.y + 25, playerRec.width, playerRec.height);
-			bottomRight = new Rectangle(playerRec.x + 16, playerRec.y - 25, playerRec.width, playerRec.height);
-			bottomLeft = new Rectangle(playerRec.x - 16, playerRec.y - 25, playerRec.width, playerRec.height);
-
-			if(leftRec.overlaps(wall)) {
-				leftBlocked = true;
-			}
-			if(rightRec.overlaps(wall)) {
-				rightBlocked = true;
-			}
-			if(upRec.overlaps(wall)) {
-				upBlocked = true;
-			}
-			if(downRec.overlaps(wall)) {
-				downBlocked = true;
-			}
-			//System.out.println("left: " + leftBlocked + " right:" + rightBlocked + " up:" + upBlocked + " down:" + downBlocked);
-
-			if(Gdx.input.isKeyPressed(Input.Keys.A)){	
-				if(!leftBlocked) {
-					setX(getX() - speed);
+		if(Gdx.input.isKeyPressed(Input.Keys.A)){
+			for(int i = 0; i<speed;i++) {
+				if(!collisionAtX(-1,"blocked")) {
+					setX(getX() - 1);
 				}
-
-				isFlipped = true;
-				isIdle=false;
-				playerMoved = true;
-
-				rightBlocked = false;
-				upBlocked = false;
-				downBlocked = false;
 			}
 
-			else if(Gdx.input.isKeyPressed(Input.Keys.D)){
-				if(!rightBlocked) {
-					setX(getX() + speed);
+			isFlipped = true;
+			isIdle=false;
+			playerMoved = true;
+		}
+
+		else if(Gdx.input.isKeyPressed(Input.Keys.D)){
+			for(int i = 0; i<speed;i++) {
+				if(!collisionAtX(1,"blocked")) {
+					setX(getX() + 1);
 				}
-
-				isFlipped = false;
-				isIdle=false;
-				playerMoved = true;
-
-				leftBlocked = false;
-				upBlocked = false;
-				downBlocked = false;
 			}
 
-			else if (Gdx.input.isKeyPressed(Input.Keys.W))
-			{	
-				if(!upBlocked) {
-					setY(getY() + speed);
+			isFlipped = false;
+			isIdle=false;
+			playerMoved = true;
+		}
+
+		if (Gdx.input.isKeyPressed(Input.Keys.W))
+		{
+			for(int i = 0; i<speed;i++) {
+				if(!collisionAtY(1,"blocked")) {
+					setY(getY() + 1);
 				}
-
-				isIdle = false;
-				playerMoved = true;
-
-				downBlocked = false;
-				leftBlocked = false;
-				rightBlocked = false;
 			}
 
-			else if (Gdx.input.isKeyPressed(Input.Keys.S))
-			{
-				if(!downBlocked) {
-					setY(getY() - speed);
+			isIdle = false;
+			playerMoved = true;
+		}
+
+		if (Gdx.input.isKeyPressed(Input.Keys.S))
+		{
+			for(int i = 0; i<speed;i++) {
+				if(!collisionAtY(-1,"blocked")) {
+					setY(getY() - 1);
 				}
-
-				isIdle = false;
-				playerMoved = true;
-
-				upBlocked = false;
-				leftBlocked = false;
-				rightBlocked = false;
 			}
+			isIdle = false;
+			playerMoved = true;
+		}
 
-			if (!isIdle && !Gdx.input.isKeyPressed(Input.Keys.W) && !Gdx.input.isKeyPressed(Input.Keys.A) && !Gdx.input.isKeyPressed(Input.Keys.S) && !Gdx.input.isKeyPressed(Input.Keys.D) )
-			{               	
-				isIdle = true;
-				Client.sendUpdate(getX(), getY(), isFlipped, isDead, isIdle);
-				playerMoved = false;
-			}
+		if (!isIdle && !Gdx.input.isKeyPressed(Input.Keys.W) && !Gdx.input.isKeyPressed(Input.Keys.A) && !Gdx.input.isKeyPressed(Input.Keys.S) && !Gdx.input.isKeyPressed(Input.Keys.D) )
+		{               	
+			isIdle = true;
+			Client.sendUpdate(getX(), getY(), isFlipped, isDead, isIdle);
+			playerMoved = false;
+		}
 
-			if(playerMoved) {
-				Client.sendUpdate(getX(), getY(), isFlipped, isDead, isIdle);
-			}
+		if(playerMoved) {
+			Client.sendUpdate(getX(), getY(), isFlipped, isDead, isIdle);
 		}
 	}
 

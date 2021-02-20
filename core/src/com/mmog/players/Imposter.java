@@ -169,11 +169,11 @@ public class Imposter extends Player{
 	}
 	
 	public boolean checkCollisionOnVent() {
-		if((collisionAtX(1,"Hole") || collisionAtY(1,"Hole"))){
+		if((collisionAtX(1,"hole") || collisionAtY(1,"hole"))){
 			ventButton.setVisible(true);
 			return true;
 		}
-		//ventButton.setVisible(false);
+		ventButton.setVisible(false);
 		return false;
 	}
 	
@@ -191,7 +191,7 @@ public class Imposter extends Player{
 		if(enteringVent) {
 			//enter vent
 			for(Vent v: GameScreen.vents) {
-				if((v.getX() >= (getX() - 50)) && ((v.getX() <= (getX() + 50))) && (v.getY() >= (getY() - 50)) && ((v.getY() <= (getY() + 50)))) {
+				if((v.getX() >= (getX() - 20)) && ((v.getX() <= (getX() + 20))) && (v.getY() >= (getY() - 20)) && ((v.getY() <= (getY() + 20)))) {
 					System.out.println("ENTERING VENT!");
 					v.addImposter((Imposter) Client.getPlayer());
 					currVent = v;
