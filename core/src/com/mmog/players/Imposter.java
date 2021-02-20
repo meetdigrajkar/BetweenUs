@@ -32,6 +32,7 @@ public class Imposter extends Player{
 	Label tasksLabel;
 	public boolean sabotageClicked;
 	public boolean enteringVent = false;
+	private Vent currVent;
 
 	public Imposter(int playerID) {
 		super(playerID);
@@ -44,7 +45,8 @@ public class Imposter extends Player{
 		float MAX_HEIGTH = Gdx.graphics.getHeight();
 		table.setSize(MAX_WIDTH, MAX_HEIGTH);
 		table.setFillParent(true);
-
+		currVent = null;
+		
 		//font sizes
 		labelFont.getData().setScale(0.4f);
 		LabelStyle labelFontStyle = new LabelStyle(labelFont, Color.WHITE);
@@ -123,6 +125,12 @@ public class Imposter extends Player{
 				}
 				else {
 					inVent = false;
+					
+					//remove the player from the vent
+					if(currVent != null) {
+						GameScreen.vents.get(GameScreen.vents.indexOf(currVent)).removeImposter((Imposter)Client.getPlayer());
+					}
+					
 					try {
 						Client.sendOutVent();
 					} catch (IOException e) {
@@ -186,6 +194,7 @@ public class Imposter extends Player{
 				if((v.getX() >= (getX() - 50)) && ((v.getX() <= (getX() + 50))) && (v.getY() >= (getY() - 50)) && ((v.getY() <= (getY() + 50)))) {
 					System.out.println("ENTERING VENT!");
 					v.addImposter((Imposter) Client.getPlayer());
+					currVent = v;
 					
 					super.inVent = true;
 					

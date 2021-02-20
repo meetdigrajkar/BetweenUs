@@ -305,6 +305,7 @@ public class GameScreen extends AbstractScreen{
 		r.render();
 		
 		r.getBatch().begin();
+		
 		//draw all the dead bodies
 		for(DeadPlayer dp: deadPlayers) {
 			dp.draw(r.getBatch());
@@ -320,11 +321,10 @@ public class GameScreen extends AbstractScreen{
 				deadPlayers.add(dp);
 				p.addedToDead = true;
 			}
-
+		
 			//ghosts players can see everyone
 			if(Client.getPlayer().isDead && !p.inVent) {
 				p.draw(r.getBatch());
-
 			}
 			//alive players can see ONLY alive players 
 			else if(!Client.getPlayer().isDead) {

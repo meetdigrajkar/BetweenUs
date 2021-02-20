@@ -194,8 +194,6 @@ public class Player extends Sprite{
 	public void update(float delta, Batch batch) {
 		//player name
 		f.draw(batch, getPlayerName(), getX() + getWidth()/2 - getPlayerName().length() * 2 - 2, getY() + getHeight() + 20);
-		playerRec.setPosition(getX(), getY());
-
 		//set player color here too
 		//batch.setColor(Color.YELLOW);
 
@@ -282,7 +280,7 @@ public class Player extends Sprite{
 	public void render(float delta) throws Exception
 	{	
 		for(Rectangle wall: getWallsRec()) {
-
+			playerRec.setPosition(getX(), getY());
 			leftRec = new Rectangle(playerRec.x - 16, playerRec.y, playerRec.width, playerRec.height);
 			rightRec = new Rectangle(playerRec.x + 16, playerRec.y, playerRec.width, playerRec.height);
 			upRec = new Rectangle(playerRec.x, playerRec.y + 25, playerRec.width, playerRec.height);
@@ -336,7 +334,7 @@ public class Player extends Sprite{
 				downBlocked = false;
 			}
 
-			if (Gdx.input.isKeyPressed(Input.Keys.W))
+			else if (Gdx.input.isKeyPressed(Input.Keys.W))
 			{	
 				if(!upBlocked) {
 					setY(getY() + speed);
@@ -350,7 +348,7 @@ public class Player extends Sprite{
 				rightBlocked = false;
 			}
 
-			if (Gdx.input.isKeyPressed(Input.Keys.S))
+			else if (Gdx.input.isKeyPressed(Input.Keys.S))
 			{
 				if(!downBlocked) {
 					setY(getY() - speed);
@@ -374,7 +372,6 @@ public class Player extends Sprite{
 			if(playerMoved) {
 				Client.sendUpdate(getX(), getY(), isFlipped, isDead, isIdle);
 			}
-			Client.sendUpdate(getX(), getY(), isFlipped, isDead, isIdle);
 		}
 	}
 
