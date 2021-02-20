@@ -342,7 +342,7 @@ public class GameScreen extends AbstractScreen{
 		if(Client.getPlayer() instanceof CrewMember) {
 			//check for collision on a dead body
 			for(DeadPlayer dp: deadPlayers) {
-				if(Client.getPlayer().playerRec.overlaps(dp.getDeadPlayerRec())) {
+				if(Client.getPlayer().getBoundingRectangle().overlaps(dp.getDeadPlayerRec())) {
 					System.out.println("FOUND DEAD BODY: @name: " + dp.getName());
 
 					((CrewMember) Client.getPlayer()).reportButton.setVisible(true);
@@ -409,7 +409,7 @@ public class GameScreen extends AbstractScreen{
 			//check if the local player overlapped any players
 			for(Player p: getYBasedSortedPlayers()) {
 				if(!Client.getPlayer().getPlayerName().equals(p.getPlayerName())) {
-					if(!p.isDead && !Client.getPlayer().isDead && Client.getPlayer().playerRec.overlaps(p.playerRec)) {
+					if(!p.isDead && !Client.getPlayer().isDead && Client.getPlayer().getBoundingRectangle().overlaps(p.getBoundingRectangle())) {
 						if(Gdx.input.isKeyPressed(Keys.SPACE)) {
 							try {
 								p.isDead = true;
@@ -426,7 +426,7 @@ public class GameScreen extends AbstractScreen{
 
 			//check for collision on a dead body
 			for(DeadPlayer dp: deadPlayers) {
-				if(Client.getPlayer().playerRec.overlaps(dp.getDeadPlayerRec())) {
+				if(Client.getPlayer().getBoundingRectangle().overlaps(dp.getDeadPlayerRec())) {
 					System.out.println("FOUND DEAD BODY: @name: " + dp.getName());
 					((Imposter) Client.getPlayer()).reportButton.setVisible(true);
 				}
