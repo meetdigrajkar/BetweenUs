@@ -57,7 +57,6 @@ public class Player extends Sprite{
 	public boolean isHost;
 	public Color playerColor;
 	public float speed;
-	public Rectangle playerRec;
 	public boolean ghostSet,justKilled;
 	Animation<TextureRegion> animation;
 	//animated background
@@ -66,6 +65,7 @@ public class Player extends Sprite{
 	public boolean inVent = false;
 	public MapObjects inGameWalls;
 	public boolean inGame = false;
+	
 	public Player(int playerID)
 	{
 		super(new Sprite (new Texture("idle.png")));
@@ -75,8 +75,9 @@ public class Player extends Sprite{
 		addedToDead = false;
 		//this.setColor(Color.YELLOW);
 		justKilled = false;
+		
 		//player collison rectangle
-		playerRec = new Rectangle(getX(),getY(),32,50);
+		
 		isDead = false;
 		createDeadAnim();
 		isHost = false;

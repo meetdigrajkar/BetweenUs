@@ -169,7 +169,8 @@ public class Imposter extends Player{
 	public boolean checkCollisionOnVent() {
 		//loop through all the vents
 		for(Vent v: GameScreen.vents) {
-			if(v.getRec().overlaps(playerRec)) {
+			if(v.getRec().overlaps(Client.getPlayer().getBoundingRectangle())) {
+				System.out.println("OVERLAPS!");
 				return true;
 			}
 		}
@@ -178,7 +179,7 @@ public class Imposter extends Player{
 
 	public void addImposterToVent() {
 		for(Vent v: GameScreen.vents) {
-			if(v.getRec().overlaps(playerRec)) {
+			if(v.getRec().overlaps(Client.getPlayer().getBoundingRectangle())) {
 				v.addImposter((Imposter) Client.getPlayer());
 
 				//send invent to all the other players

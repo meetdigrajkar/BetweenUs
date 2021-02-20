@@ -150,6 +150,8 @@ public class GameScreen extends AbstractScreen{
 			vents.add(new Vent(rectangle));
 		}
 		
+		System.out.println("Number of Vents:" + vents.size());
+		
 		//set connected vents
 		vents.get(0).addConnectedVent(1);
 		vents.get(0).addConnectedVent(2);
@@ -374,6 +376,7 @@ public class GameScreen extends AbstractScreen{
 		}
 		else if(Client.getPlayer() instanceof Imposter) {
 			light.setDistance(500);
+			
 			((Imposter) Client.getPlayer()).drawUI(r.getBatch());
 			
 			if(Client.getPlayer().inVent) {
@@ -383,14 +386,18 @@ public class GameScreen extends AbstractScreen{
 					if(v.hasImposter((Imposter) Client.getPlayer())) {
 						if(Gdx.input.isKeyJustPressed(Keys.LEFT)) {
 							System.out.println("MOVING LEFT");
+							
 							vents.get(v.getConnectedVents().get(0)).addImposter((Imposter) Client.getPlayer());
+							
 							Client.getPlayer().setPosition(vents.get(v.getConnectedVents().get(0)).getRec().x, vents.get(v.getConnectedVents().get(0)).getRec().y);
 							v.removeImposter((Imposter) Client.getPlayer());
 							break;
 						}
 						else if(Gdx.input.isKeyJustPressed(Keys.RIGHT)) {
 							System.out.println("MOVING RIGHT");
+							
 							vents.get(v.getConnectedVents().get(1)).addImposter((Imposter) Client.getPlayer());
+							
 							Client.getPlayer().setPosition(vents.get(v.getConnectedVents().get(0)).getRec().x, vents.get(v.getConnectedVents().get(0)).getRec().y);
 							v.removeImposter((Imposter) Client.getPlayer());
 							break;
