@@ -89,7 +89,7 @@ public class GameScreen extends AbstractScreen{
 	//tiled map
 	private static TiledMap map;
 	private OrthogonalTiledMapRenderer r;
-	private static MapObjects mapObjects, wallObjects;
+	private static MapObjects mapObjects, ventObjects;
 
 	Task task;
 
@@ -141,18 +141,15 @@ public class GameScreen extends AbstractScreen{
 	}
 
 	public void initVents() {
-		//create vents
-		vents.add(new Vent(22,98));
-		vents.add(new Vent(85,82));
-		vents.add(new Vent(63,138));
-		vents.add(new Vent(108,175));
-		vents.add(new Vent(161,224));
-		vents.add(new Vent(143,180));
-		vents.add(new Vent(172,229));
-		vents.add(new Vent(252,115));
-		vents.add(new Vent(204,88));
-		vents.add(new Vent(279,98));
-
+		//map objects
+		ventObjects = map.getLayers().get("vents").getObjects();
+		
+		for(MapObject mo: ventObjects) {
+			//System.out.println(mo.getColor());
+			Rectangle rectangle = ((RectangleMapObject)mo).getRectangle();
+			vents.add(new Vent(rectangle));
+		}
+		
 		//set connected vents
 		vents.get(0).addConnectedVent(1);
 		vents.get(0).addConnectedVent(2);
@@ -385,18 +382,16 @@ public class GameScreen extends AbstractScreen{
 					//find the vent the imposter is in
 					if(v.hasImposter((Imposter) Client.getPlayer())) {
 						if(Gdx.input.isKeyJustPressed(Keys.LEFT)) {
-							((Imposter)Client.getPlayer()).ventButton.setVisible(true);
 							System.out.println("MOVING LEFT");
 							vents.get(v.getConnectedVents().get(0)).addImposter((Imposter) Client.getPlayer());
-							Client.getPlayer().setPosition(vents.get(v.getConnectedVents().get(0)).getX(), vents.get(v.getConnectedVents().get(0)).getY());
+							Client.getPlayer().setPosition(vents.get(v.getConnectedVents().get(0)).getRec().x, vents.get(v.getConnectedVents().get(0)).getRec().y);
 							v.removeImposter((Imposter) Client.getPlayer());
 							break;
 						}
 						else if(Gdx.input.isKeyJustPressed(Keys.RIGHT)) {
-							((Imposter)Client.getPlayer()).ventButton.setVisible(true);
 							System.out.println("MOVING RIGHT");
 							vents.get(v.getConnectedVents().get(1)).addImposter((Imposter) Client.getPlayer());
-							Client.getPlayer().setPosition(vents.get(v.getConnectedVents().get(1)).getX(), vents.get(v.getConnectedVents().get(1)).getY());
+							Client.getPlayer().setPosition(vents.get(v.getConnectedVents().get(0)).getRec().x, vents.get(v.getConnectedVents().get(0)).getRec().y);
 							v.removeImposter((Imposter) Client.getPlayer());
 							break;
 						}

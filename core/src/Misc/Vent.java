@@ -1,19 +1,18 @@
 package Misc;
 import java.util.ArrayList;
 
+import com.badlogic.gdx.math.Rectangle;
 import com.mmog.Client;
 import com.mmog.players.Imposter;
 
 public class Vent {
-	private int x,y;
 	private ArrayList<Imposter> imposters;
 	private boolean containsPlayer;
 	private ArrayList<Integer> connectedVents;
+	private Rectangle rec;
 	
-	public Vent(int x, int y) {
-		this.setX(x * Client.getPlayer().getCollisionLayer().getTileWidth());
-		this.setY((Client.getPlayer().getCollisionLayer().getHeight() - y) * Client.getPlayer().getCollisionLayer().getTileHeight());
-		
+	public Vent(Rectangle rec) {
+		this.setRec(rec);
 		setContainsPlayer(false);
 		connectedVents = new ArrayList<Integer>();
 		imposters = new ArrayList<Imposter>();
@@ -52,22 +51,6 @@ public class Vent {
 	public void setContainsPlayer(boolean containsPlayer) {
 		this.containsPlayer = containsPlayer;
 	}
-
-	public int getX() {
-		return x;
-	}
-
-	public void setX(int x) {
-		this.x = x;
-	}
-
-	public int getY() {
-		return y;
-	}
-
-	public void setY(int y) {
-		this.y = y;
-	}
 	
 	public void addImposter(Imposter imp) {
 		imposters.add(imp);
@@ -83,5 +66,13 @@ public class Vent {
 
 	public void setImposters(ArrayList<Imposter> imposters) {
 		this.imposters = imposters;
+	}
+
+	public Rectangle getRec() {
+		return rec;
+	}
+
+	public void setRec(Rectangle rec) {
+		this.rec = rec;
 	}
 }

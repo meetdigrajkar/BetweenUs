@@ -36,9 +36,9 @@ public class Imposter extends Player{
 
 	public Imposter(int playerID) {
 		super(playerID);
-		
+
 		sabotageClicked =  false;
-		
+
 		stage = new Stage();
 		table = new Table();
 		float MAX_WIDTH = Gdx.graphics.getWidth();
@@ -46,7 +46,7 @@ public class Imposter extends Player{
 		table.setSize(MAX_WIDTH, MAX_HEIGTH);
 		table.setFillParent(true);
 		currVent = null;
-		
+
 		//font sizes
 		labelFont.getData().setScale(0.4f);
 		LabelStyle labelFontStyle = new LabelStyle(labelFont, Color.WHITE);
@@ -77,12 +77,12 @@ public class Imposter extends Player{
 		table.left().top();
 		table.add(tasksLabel);
 		table.row().padTop((Gdx.graphics.getHeight()/2) + 100);
-		
+
 		table.add(lightsButton);
 		table.add(reactorButton);
-		
+
 		table.row().padTop(40);
-		
+
 		table.add(ventButton);
 		table.add(reportButton);
 		table.add(sabotageButton);
@@ -95,7 +95,7 @@ public class Imposter extends Player{
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
 				System.out.println("LIGHTS CLICKED: " + isOver());
-				
+
 				//should add a timer here, so imposters can't spam this command
 				try {
 					Client.sendLightsCommand();
@@ -105,32 +105,30 @@ public class Imposter extends Player{
 				}
 			}
 		});
-		
+
 		//use button listener
 		reactorButton.addListener(new ClickListener() {
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
 				System.out.println("REACTOR CLICKED: " + isOver());
-				
+
 			}
 		});
-		
+
 		//use button listener
 		ventButton.addListener(new ClickListener() {
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
 				if(!inVent) {
-					System.out.println("TRYING TO ENTER VENT: ");
-					enteringVent = true;
+					inVent = true;
+					
+					System.out.println("ENTERING VENT!");
+					addImposterToVent();
 				}
 				else {
 					inVent = false;
-					
-					//remove the player from the vent
-					if(currVent != null) {
-						GameScreen.vents.get(GameScreen.vents.indexOf(currVent)).removeImposter((Imposter)Client.getPlayer());
-					}
-					
+
+					//sends message to all other players that the player has vented OUT
 					try {
 						Client.sendOutVent();
 					} catch (IOException e) {
@@ -167,16 +165,33 @@ public class Imposter extends Player{
 			}
 		});
 	}
-	
+
 	public boolean checkCollisionOnVent() {
-		if((collisionAtX(1,"hole") || collisionAtY(1,"hole"))){
-			ventButton.setVisible(true);
-			return true;
+		//loop through all the vents
+		for(Vent v: GameScreen.vents) {
+			if(v.getRec().overlaps(playerRec)) {
+				return true;
+			}
 		}
-		ventButton.setVisible(false);
 		return false;
 	}
-	
+
+	public void addImposterToVent() {
+		for(Vent v: GameScreen.vents) {
+			if(v.getRec().overlaps(playerRec)) {
+				v.addImposter((Imposter) Client.getPlayer());
+
+				//send invent to all the other players
+				try {
+					Client.sendInVent();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+
 	public String tasksToString() {
 		String tasksString = "-Fake Tasks-\n";
 
@@ -186,32 +201,11 @@ public class Imposter extends Player{
 
 	public void drawUI(Batch batch) {
 		Gdx.input.setInputProcessor(this.stage);
-		checkCollisionOnVent();
 		
-		if(enteringVent) {
-			//enter vent
-			for(Vent v: GameScreen.vents) {
-				if((v.getX() >= (getX() - 20)) && ((v.getX() <= (getX() + 20))) && (v.getY() >= (getY() - 20)) && ((v.getY() <= (getY() + 20)))) {
-					System.out.println("ENTERING VENT!");
-					v.addImposter((Imposter) Client.getPlayer());
-					currVent = v;
-					
-					super.inVent = true;
-					
-					//send invent to all the other players
-					try {
-						Client.sendInVent();
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-					
-					enteringVent = false;
-				}
-			}
-		}
-		
+		ventButton.setVisible(checkCollisionOnVent());
+
 		stage.act();
 		stage.draw();
 	}
+
 }
