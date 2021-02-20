@@ -378,26 +378,28 @@ public class GameScreen extends AbstractScreen{
 		else if(Client.getPlayer() instanceof Imposter) {
 			light.setDistance(500);
 			((Imposter) Client.getPlayer()).drawUI(r.getBatch());
-
-			//if the player is in the vent allow the player to move to other vents
-			for(Vent v: vents) {
-				//find the vent the imposter is in
-				if(v.hasImposter((Imposter) Client.getPlayer())) {
-					if(Gdx.input.isKeyJustPressed(Keys.LEFT)) {
-						((Imposter)Client.getPlayer()).ventButton.setVisible(true);
-						System.out.println("MOVING LEFT");
-						vents.get(v.getConnectedVents().get(0)).addImposter((Imposter) Client.getPlayer());
-						Client.getPlayer().setPosition(vents.get(v.getConnectedVents().get(0)).getX(), vents.get(v.getConnectedVents().get(0)).getY());
-						v.removeImposter((Imposter) Client.getPlayer());
-						break;
-					}
-					else if(Gdx.input.isKeyJustPressed(Keys.RIGHT)) {
-						((Imposter)Client.getPlayer()).ventButton.setVisible(true);
-						System.out.println("MOVING RIGHT");
-						vents.get(v.getConnectedVents().get(1)).addImposter((Imposter) Client.getPlayer());
-						Client.getPlayer().setPosition(vents.get(v.getConnectedVents().get(1)).getX(), vents.get(v.getConnectedVents().get(1)).getY());
-						v.removeImposter((Imposter) Client.getPlayer());
-						break;
+			
+			if(Client.getPlayer().inVent) {
+				//if the player is in the vent allow the player to move to other vents
+				for(Vent v: vents) {
+					//find the vent the imposter is in
+					if(v.hasImposter((Imposter) Client.getPlayer())) {
+						if(Gdx.input.isKeyJustPressed(Keys.LEFT)) {
+							((Imposter)Client.getPlayer()).ventButton.setVisible(true);
+							System.out.println("MOVING LEFT");
+							vents.get(v.getConnectedVents().get(0)).addImposter((Imposter) Client.getPlayer());
+							Client.getPlayer().setPosition(vents.get(v.getConnectedVents().get(0)).getX(), vents.get(v.getConnectedVents().get(0)).getY());
+							v.removeImposter((Imposter) Client.getPlayer());
+							break;
+						}
+						else if(Gdx.input.isKeyJustPressed(Keys.RIGHT)) {
+							((Imposter)Client.getPlayer()).ventButton.setVisible(true);
+							System.out.println("MOVING RIGHT");
+							vents.get(v.getConnectedVents().get(1)).addImposter((Imposter) Client.getPlayer());
+							Client.getPlayer().setPosition(vents.get(v.getConnectedVents().get(1)).getX(), vents.get(v.getConnectedVents().get(1)).getY());
+							v.removeImposter((Imposter) Client.getPlayer());
+							break;
+						}
 					}
 				}
 			}
