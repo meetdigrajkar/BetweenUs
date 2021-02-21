@@ -179,7 +179,14 @@ public class CrewMember extends Player {
 
 		return tasksString;
 	}
-
+	
+	public void removeTask(String task) {
+		for(Task t: tasks) {
+			if(t.getTaskName().equals(task)){
+				tasks.remove(t);
+			}
+		}
+	}
 
 	public Task getTask(String taskName) {
 		Task task = null;

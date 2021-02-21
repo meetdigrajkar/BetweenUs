@@ -215,8 +215,18 @@ public class Client
 	public static void sendPlayerKilled(String playerName) throws IOException {
 		String toSend = "";
 		toSend += 10 + ",";
-		toSend += Client.getPlayer().connectedRoomName + ",";
+		toSend += getPlayer().connectedRoomName + ",";
 		toSend += playerName;
+
+		DatagramPacket datagramPacket = new DatagramPacket(toSend.getBytes(), toSend.getBytes().length, address, 7077);	     
+		socket.send(datagramPacket);
+	}
+	
+	public static void sendReactorCommand() throws IOException{
+		String toSend = "";
+		toSend += 14 + ",";
+		toSend += Client.getPlayer().connectedRoomName + ",";
+		toSend += getPlayer().getPlayerName();
 
 		DatagramPacket datagramPacket = new DatagramPacket(toSend.getBytes(), toSend.getBytes().length, address, 7077);	     
 		socket.send(datagramPacket);
@@ -424,6 +434,10 @@ public class Client
 					p.setAll(Float.parseFloat(dataArray[2]),Float.parseFloat(dataArray[3]), Boolean.parseBoolean(dataArray[4]), Boolean.parseBoolean(dataArray[5]), Boolean.parseBoolean(dataArray[6]));
 				}
 			}
+		}
+		//add a reactor task
+		else if(command == 14) {
+			GameScreen.reactorTaskStarted = true;
 		}
 	}
 

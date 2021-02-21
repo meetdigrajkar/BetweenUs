@@ -360,6 +360,19 @@ public class Server {
 			
 			toAllClients.append(command);
 		}
+		//reactor command sent
+		else if(command == 14) {
+			toLocal = false;
+			toAll = true;
+			
+			roomName = dataArray[1];
+			String pn = dataArray[2];
+			
+			toAllClients = (new StringBuilder());
+			toAllClients.append(pn).append(",");
+			toAllClients.append(command);
+		}
+		
 		//send the command
 		sendCommand(toLocalc.toString(),toAllClients.toString(),serverDatagramSocket, command, toLocal, toAll, hostAddress, roomName);
 	}
@@ -433,7 +446,7 @@ public class Server {
 					if((command == 0) && address.equals(hostAddress)) {
 						toSend = new DatagramPacket(toLocalc.getBytes(), toLocalc.getBytes().length, hostAddress, 8000);
 					}
-					else if((command == 0 || command == 1 || command == 4 || command == 10 || command == 12 || command == 13) && !address.equals(hostAddress)) {
+					else if((command == 0 || command == 1 || command == 4 || command == 10 || command == 12 || command == 13 || command == 14) && !address.equals(hostAddress)) {
 						toSend = new DatagramPacket(toAllClients.getBytes(), toAllClients.getBytes().length, address, 8000);
 					}
 

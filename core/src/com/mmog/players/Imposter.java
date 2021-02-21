@@ -1,6 +1,7 @@
 package com.mmog.players;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
@@ -18,6 +19,8 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.mmog.Client;
 import com.mmog.screens.GameScreen;
+import com.mmog.tasks.ElectricalTask;
+import com.mmog.tasks.ReactorTask;
 import com.mmog.tasks.Task;
 
 import Misc.Vent;
@@ -26,27 +29,26 @@ public class Imposter extends Player{
 	private Table table;
 	private Stage stage;
 
-	public ImageButton sabotageButton,reportButton,ventButton,lightsButton,reactorButton;
+	public ImageButton useButton, sabotageButton,reportButton,ventButton,lightsButton,reactorButton;
 
 	BitmapFont labelFont = new BitmapFont(Gdx.files.internal("UI/newlabelfont.fnt"));
 	Label tasksLabel;
 	public boolean sabotageClicked;
-	public boolean enteringVent = false;
-	private Vent currVent;
-
+	public ArrayList<Task> tasks;
+	private Task currentTask;
+	
 	public Imposter(int playerID) {
 		super(playerID);
 
 		sabotageClicked =  false;
-
+		tasks = new ArrayList<Task>();
 		stage = new Stage();
 		table = new Table();
 		float MAX_WIDTH = Gdx.graphics.getWidth();
 		float MAX_HEIGTH = Gdx.graphics.getHeight();
 		table.setSize(MAX_WIDTH, MAX_HEIGTH);
 		table.setFillParent(true);
-		currVent = null;
-
+		setCurrentTask(null);
 		//font sizes
 		labelFont.getData().setScale(0.4f);
 		LabelStyle labelFontStyle = new LabelStyle(labelFont, Color.WHITE);
@@ -57,8 +59,11 @@ public class Imposter extends Player{
 		final TextureRegionDrawable vent = new TextureRegionDrawable(new Texture("UI/ventButton.png"));
 		final TextureRegionDrawable lights = new TextureRegionDrawable(new Texture("UI/lightsButton.png"));
 		final TextureRegionDrawable reactor = new TextureRegionDrawable(new Texture("UI/reactorButton.png"));
+		final TextureRegionDrawable use = new TextureRegionDrawable(new Texture("UI/useButton.png"));
+
 
 		//init images
+		useButton = new ImageButton(use);
 		sabotageButton = new ImageButton(sabotage);
 		reportButton = new ImageButton(report);
 		ventButton = new ImageButton(vent);
@@ -86,6 +91,7 @@ public class Imposter extends Player{
 		table.add(ventButton);
 		table.add(reportButton);
 		table.add(sabotageButton);
+		table.add(useButton);
 
 		//add table as an actor to the stage
 		stage.addActor(table);
@@ -95,7 +101,12 @@ public class Imposter extends Player{
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
 				System.out.println("LIGHTS CLICKED: " + isOver());
-
+				
+				//when they trigger lights, add the electrical task
+				if(!hasTask("Electrical Task")) {
+					tasks.add(new ElectricalTask());
+				}
+				
 				//should add a timer here, so imposters can't spam this command
 				try {
 					Client.sendLightsCommand();
@@ -111,7 +122,19 @@ public class Imposter extends Player{
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
 				System.out.println("REACTOR CLICKED: " + isOver());
-
+				
+				if(!hasTask("Reactor Task")) {
+					tasks.add(new ReactorTask());
+				}
+				
+				//should add a timer here, so imposters can't spam this command
+				try {
+					Client.sendReactorCommand();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
 			}
 		});
 
@@ -121,7 +144,7 @@ public class Imposter extends Player{
 			public void clicked(InputEvent event, float x, float y) {
 				if(!inVent) {
 					inVent = true;
-					
+
 					System.out.println("ENTERING VENT!");
 					addImposterToVent();
 				}
@@ -164,8 +187,69 @@ public class Imposter extends Player{
 				System.out.println("REPORT CLICKED: " + isOver());
 			}
 		});
+
+		//use button listener
+		useButton.addListener(new ClickListener() {
+			@Override
+			public void clicked(InputEvent event, float x, float y) {
+				System.out.println("USE CLICKED: " + isOver());
+				((Imposter) Client.getPlayer()).setCurrentTaskIfCollided();
+			}
+		});
 	}
 
+	public void setCurrentTaskIfCollided() {
+		for(Task task: tasks) {
+			if(!task.isTaskCompleted() && checkCollisionOnTask(task.getTaskName())) {	
+				setCurrentTask(task);
+				return;
+			}
+		}
+	}
+	
+	public boolean checkCollisionOnTask(String taskName) {
+		if((collisionAtX(1,taskName) || collisionAtY(1,taskName))){
+			return true;
+		}
+		return false;
+	}
+	
+	public boolean isTaskCompleted(String task) {
+		for(Task t: tasks) {
+			if(t.getTaskName().equals(task) && t.isTaskCompleted()) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+
+	public void setTaskCompleted(String task) {
+		for(Task t: tasks) {
+			if(t.getTaskName().equals(task)) {
+				t.setTaskCompleted();
+				return;
+			}
+		}
+	}
+	
+	public void removeTask(String task) {
+		for(Task t: tasks) {
+			if(t.getTaskName().equals(task)){
+				tasks.remove(t);
+			}
+		}
+	}
+
+	public boolean hasTask(String task) {
+		for(Task t: tasks) {
+			if(t.getTaskName().equals(task)) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	public boolean checkCollisionOnVent() {
 		//loop through all the vents
 		for(Vent v: GameScreen.vents) {
@@ -202,11 +286,19 @@ public class Imposter extends Player{
 
 	public void drawUI(Batch batch) {
 		Gdx.input.setInputProcessor(this.stage);
-		
+
 		ventButton.setVisible(checkCollisionOnVent());
 
 		stage.act();
 		stage.draw();
+	}
+
+	public Task getCurrentTask() {
+		return currentTask;
+	}
+
+	public void setCurrentTask(Task currentTask) {
+		this.currentTask = currentTask;
 	}
 
 }
