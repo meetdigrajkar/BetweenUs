@@ -451,6 +451,21 @@ public class Client
 		//lights fixed command
 		else if(command == 15) {
 			GameScreen.light.setDistance(180);
+			
+			if(Client.getPlayer() instanceof CrewMember) {
+				if(((CrewMember) Client.getPlayer()).getCurrentTask().getTaskName().equals("Electrical Task")) {
+					((CrewMember) Client.getPlayer()).setCurrentTask(null);
+				}
+				
+				((CrewMember) Client.getPlayer()).removeTask("Electrical Task");
+			}
+			else{
+				if(((Imposter) Client.getPlayer()).getCurrentTask().getTaskName().equals("Electrical Task")) {
+					((Imposter) Client.getPlayer()).setCurrentTask(null);
+				}
+				
+				((Imposter) Client.getPlayer()).removeTask("Electrical Task");
+			}
 		}
 	}
 

@@ -105,7 +105,9 @@ public class LobbyScreen extends AbstractScreen{
 		//allow player movement
 		try {
 			Gdx.input.setInputProcessor(this);
-			Client.getPlayer().render(Gdx.graphics.getDeltaTime());
+			if(Client.getPlayer().role.equals("none")) {
+				Client.getPlayer().render(Gdx.graphics.getDeltaTime());
+			}
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

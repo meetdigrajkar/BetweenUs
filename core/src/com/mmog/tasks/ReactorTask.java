@@ -369,12 +369,18 @@ public class ReactorTask extends Task {
 
 	public static void setCompletedTask(Boolean isCompleted) {
 		if(isCompleted) {
-			((CrewMember) Client.getPlayer()).setCurrentTask(null);
-			
 			if(Client.getPlayer() instanceof CrewMember) {
+				if(((CrewMember) Client.getPlayer()).getCurrentTask().getTaskName().equals(taskName)) {
+					((CrewMember) Client.getPlayer()).setCurrentTask(null);
+				}
+				
 				((CrewMember) Client.getPlayer()).removeTask(taskName);
 			}
 			else{
+				if(((Imposter) Client.getPlayer()).getCurrentTask().getTaskName().equals(taskName)) {
+					((Imposter) Client.getPlayer()).setCurrentTask(null);
+				}
+				
 				((Imposter) Client.getPlayer()).removeTask(taskName);
 			}
 			
@@ -383,7 +389,7 @@ public class ReactorTask extends Task {
 	}
 
 	public void render(Batch batch){
-		((CrewMember) Client.getPlayer()).draw(batch);
+		(Client.getPlayer()).draw(batch);
 		Gdx.input.setInputProcessor(stage);
 
 		stage.draw();

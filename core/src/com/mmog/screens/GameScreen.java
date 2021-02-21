@@ -387,6 +387,8 @@ public class GameScreen extends AbstractScreen{
 		else if(Client.getPlayer() instanceof Imposter) {
 			light.setDistance(500);
 			
+			((Imposter) Client.getPlayer()).drawUI(r.getBatch());
+			
 			//if the player has a current task, render the task screen ui
 			if(((Imposter) Client.getPlayer()).getCurrentTask() != null) {
 				//based on the task the player is doing, render the appropriate task 
@@ -399,8 +401,6 @@ public class GameScreen extends AbstractScreen{
 					((ElectricalTask) task).render(r.getBatch());
 				}
 			}
-			
-			((Imposter) Client.getPlayer()).drawUI(r.getBatch());
 			
 			
 			if(Client.getPlayer().inVent) {

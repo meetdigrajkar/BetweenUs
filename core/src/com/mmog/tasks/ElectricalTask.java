@@ -283,11 +283,13 @@ public class ElectricalTask extends Task {
 
 	public void render(Batch batch) {
 		(Client.getPlayer()).draw(batch);
+		
 		Gdx.input.setInputProcessor(stage);
 		stage.draw();
 
 		if(done) {
 			System.out.println("SUCCESS!");
+			
 			GameScreen.light.setDistance(180);
 
 			if(!sentFixed) {
@@ -305,10 +307,9 @@ public class ElectricalTask extends Task {
 				((CrewMember) Client.getPlayer()).removeTask(taskName);
 			}
 			else{
-				((CrewMember) Client.getPlayer()).setCurrentTask(null);
+				((Imposter) Client.getPlayer()).setCurrentTask(null);
 				((Imposter) Client.getPlayer()).removeTask(taskName);
 			}
-
 		}
 	}
 }
