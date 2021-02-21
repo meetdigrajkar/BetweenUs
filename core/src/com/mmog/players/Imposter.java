@@ -36,9 +36,9 @@ public class Imposter extends Player{
 	public boolean sabotageClicked;
 	public ArrayList<Task> tasks;
 	private Task currentTask;
-	private int lightsCDTimer = 30, reactorCDTimer = 80;
+	private int lightsCDTimer = 3000, reactorCDTimer = 80;
 	private boolean lightsOnCD = false, reactorOnCD = false;
-	
+
 	public Imposter(int playerID) {
 		super(playerID);
 
@@ -104,12 +104,12 @@ public class Imposter extends Player{
 			public void clicked(InputEvent event, float x, float y) {
 				System.out.println("LIGHTS CLICKED: " + isOver());
 				lightsOnCD = true;
-				
+
 				//when they trigger lights, add the electrical task
 				if(!hasTask("Electrical Task")) {
 					tasks.add(new ElectricalTask());
 				}
-				
+
 				//should add a timer here, so imposters can't spam this command
 				try {
 					Client.sendLightsCommand();
@@ -126,11 +126,11 @@ public class Imposter extends Player{
 			public void clicked(InputEvent event, float x, float y) {
 				System.out.println("REACTOR CLICKED: " + isOver());
 				reactorOnCD = true;
-				
+
 				if(!hasTask("Reactor Task")) {
 					tasks.add(new ReactorTask());
 				}
-				
+
 				//should add a timer here, so imposters can't spam this command
 				try {
 					Client.sendReactorCommand();
@@ -138,7 +138,7 @@ public class Imposter extends Player{
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-				
+
 			}
 		});
 
@@ -172,8 +172,12 @@ public class Imposter extends Player{
 			public void clicked(InputEvent event, float x, float y) {
 				System.out.println("SABOTAGE CLICKED: " + isOver());
 				if(!sabotageClicked) {
-					lightsButton.setVisible(true);
-					reactorButton.setVisible(true);
+					if(!lightsOnCD) {
+						lightsButton.setVisible(true);
+					}
+					if(!reactorOnCD) {
+						reactorButton.setVisible(true);
+					}
 					sabotageClicked = true;
 				}
 				else {
@@ -210,14 +214,14 @@ public class Imposter extends Player{
 			}
 		}
 	}
-	
+
 	public boolean checkCollisionOnTask(String taskName) {
 		if((collisionAtX(1,taskName) || collisionAtY(1,taskName))){
 			return true;
 		}
 		return false;
 	}
-	
+
 	public boolean isTaskCompleted(String task) {
 		for(Task t: tasks) {
 			if(t.getTaskName().equals(task) && t.isTaskCompleted()) {
@@ -236,16 +240,16 @@ public class Imposter extends Player{
 			}
 		}
 	}
-	
+
 	public void removeTask(String task) {
 		ArrayList<Task> toRemove = new ArrayList<Task>();
-		
+
 		for(Task t: tasks) {
 			if(t.getTaskName().equals(task)){
 				toRemove.add(t);
 			}
 		}
-		
+
 		tasks.removeAll(toRemove);
 	}
 
@@ -257,7 +261,7 @@ public class Imposter extends Player{
 		}
 		return false;
 	}
-	
+
 	public boolean checkCollisionOnVent() {
 		//loop through all the vents
 		for(Vent v: GameScreen.vents) {
@@ -296,26 +300,36 @@ public class Imposter extends Player{
 		Gdx.input.setInputProcessor(this.stage);
 
 		ventButton.setVisible(checkCollisionOnVent());
-		
+
 		//if lights sabotage on cool down, disable button
 		if(lightsOnCD) {
 			lightsButton.setVisible(false);
-			
+
 			if(lightsCDTimer > 0) {
 				lightsCDTimer -= Gdx.graphics.getDeltaTime();
 			}
 			else {
 				lightsCDTimer = 30;
 				lightsOnCD = false;
+				lightsButton.setVisible(true);
 			}
-			
+
 		}
 		//if reactor sabotage on cool down, disable button
 		if(reactorOnCD) {
 			reactorButton.setVisible(false);
+
+			if(reactorCDTimer > 0) {
+				reactorCDTimer -= Gdx.graphics.getDeltaTime();
+			}
+			else {
+				reactorCDTimer = 80;
+				reactorOnCD = false;
+				reactorButton.setVisible(true);
+			}
 		}
-			
-		
+
+
 		stage.act();
 		stage.draw();
 	}
