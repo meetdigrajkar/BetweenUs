@@ -373,12 +373,7 @@ public class Server {
 			toAllClients.append(command);
 		}
 		else if(command == 15) {
-			toLocal = false;
-			toAll = true;
-			
-			roomName = dataArray[1];
-			
-			sendLightsToCrew(command,roomName,serverDatagramSocket);
+			sendLightsToCrew(command,dataArray[1],serverDatagramSocket);
 		}
 		
 		//send the command

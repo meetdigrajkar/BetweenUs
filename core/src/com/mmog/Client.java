@@ -159,7 +159,7 @@ public class Client
 	public static void sendLightsCommand() throws IOException{
 		String toSend = "";
 		toSend += 11 + ",";
-		toSend += player.connectedRoomName +",";
+		toSend += player.connectedRoomName;
 		
 		DatagramPacket datagramPacket = new DatagramPacket(toSend.getBytes(), toSend.getBytes().length, address, 7077);	     
 		socket.send(datagramPacket);
@@ -168,7 +168,7 @@ public class Client
 	public static void sendLightsFixed() throws IOException{
 		String toSend = "";
 		toSend += 15 + ",";
-		toSend += player.connectedRoomName +",";
+		toSend += player.connectedRoomName;
 		
 		DatagramPacket datagramPacket = new DatagramPacket(toSend.getBytes(), toSend.getBytes().length, address, 7077);	     
 		socket.send(datagramPacket);
