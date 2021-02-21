@@ -203,6 +203,7 @@ public class GameScreen extends AbstractScreen{
 		if(Client.getPlayer() instanceof CrewMember) {
 			((CrewMember) Client.getPlayer()).addTask(new AdminTask());
 			((CrewMember) Client.getPlayer()).addTask(new ComsTask()); 
+			((CrewMember) Client.getPlayer()).addTask(new EmergencyMeeting()); 
 		}
 
 		map = new TmxMapLoader().load("map/map.tmx");
@@ -237,7 +238,6 @@ public class GameScreen extends AbstractScreen{
 		//change the light distance when the imposter sends the sabotage request
 		light = new ConeLight(rayhandler,120,Color.WHITE, 180,Client.getPlayer().getX(), Client.getPlayer().getY(),360,360);
 		light.setPosition(Client.getPlayer().getX()+ 17,Client.getPlayer().getY()+ 17);
-
 	}
 
 	private void buildBuildingsBodies() {
@@ -381,6 +381,9 @@ public class GameScreen extends AbstractScreen{
 				if(task instanceof ComsTask) {
 					((ComsTask) task).render(r.getBatch());
 				}
+				if(task instanceof EmergencyMeeting) {
+					((EmergencyMeeting) task).render(r.getBatch());
+				}
 			}
 
 		}
@@ -399,6 +402,9 @@ public class GameScreen extends AbstractScreen{
 				}
 				if(task instanceof ElectricalTask) {
 					((ElectricalTask) task).render(r.getBatch());
+				}
+				if(task instanceof EmergencyMeeting) {
+					((EmergencyMeeting) task).render(r.getBatch());
 				}
 			}
 			

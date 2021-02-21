@@ -1,5 +1,7 @@
 package com.mmog.tasks;
 
+import java.util.ArrayList;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
@@ -14,21 +16,21 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.scenes.scene2d.utils.DragListener;
+import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.mmog.Client;
 import com.mmog.players.CrewMember;
+import com.mmog.players.Player;
 
 public class EmergencyMeeting extends Task{
 
 	final static String taskName = "Emergency Meeting";
 	Table table;
-	TextField crewMemberID;
+	ArrayList<Label> playerNames;
 	Stage stage;
 
-	Sprite adminCard,adminTextBar,adminbg,adminWalletFront;
-	final Image cardImg, adminbgImg, adminWalletFrontImg;
-	boolean setInPlace = false;
-	float cardInPlaceXPos;
+	Sprite meetingbg,playerbox,chaticon,cancelvote, confirmvote, playervoteicon, deadx, skipvote, skipped, playervoted, playericon;
+	final Image meetingbgImage, playericonImage, playerboxImage, chaticonImage, cancelvoteImage, confirmvoteImage, playervoteiconImage, playervotedImage, deadxImage, skippedImage,skipvoteImage;
 	boolean completed = false;
 	private long startTime = 0, elapsedTime = 0;
 	
@@ -36,87 +38,65 @@ public class EmergencyMeeting extends Task{
 		super(taskName);
 
 		stage = new Stage();
-
-		adminbg = new Sprite(new Texture("TaskUI/Swipe Card/adminTask.png"));
-		adminCard = new Sprite(new Texture("TaskUI/Swipe Card/admin_Card.png"));
-		adminWalletFront = new Sprite(new Texture("TaskUI/Swipe Card/admin_walletFront.png"));
-
-		//resizing because of camera zoom
-		adminbg.setSize(250, 250);
-		adminCard.setSize(100, 55);
-		adminWalletFront.setSize(125, 52);
-
-		LabelStyle ls = new LabelStyle(new BitmapFont(),Color.FIREBRICK);
-		final Label textLabel = new Label("Swipe your ID card.", ls);
-		
-		adminbgImg = new Image(adminbg);
-		cardImg = new Image(adminCard);
-		adminWalletFrontImg = new Image(adminWalletFront);
+		table = new Table();
 	
-		stage.addActor(adminbgImg);
-		stage.addActor(cardImg);
-		stage.addActor(adminWalletFrontImg);
-		stage.addActor(textLabel);
+		playerNames = new ArrayList<Label>();
 		
-		adminbgImg.setPosition(stage.getWidth()/2,stage.getHeight()/2);
-		cardImg.setPosition((stage.getWidth()/2)+25,stage.getHeight()/2);
-		adminWalletFrontImg.setPosition((stage.getWidth()/2) + 20,stage.getHeight()/2);
-		textLabel.setPosition((stage.getWidth()/2) + 50,(stage.getHeight()/2) + 453);
-
-		cardImg.addListener(new DragListener() {
-			@Override
-			public boolean touchDown(InputEvent e, float x, float y, int pointer, int button) {
-				if(!setInPlace) {
-					cardInPlaceXPos = cardImg.getX();
-					cardImg.setPosition(cardImg.getX(), cardImg.getY() + 190);
-					setInPlace = true;
-				}
-				return true;
-			}
-			
-			@Override
-			public void touchDragged(InputEvent e, float x, float y, int pointer) {
-				if(setInPlace) {
-					cardImg.setPosition(cardImg.getX() + x, cardImg.getY());
+		meetingbg = new Sprite(new Texture("TaskUI/meeting/meetingbg.png"));
+		playerbox = new Sprite(new Texture("TaskUI/meeting/playerbox.png"));
+		playericon = new Sprite(new Texture("TaskUI/meeting/playericon.png"));
+		cancelvote = new Sprite(new Texture("TaskUI/meeting/cancelvote.png"));
+		chaticon = new Sprite(new Texture("TaskUI/meeting/chaticon.png"));
+		confirmvote = new Sprite(new Texture("TaskUI/meeting/confirmvote.png"));
+		playervoteicon = new Sprite(new Texture("TaskUI/meeting/playervoteicon.png"));
+		deadx = new Sprite(new Texture("TaskUI/meeting/x.png"));
+		skipvote = new Sprite(new Texture("TaskUI/meeting/skip.png"));
+		skipped = new Sprite(new Texture("TaskUI/meeting/skipped.png"));
+		playervoted = new Sprite(new Texture("TaskUI/meeting/playervoted.png"));
 		
-					//reset the position of the card if it reaches the end of the scanner or if the card is not being dragged
-					if((cardImg.getX() > (adminbgImg.getX() + 500)) || (cardImg.getX() < adminbgImg.getX()))  {
-						cardImg.setX(cardInPlaceXPos);
-					}
-					
-					//check the amount of time it took to drag
-					if((cardImg.getX() >= adminbgImg.getX() + 400)) {
-						elapsedTime = TimeUtils.timeSinceMillis((long) startTime);
-					}
-					
-				}
-			}
-			
-			@Override
-			public void touchUp (InputEvent event, float x, float y, int pointer, int button) {
-				super.touchUp(event, x, y, pointer, button);
-				cardImg.setX(cardInPlaceXPos);
-				startTime = TimeUtils.millis();
-				System.out.println(elapsedTime);
-				
-				if(elapsedTime < 3000 && elapsedTime > 2000) {
-					completed = true;
-				}
-				
-				else if(elapsedTime < 2000 && elapsedTime > 300) {
-					textLabel.setText("TOO FAST!");
-				}
-				
-				else if(elapsedTime > 3000) {
-					textLabel.setText("TOO SLOW!");
-				}
-			}
-		});
-
+		meetingbgImage = new Image(meetingbg);
+		playerboxImage = new Image(playerbox);
+		chaticonImage = new Image(chaticon);
+		cancelvoteImage = new Image(cancelvote);
+		confirmvoteImage = new Image(confirmvote);
+		playervoteiconImage = new Image(playervoteicon);
+		deadxImage = new Image(deadx);
+		skipvoteImage = new Image(skipvote);
+		skippedImage = new Image(skipped);
+		playervotedImage = new Image(playervoted);
+		playericonImage = new Image(playericon);
+		
+		//set position
+		meetingbgImage.setPosition(stage.getWidth()/3,stage.getHeight()/3);
+		chaticonImage.setPosition((stage.getWidth()/2) + 380, (stage.getHeight()/2) + 300);
+		skippedImage.setPosition((stage.getWidth()/3) + 60,(stage.getHeight()/3) + 80);
+		skipvoteImage.setPosition((stage.getWidth()/3) + 60,(stage.getHeight()/3) + 150);
+		
+		stage.addActor(meetingbgImage);
+		stage.addActor(chaticonImage);
+		
+		//table for the playerbox
+		table.setFillParent(true);
+		float MAX_WIDTH = meetingbgImage.getWidth();
+		float MAX_HEIGTH = meetingbgImage.getHeight();
+		//table.setPosition(0,0);
+		//table.setSize(MAX_WIDTH, MAX_HEIGTH);
+		
+		for(Player p: Client.getPlayers()) {
+			table.add(playerboxImage);
+		}
+		
+		//stage.addActor(cancelvoteImage);
+		//stage.addActor(confirmvoteImage);
+		stage.addActor(table);
+		stage.addActor(skipvoteImage);
+		stage.addActor(skippedImage);
+		
+		
 	}
 
 	public void render(Batch batch) {
-		((CrewMember) Client.getPlayer()).draw(batch);
+		(Client.getPlayer()).draw(batch);
 		Gdx.input.setInputProcessor(stage);
 		stage.draw();
 		
