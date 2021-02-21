@@ -165,6 +165,15 @@ public class Client
 		socket.send(datagramPacket);
 	}
 	
+	public static void sendLightsFixed() throws IOException{
+		String toSend = "";
+		toSend += 15 + ",";
+		toSend += player.connectedRoomName +",";
+		
+		DatagramPacket datagramPacket = new DatagramPacket(toSend.getBytes(), toSend.getBytes().length, address, 7077);	     
+		socket.send(datagramPacket);
+	}
+	
 	public static void sendInVent() throws IOException{
 		String toSend = "";
 		toSend += 12 + ",";
@@ -438,6 +447,10 @@ public class Client
 		//add a reactor task
 		else if(command == 14) {
 			GameScreen.reactorTaskStarted = true;
+		}
+		//lights fixed command
+		else if(command == 15) {
+			GameScreen.light.setDistance(180);
 		}
 	}
 

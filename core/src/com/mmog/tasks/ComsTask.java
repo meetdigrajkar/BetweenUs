@@ -129,7 +129,7 @@ public class ComsTask extends Task {
 	
 	
 	public void render(Batch batch) {
-		((CrewMember) Client.getPlayer()).draw(batch);
+		(Client.getPlayer()).draw(batch);
 		Gdx.input.setInputProcessor(stage);
 		stage.draw();
 		

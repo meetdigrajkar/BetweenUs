@@ -1,5 +1,7 @@
 package com.mmog.tasks;
 
+import java.io.IOException;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
@@ -46,7 +48,7 @@ public class ElectricalTask extends Task {
 	boolean BlueWire = false;
 	boolean GreenWire = false;
 	boolean YellowWire = false;
-	
+	boolean sentFixed = false;
 	
 	private String test;
 		
@@ -280,15 +282,25 @@ public class ElectricalTask extends Task {
 	}
 	
 	public void render(Batch batch) {
+		(Client.getPlayer()).draw(batch);
 		
-		((CrewMember) Client.getPlayer()).draw(batch);
 		Gdx.input.setInputProcessor(stage);
 		stage.draw();
 		
 		if(done) {
 			System.out.println("SUCCESS!");
-			//GameScreen.light.setDistance(180);
+			GameScreen.light.setDistance(180);
 			((CrewMember) Client.getPlayer()).setCurrentTask(null);
+			
+			if(!sentFixed) {
+				try {
+					Client.sendLightsFixed();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				sentFixed = true;
+			}
 			
 			if(Client.getPlayer() instanceof CrewMember) {
 				((CrewMember) Client.getPlayer()).removeTask(taskName);

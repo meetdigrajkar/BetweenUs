@@ -328,7 +328,7 @@ public class Server {
 		}
 		//imposter's sent the lights command
 		else if(command == 11) {
-			sendTurnOffLightsToCrew(dataArray[1],serverDatagramSocket);
+			sendLightsToCrew(command, dataArray[1],serverDatagramSocket);
 		}
 		//imposter's vent command
 		else if(command == 12) {
@@ -372,22 +372,29 @@ public class Server {
 			toAllClients.append(pn).append(",");
 			toAllClients.append(command);
 		}
+		else if(command == 15) {
+			toLocal = false;
+			toAll = true;
+			
+			roomName = dataArray[1];
+			
+			sendLightsToCrew(command,roomName,serverDatagramSocket);
+		}
 		
 		//send the command
 		sendCommand(toLocalc.toString(),toAllClients.toString(),serverDatagramSocket, command, toLocal, toAll, hostAddress, roomName);
 	}
 	
-	public static void sendTurnOffLightsToCrew(String roomName,DatagramSocket serverDatagramSocket) {
+	public static void sendLightsToCrew(int command, String roomName,DatagramSocket serverDatagramSocket) {
 		ArrayList<ServerPlayer> crew = new ArrayList<ServerPlayer>();
 		String toallString = "";
 		
 		StringBuilder toAllClients = (new StringBuilder());
-		toAllClients.append(11);
+		toAllClients.append(command);
 		toallString = toAllClients.toString();
 		
 		for(Room room: rooms) {
 			if(room.getRoomName().equals(roomName)) {
-				System.out.println("OK-----------------");
 				crew = room.getCrewMembers();
 				
 				for(ServerPlayer p: crew) {
