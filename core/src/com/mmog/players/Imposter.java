@@ -234,11 +234,15 @@ public class Imposter extends Player{
 	}
 	
 	public void removeTask(String task) {
+		ArrayList<Task> toRemove = new ArrayList<Task>();
+		
 		for(Task t: tasks) {
 			if(t.getTaskName().equals(task)){
-				tasks.remove(t);
+				toRemove.add(t);
 			}
 		}
+		
+		tasks.removeAll(toRemove);
 	}
 
 	public boolean hasTask(String task) {
