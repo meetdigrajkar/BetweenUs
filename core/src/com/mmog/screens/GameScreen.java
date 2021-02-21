@@ -230,7 +230,7 @@ public class GameScreen extends AbstractScreen{
 
 		//ray handler
 		rayhandler = new RayHandler(world);
-		rayhandler.setAmbientLight(0.01f);
+		rayhandler.setAmbientLight(0.1f);
 		RayHandler.useDiffuseLight(true);
 
 		//cone light for the player

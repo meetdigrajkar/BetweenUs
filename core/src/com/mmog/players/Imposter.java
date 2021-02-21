@@ -36,6 +36,8 @@ public class Imposter extends Player{
 	public boolean sabotageClicked;
 	public ArrayList<Task> tasks;
 	private Task currentTask;
+	private int lightsCDTimer = 30, reactorCDTimer = 80;
+	private boolean lightsOnCD = false, reactorOnCD = false;
 	
 	public Imposter(int playerID) {
 		super(playerID);
@@ -101,6 +103,7 @@ public class Imposter extends Player{
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
 				System.out.println("LIGHTS CLICKED: " + isOver());
+				lightsOnCD = true;
 				
 				//when they trigger lights, add the electrical task
 				if(!hasTask("Electrical Task")) {
@@ -122,6 +125,7 @@ public class Imposter extends Player{
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
 				System.out.println("REACTOR CLICKED: " + isOver());
+				reactorOnCD = true;
 				
 				if(!hasTask("Reactor Task")) {
 					tasks.add(new ReactorTask());
@@ -292,7 +296,26 @@ public class Imposter extends Player{
 		Gdx.input.setInputProcessor(this.stage);
 
 		ventButton.setVisible(checkCollisionOnVent());
-
+		
+		//if lights sabotage on cool down, disable button
+		if(lightsOnCD) {
+			lightsButton.setVisible(false);
+			
+			if(lightsCDTimer > 0) {
+				lightsCDTimer -= Gdx.graphics.getDeltaTime();
+			}
+			else {
+				lightsCDTimer = 30;
+				lightsOnCD = false;
+			}
+			
+		}
+		//if reactor sabotage on cool down, disable button
+		if(reactorOnCD) {
+			reactorButton.setVisible(false);
+		}
+			
+		
 		stage.act();
 		stage.draw();
 	}
