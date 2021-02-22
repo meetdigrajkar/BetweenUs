@@ -53,6 +53,7 @@ public class EmergencyMeeting extends Task{
 	private String votedPlayer = "";
 	private boolean voted = false, end = false, drawVotes = false, drawSkippedVotes =  false;
 	public static HashMap<String, Integer> votes;
+	LabelStyle timerstyle;
 	
 	public EmergencyMeeting() {
 		super(taskName);
@@ -87,7 +88,9 @@ public class EmergencyMeeting extends Task{
 		playervotedImage = new Image(playervoted);
 
 		LabelStyle style = new LabelStyle(font, Color.BLACK);
-		timer = new Label(timerNum + "", style);
+		timerstyle = new LabelStyle(font, Color.WHITE);
+		
+		timer = new Label(timerNum + "", timerstyle);
 		
 		//set position
 		meetingbgImage.setPosition(stage.getWidth()/3,stage.getHeight()/3);
@@ -216,7 +219,7 @@ public class EmergencyMeeting extends Task{
 		(Client.getPlayer()).draw(batch);
 		Gdx.input.setInputProcessor(stage);
 		
-		if(timerNum > 50) {
+		if(timerNum > 10) {
 			timerNum = (((timerNum * 1000) - (Gdx.graphics.getDeltaTime() * 1000)) /1000);
 			timer.setText(((int) timerNum) + "");
 		}
@@ -283,8 +286,17 @@ public class EmergencyMeeting extends Task{
 			}
 			
 			if(timerNum > 0) {
+				if((((int) timerNum) % 2) == 0) {
+					timerstyle.fontColor = Color.RED;
+				}
+				else
+					timerstyle.fontColor = Color.WHITE;
+				
 				timerNum = (((timerNum * 1000) - (Gdx.graphics.getDeltaTime() * 1000)) /1000);
 				timer.setText(((int) timerNum) + "");
+			
+				
+				timer.act(Gdx.graphics.getDeltaTime());
 			}
 			else {
 				((CrewMember) Client.getPlayer()).setCurrentTask(null);
