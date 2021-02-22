@@ -68,7 +68,7 @@ public class Client
 
 	public static void replacePlayerByRole(Batch batch) {
 		if(!player.role.equals("none")) {
-			System.out.println("NOW ENTERING GAME!");
+			System.out.println("ROLE ASSIGNED!");
 			
 			String name = getPlayer().getPlayerName();
 			String roomName = getPlayer().connectedRoomName;

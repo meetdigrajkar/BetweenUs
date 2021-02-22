@@ -119,10 +119,9 @@ public class GameScreen extends AbstractScreen{
 		super();
 	}
 
-	private ArrayList<Player> getYBasedSortedPlayers() {
+	public static ArrayList<Player> getYBasedSortedPlayers() {
 		ArrayList<Player> allPlayers = new ArrayList();
 		allPlayers.add(Client.getPlayer());
-
 
 		for (Player p: Client.getPlayers())
 		{
@@ -341,6 +340,7 @@ public class GameScreen extends AbstractScreen{
 		//if the player is a crew member, call setCurrentTask() on the player which sets the players current task if they have tried to start a task
 		if(Client.getPlayer() instanceof CrewMember) {
 			((EmergencyMeeting) ((CrewMember) Client.getPlayer()).getTask("Emergency Meeting")).render(r.getBatch());
+			
 			//add lights task if the lights were sabotaged
 			if(light.getDistance() == 50 && !((CrewMember) Client.getPlayer()).hasTask("Electrical Task")) {
 				((CrewMember) Client.getPlayer()).addTask(new ElectricalTask());

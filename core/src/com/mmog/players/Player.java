@@ -233,28 +233,30 @@ public class Player extends Sprite{
 
 	public boolean collisionAtX(int x, String key) {
 		//collision detection in x
-		
-		//collisionX = collisionLayer.getCell((int)((getX()+ x) /tileWidth), (int) ((getY() + getHeight()) / tileHeight)).getTile().getProperties().containsKey(key);
-		//collisionX |= collisionLayer.getCell((int)((getX()+ x) /tileWidth), (int) ((getY() + getHeight()/2) / tileHeight)).getTile().getProperties().containsKey(key);
-		collisionX = collisionLayer.getCell((int)((getX()+ x) /tileWidth), (int) (getY() / tileHeight)).getTile().getProperties().containsKey(key);
+		if(collisionLayer != null){
+			//collisionX = collisionLayer.getCell((int)((getX()+ x) /tileWidth), (int) ((getY() + getHeight()) / tileHeight)).getTile().getProperties().containsKey(key);
+			//collisionX |= collisionLayer.getCell((int)((getX()+ x) /tileWidth), (int) ((getY() + getHeight()/2) / tileHeight)).getTile().getProperties().containsKey(key);
+			collisionX = collisionLayer.getCell((int)((getX()+ x) /tileWidth), (int) (getY() / tileHeight)).getTile().getProperties().containsKey(key);
 
-		//collisionX |= collisionLayer.getCell((int)((getX()+ x + getWidth()) /tileWidth), (int) ((getY() + getHeight()) / tileHeight)).getTile().getProperties().containsKey(key);
-		//collisionX |= collisionLayer.getCell((int)((getX()+ x + getWidth()) /tileWidth), (int) ((getY() + getWidth()/2) / tileHeight)).getTile().getProperties().containsKey(key);
-		collisionX |= collisionLayer.getCell((int)((getX()+ x + getWidth()) /tileWidth), (int) (getY() / tileHeight)).getTile().getProperties().containsKey(key);
+			//collisionX |= collisionLayer.getCell((int)((getX()+ x + getWidth()) /tileWidth), (int) ((getY() + getHeight()) / tileHeight)).getTile().getProperties().containsKey(key);
+			//collisionX |= collisionLayer.getCell((int)((getX()+ x + getWidth()) /tileWidth), (int) ((getY() + getWidth()/2) / tileHeight)).getTile().getProperties().containsKey(key);
+			collisionX |= collisionLayer.getCell((int)((getX()+ x + getWidth()) /tileWidth), (int) (getY() / tileHeight)).getTile().getProperties().containsKey(key);	
+		}
 
 		return collisionX;
 	}
 
 	public boolean collisionAtY(int y, String key) {
-		//collision detection in y
-		collisionY = collisionLayer.getCell((int) (getX()/tileWidth), (int) ((getY()+ y)  / tileHeight)).getTile().getProperties().containsKey(key);
-		collisionY |= collisionLayer.getCell((int) ((getX()+ getWidth() /2) /tileWidth), (int) ((getY()+ y)  / tileHeight)).getTile().getProperties().containsKey(key);
-		collisionY |= collisionLayer.getCell((int) ((getX()+ getWidth()) /tileWidth), (int) ((getY()+ y)  / tileHeight)).getTile().getProperties().containsKey(key);
+		if(collisionLayer != null){
+			//collision detection in y
+			collisionY = collisionLayer.getCell((int) (getX()/tileWidth), (int) ((getY()+ y)  / tileHeight)).getTile().getProperties().containsKey(key);
+			collisionY |= collisionLayer.getCell((int) ((getX()+ getWidth() /2) /tileWidth), (int) ((getY()+ y)  / tileHeight)).getTile().getProperties().containsKey(key);
+			collisionY |= collisionLayer.getCell((int) ((getX()+ getWidth()) /tileWidth), (int) ((getY()+ y)  / tileHeight)).getTile().getProperties().containsKey(key);
 
-		//collisionY |= collisionLayer.getCell((int) (getX()/tileWidth), (int) ((getY() + y + getHeight()) / tileHeight)).getTile().getProperties().containsKey(key);
-		//collisionY |= collisionLayer.getCell((int) ((getX()+ getWidth() /2) /tileWidth), (int) ((getY()+ y  + getHeight()) / tileHeight)).getTile().getProperties().containsKey(key);
-		//collisionY |= collisionLayer.getCell((int) ((getX()+ getWidth()) /tileWidth), (int) ((getY()+ y  + getHeight()) / tileHeight)).getTile().getProperties().containsKey(key);
-
+			//collisionY |= collisionLayer.getCell((int) (getX()/tileWidth), (int) ((getY() + y + getHeight()) / tileHeight)).getTile().getProperties().containsKey(key);
+			//collisionY |= collisionLayer.getCell((int) ((getX()+ getWidth() /2) /tileWidth), (int) ((getY()+ y  + getHeight()) / tileHeight)).getTile().getProperties().containsKey(key);
+			//collisionY |= collisionLayer.getCell((int) ((getX()+ getWidth()) /tileWidth), (int) ((getY()+ y  + getHeight()) / tileHeight)).getTile().getProperties().containsKey(key);
+		}
 		return collisionY;
 	}
 
