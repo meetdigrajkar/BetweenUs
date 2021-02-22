@@ -16,6 +16,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.scenes.scene2d.utils.DragListener;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.mmog.Client;
@@ -79,11 +80,18 @@ public class EmergencyMeeting extends Task{
 		table.setFillParent(true);
 		float MAX_WIDTH = meetingbgImage.getWidth();
 		float MAX_HEIGTH = meetingbgImage.getHeight();
-		//table.setPosition(0,0);
+		
+		table.setPosition(-1000, 325);
 		//table.setSize(MAX_WIDTH, MAX_HEIGTH);
 		
+		int count = 0;
 		for(Player p: Client.getPlayers()) {
-			table.add(playerboxImage);
+			table.add(playerboxImage).padRight(50);
+			count++;
+			if (count == 2) {
+				table.row();
+				count = 0;
+			}
 		}
 		
 		//stage.addActor(cancelvoteImage);
