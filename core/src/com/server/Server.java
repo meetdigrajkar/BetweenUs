@@ -375,6 +375,37 @@ public class Server {
 		else if(command == 15) {
 			sendLightsToCrew(command,dataArray[1],serverDatagramSocket);
 		}
+		//received a vote from a player
+		else if(command == 16) {
+			for(Room room: rooms) {
+				if(dataArray[1].equals(room.getRoomName())){
+					if(Boolean.parseBoolean(dataArray[2])) {
+						room.addVote(dataArray[3]);
+					}
+				}
+			}
+		}
+		//get the votes command
+		else if(command == 17) {
+			toLocal = true;
+			toAll = true;
+			
+			toAllClients = new StringBuilder();
+			toLocalc = new StringBuilder();
+			roomName = dataArray[1];
+			
+			for(Room room: rooms) {
+				if(dataArray[1].equals(room.getRoomName())){
+					toAllClients.append(room.getPlayerNameAndNumVotes());
+					toLocalc.append(room.getPlayerNameAndNumVotes());
+					
+					room.votes.clear();
+				}
+			}
+		
+			toAllClients.append(command);
+			toLocalc.append(command);
+		}
 		
 		//send the command
 		sendCommand(toLocalc.toString(),toAllClients.toString(),serverDatagramSocket, command, toLocal, toAll, hostAddress, roomName);
@@ -428,27 +459,10 @@ public class Server {
 				for(ServerPlayer player : room.allPlayers) {
 					InetAddress address = player.getAddress();
 
-					//4 situations------------------------------------------------------
-					//1
-					//command == 0, need to send to both local and all other clients
-					//toLocalc to local and toAllClients to all the other clients
-					//2
-					//command == 1, need to send update command to ONLY all other clients
-					//toAllClients to all the other clients
-					//3
-					//command == 3, need to send role assignment to ONLY the local client
-					//toLocalc to the local client
-					//4
-					//command == 4, need to send close command to ONLY all the other clients
-					//toAllClients to all the other clients
-					//doing the same shit above for update command == 1
-
-					//System.out.println(toAllClients);
-
-					if((command == 0) && address.equals(hostAddress)) {
+					if((command == 0 || command == 17) && address.equals(hostAddress)) {
 						toSend = new DatagramPacket(toLocalc.getBytes(), toLocalc.getBytes().length, hostAddress, 8000);
 					}
-					else if((command == 0 || command == 1 || command == 4 || command == 10 || command == 12 || command == 13 || command == 14) && !address.equals(hostAddress)) {
+					else if((command == 0 || command == 1 || command == 4 || command == 10 || command == 12 || command == 13 || command == 14 || command == 17) && !address.equals(hostAddress)) {
 						toSend = new DatagramPacket(toAllClients.getBytes(), toAllClients.getBytes().length, address, 8000);
 					}
 

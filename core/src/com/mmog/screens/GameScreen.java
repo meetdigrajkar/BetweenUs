@@ -112,6 +112,7 @@ public class GameScreen extends AbstractScreen{
 	public ArrayList<DeadPlayer> deadPlayers;
 	ShapeRenderer shapeRenderer = new ShapeRenderer();
 	
+	
 	public static boolean reactorTaskStarted = false;
 
 
@@ -339,7 +340,7 @@ public class GameScreen extends AbstractScreen{
 		r.getBatch().begin();
 		//if the player is a crew member, call setCurrentTask() on the player which sets the players current task if they have tried to start a task
 		if(Client.getPlayer() instanceof CrewMember) {
-			((EmergencyMeeting) ((CrewMember) Client.getPlayer()).getTask("Emergency Meeting")).render(r.getBatch());
+			//((EmergencyMeeting) ((CrewMember) Client.getPlayer()).getTask("Emergency Meeting")).render(r.getBatch());
 			
 			//add lights task if the lights were sabotaged
 			if(light.getDistance() == 50 && !((CrewMember) Client.getPlayer()).hasTask("Electrical Task")) {

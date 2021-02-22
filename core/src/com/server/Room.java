@@ -23,6 +23,7 @@ public class Room {
 	public  boolean startGame = false;
 	public int numCrew, numImp;
 	ArrayList<Boolean> reactorTaskCompleted;
+	public HashMap<String, Integer> votes;
 
 	public Room(String hostName, String roomName, InetAddress hostAddres, int numCrew, int numImp) {
 		this.setHostName(hostName);
@@ -31,6 +32,8 @@ public class Room {
 		this.numCrew = numCrew;
 		this.numImp = numImp;
 		rolelist = new ArrayList<>();
+		votes = new HashMap<String, Integer>();
+		
 		//populate rolelist
 
 		for(int i = 0; i < numCrew; i++) {
@@ -58,7 +61,28 @@ public class Room {
 		}
 		return false;
 	}
-
+	
+	public String getPlayerNameAndNumVotes() {
+		String toReturn = "";
+		
+		for(Entry<String,Integer> e: votes.entrySet()) {
+			String playerName = e.getKey();
+			Integer numOfVotes = e.getValue();
+			
+			toReturn += playerName + "," + numOfVotes + ",";
+		}
+		
+		return toReturn;
+	}
+	
+	public void addVote(String playerVoted) {
+		if(votes.containsKey(playerVoted)){
+			votes.replace(playerVoted, votes.get(playerVoted) + 1);
+		}
+		else
+			votes.put(playerVoted, 1);
+	}
+	
 	public boolean hostLeft() {
 		//loop through the list of players and check if the host is still in the list
 		//if the host is not in the list return true

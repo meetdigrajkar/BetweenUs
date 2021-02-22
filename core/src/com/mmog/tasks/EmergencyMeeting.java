@@ -1,6 +1,9 @@
 package com.mmog.tasks;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map.Entry;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
@@ -37,21 +40,27 @@ public class EmergencyMeeting extends Task{
 	Stage stage;
 
 	Sprite meetingbg,playerbox,chaticon,cancelvote, confirmvote, playervoteicon, deadx, skipvote, skipped, playervoted, playericon;
-	final Image meetingbgImage, chaticonImage, playervoteiconImage, playervotedImage, deadxImage, skippedImage,skipvoteImage;
+	final Image meetingbgImage, chaticonImage, playervotedImage, deadxImage, skippedImage,skipvoteImage;
 	boolean completed = false;
+	private Label timer;
+	private float timerNum = 60;
 
 	//make fonts here
 	BitmapFont font = new BitmapFont(Gdx.files.internal("UI/newlabelfont.fnt"));
 
 	private long startTime = 0, elapsedTime = 0;
 	private ArrayList<Table> playerboxtables;
+	private String votedPlayer = "";
+	private boolean voted = false, end = false, drawVotes = false;
+	public static HashMap<String, Integer> votes;
 	
-
 	public EmergencyMeeting() {
 		super(taskName);
 
 		stage = new Stage();
 		table = new Table();
+		
+		votes = new HashMap<String,Integer>();
 		
 		//resizing fonts
 		font.getData().setScale(0.6f);
@@ -73,31 +82,28 @@ public class EmergencyMeeting extends Task{
 
 		meetingbgImage = new Image(meetingbg);
 		chaticonImage = new Image(chaticon);
-		playervoteiconImage = new Image(playervoteicon);
 		deadxImage = new Image(deadx);
 		skipvoteImage = new Image(skipvote);
 		skippedImage = new Image(skipped);
 		playervotedImage = new Image(playervoted);
 
+		LabelStyle style = new LabelStyle(font, Color.BLACK);
+		timer = new Label(timerNum + "", style);
+		
 		//set position
 		meetingbgImage.setPosition(stage.getWidth()/3,stage.getHeight()/3);
 		chaticonImage.setPosition((stage.getWidth()/2) + 380, (stage.getHeight()/2) + 300);
 		skippedImage.setPosition((stage.getWidth()/3) + 60,(stage.getHeight()/3) + 80);
 		skipvoteImage.setPosition((stage.getWidth()/3) + 60,(stage.getHeight()/3) + 150);
+		timer.setPosition((stage.getWidth()/2) + 300,(stage.getHeight()/3) + 80);
 
 		stage.addActor(meetingbgImage);
 		stage.addActor(chaticonImage);
 
 		//table for the playerbox
 		table.setFillParent(true);
-		float MAX_WIDTH = meetingbgImage.getWidth();
-		float MAX_HEIGTH = meetingbgImage.getHeight();
-
-		table.setPosition(70, 325);
-		//table.setSize(MAX_WIDTH, MAX_HEIGTH);
-
-		LabelStyle style = new LabelStyle(font, Color.BLACK);
-
+		table.setPosition(70, 290);
+	
 		int count = 0, i = 0;
 
 		for(final Player p: GameScreen.getYBasedSortedPlayers()) {
@@ -118,18 +124,53 @@ public class EmergencyMeeting extends Task{
 			playerboxtable.add(playerlabel).padRight(15);
 			playerboxtable.add(cancelvoteImage).padRight(5);
 			playerboxtable.add(confirmvoteImage);
+			playerboxtable.row();
 
 			playerboxtables.add(playerboxtable);
 			table.add(playerboxtables.get(i)).padRight(10);
 			
 			//add listener
 			
-			playerboxtables.get(i).addListener(new ClickListener() {
+			playerboxtables.get(i).getChild(0).addListener(new ClickListener() {
 				@Override
 				public void clicked(InputEvent event, float x, float y) {
-					System.out.println("VOTING! @playerName: " + p.getPlayerName());
-					cancelvoteImage.setVisible(true);
-					confirmvoteImage.setVisible(true);
+					if(!voted) {
+						System.out.println("CLICKED: @playerName: " + p.getPlayerName());
+						
+						cancelvoteImage.setVisible(true);
+						confirmvoteImage.setVisible(true);
+					}	
+				}
+			});
+			
+			playerboxtables.get(i).getChild(2).addListener(new ClickListener() {
+				@Override
+				public void clicked(InputEvent event, float x, float y) {
+					System.out.println("CANCEL CLICK ON: @playerName: " + p.getPlayerName());
+					
+					cancelvoteImage.setVisible(false);
+					confirmvoteImage.setVisible(false);
+				}
+			});
+			
+			playerboxtables.get(i).getChild(3).addListener(new ClickListener() {
+				@Override
+				public void clicked(InputEvent event, float x, float y) {
+					System.out.println("CONFIRM VOTE ON: @playerName: " + p.getPlayerName());
+					
+					votedPlayer = p.getPlayerName();
+					voted = true;
+					
+					//send vote to the server
+					try {
+						Client.sendVote(voted, p.getPlayerName());
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					
+					cancelvoteImage.setVisible(false);
+					confirmvoteImage.setVisible(false);
 				}
 			});
 	
@@ -143,20 +184,79 @@ public class EmergencyMeeting extends Task{
 
 		stage.addActor(table);
 		stage.addActor(skipvoteImage);
+		stage.addActor(timer);
+		
+		skipvoteImage.addListener(new ClickListener() {
+			@Override
+			public void clicked(InputEvent event, float x, float y) {
+				System.out.println("SKIPPED VOTE!");
+				
+				voted = true;
+			}
+		});
+		
+		
 		stage.addActor(skippedImage);
+	}
+	
+	public static void addVote(String playerName, Integer numOfVotes) {
+		votes.put(playerName, numOfVotes);
 	}
 
 	public void render(Batch batch) {
 		(Client.getPlayer()).draw(batch);
 		Gdx.input.setInputProcessor(stage);
 		
+		if(timerNum > 50) {
+			timerNum = (((timerNum * 1000) - (Gdx.graphics.getDeltaTime() * 1000)) /1000);
+			timer.setText(((int) timerNum) + "");
+		}
+		else {
+			completed = true;
+		}
+		
+		for(int i = 0; i < playerboxtables.size(); i++) {
+			if(voted) {
+				 playerboxtables.get(i).getChild(2).setVisible(false);
+				 playerboxtables.get(i).getChild(3).setVisible(false);
+			}
+			if(end && !drawVotes) {
+				for(Entry<String, Integer> e: votes.entrySet()) {
+					String playerName = e.getKey();
+					Integer numOfVotes = e.getValue();
+					
+					if(((Label) playerboxtables.get(i).getChild(1)).getText().toString().equals(playerName)) {
+						for(int k = 0; k < numOfVotes; k ++) {
+							Image playervoteiconImage = new Image(playervoteicon);
+							
+							playerboxtables.get(i).add(playervoteiconImage);
+						}
+					}
+				}
+				drawVotes = true;
+			}
+		}
+		
+		if(completed) {
+			//System.out.println("SUCCESS!");
+			
+			if(!end) {
+				try {
+					Client.sendGetVotes();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+				end = true;
+			}
+			
+			//((CrewMember) Client.getPlayer()).setCurrentTask(null);
+			//((CrewMember) Client.getPlayer()).setTaskCompleted(taskName);
+		}
+		
+		
 		stage.act();
 		stage.draw();
-
-		if(completed) {
-			System.out.println("SUCCESS!");
-			((CrewMember) Client.getPlayer()).setCurrentTask(null);
-			((CrewMember) Client.getPlayer()).setTaskCompleted(taskName);
-		}
 	}
 }

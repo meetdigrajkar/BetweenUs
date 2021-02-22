@@ -24,6 +24,7 @@ import com.mmog.screens.MainScreen;
 import com.mmog.screens.RoleUI;
 import com.mmog.screens.ScreenEnum;
 import com.mmog.screens.ScreenManager;
+import com.mmog.tasks.EmergencyMeeting;
 import com.mmog.tasks.ReactorTask;
 
 import java.io.*;
@@ -184,6 +185,17 @@ public class Client
 		socket.send(datagramPacket);
 	}
 	
+	public static void sendVote(boolean voted, String playerName) throws IOException{
+		String toSend = "";
+		toSend += 16 + ",";
+		toSend += player.connectedRoomName +",";
+		toSend += voted + ",";
+		toSend += playerName;
+				
+		DatagramPacket datagramPacket = new DatagramPacket(toSend.getBytes(), toSend.getBytes().length, address, 7077);	     
+		socket.send(datagramPacket);
+	}
+	
 	public static void sendOutVent(float x, float y, boolean isFlipped, boolean isDead, boolean isIdle) throws IOException{
 		String toSend = "";
 		toSend += 13 + ",";
@@ -219,6 +231,15 @@ public class Client
 		DatagramPacket datagramPacket = new DatagramPacket(toSend.getBytes(), toSend.getBytes().length, address, 7077);	     
 		socket.send(datagramPacket);
 
+	}
+	
+	public static void sendGetVotes() throws IOException {
+		String toSend = "";
+		toSend += 17 + ",";
+		toSend += Client.getPlayer().connectedRoomName;
+
+		DatagramPacket datagramPacket = new DatagramPacket(toSend.getBytes(), toSend.getBytes().length, address, 7077);	     
+		socket.send(datagramPacket);
 	}
 	
 	public static void sendPlayerKilled(String playerName) throws IOException {
@@ -334,7 +355,6 @@ public class Client
 				playerNames.push(playerName);
 
 				System.out.println("Connected with @ClientID: " + playerID + " @Name:" + playerName);
-
 			}
 
 			for(Player p: players) 
@@ -466,6 +486,15 @@ public class Client
 				
 				((Imposter) Client.getPlayer()).removeTask("Electrical Task");
 			}
+		}
+		else if(command == 17) {
+			for(int i = 0; i < size-1;i+=2) {
+				String playerName = dataArray[i];
+				Integer numOfVotes = Integer.parseInt(dataArray[i+1]);
+				
+				EmergencyMeeting.addVote(playerName, numOfVotes);
+			}
+
 		}
 	}
 
