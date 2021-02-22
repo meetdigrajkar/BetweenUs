@@ -382,6 +382,9 @@ public class Server {
 					if(Boolean.parseBoolean(dataArray[2])) {
 						room.addVote(dataArray[3]);
 					}
+					else {
+						room.addVote("skipped");
+					}
 				}
 			}
 		}

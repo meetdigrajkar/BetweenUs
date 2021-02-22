@@ -51,7 +51,7 @@ public class EmergencyMeeting extends Task{
 	private long startTime = 0, elapsedTime = 0;
 	private ArrayList<Table> playerboxtables;
 	private String votedPlayer = "";
-	private boolean voted = false, end = false, drawVotes = false;
+	private boolean voted = false, end = false, drawVotes = false, drawSkippedVotes =  false;
 	public static HashMap<String, Integer> votes;
 	
 	public EmergencyMeeting() {
@@ -59,7 +59,6 @@ public class EmergencyMeeting extends Task{
 
 		stage = new Stage();
 		table = new Table();
-		
 		votes = new HashMap<String,Integer>();
 		
 		//resizing fonts
@@ -181,7 +180,7 @@ public class EmergencyMeeting extends Task{
 				count = 0;
 			}
 		}
-
+		
 		stage.addActor(table);
 		stage.addActor(skipvoteImage);
 		stage.addActor(timer);
@@ -189,9 +188,19 @@ public class EmergencyMeeting extends Task{
 		skipvoteImage.addListener(new ClickListener() {
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
-				System.out.println("SKIPPED VOTE!");
-				
-				voted = true;
+				if(!voted) {
+					System.out.println("SKIPPED VOTE!");
+					
+					voted = true;
+					
+					//send vote to the server
+					try {
+						Client.sendVote(false, "");
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
 			}
 		});
 		
@@ -213,6 +222,10 @@ public class EmergencyMeeting extends Task{
 		}
 		else {
 			completed = true;
+		}
+		
+		if(voted) {
+			skipvoteImage.setVisible(false);
 		}
 		
 		for(int i = 0; i < playerboxtables.size(); i++) {
@@ -237,9 +250,27 @@ public class EmergencyMeeting extends Task{
 			}
 		}
 		
+		if(end && !drawSkippedVotes) {
+			for(Entry<String, Integer> e: votes.entrySet()) {
+				String playerName = e.getKey();
+				Integer numOfVotes = e.getValue();
+				
+				if(playerName.equals("skipped")) {
+					int newx = 0;
+					for(int o = 0; o < numOfVotes; o++) {
+						Image playervoteiconImage = new Image(playervoteicon);
+						playervoteiconImage.setPosition((stage.getWidth()/3) + 60 + newx,(stage.getHeight()/3) + 50);
+						stage.addActor(playervoteiconImage);
+						
+						newx += 10;
+					}
+				}
+			}
+			drawSkippedVotes = true;
+		}
+		
+		
 		if(completed) {
-			//System.out.println("SUCCESS!");
-			
 			if(!end) {
 				try {
 					Client.sendGetVotes();
@@ -251,8 +282,14 @@ public class EmergencyMeeting extends Task{
 				end = true;
 			}
 			
-			//((CrewMember) Client.getPlayer()).setCurrentTask(null);
-			//((CrewMember) Client.getPlayer()).setTaskCompleted(taskName);
+			if(timerNum > 0) {
+				timerNum = (((timerNum * 1000) - (Gdx.graphics.getDeltaTime() * 1000)) /1000);
+				timer.setText(((int) timerNum) + "");
+			}
+			else {
+				((CrewMember) Client.getPlayer()).setCurrentTask(null);
+				((CrewMember) Client.getPlayer()).setTaskCompleted(taskName);
+			}
 		}
 		
 		
