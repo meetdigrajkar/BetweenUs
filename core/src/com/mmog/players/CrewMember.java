@@ -18,6 +18,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.mmog.Client;
+import com.mmog.tasks.AdminTask;
+import com.mmog.tasks.ComsTask;
 import com.mmog.tasks.EmergencyMeeting;
 import com.mmog.tasks.Task;
 
@@ -75,13 +77,20 @@ public class CrewMember extends Player {
 
 		//add table as an actor to the stage
 		stage.addActor(table);
-
+		
+		//for the use button
+		for(int i = 0; i < meetingUses; i++) {
+			addTask(new EmergencyMeeting());
+		}
+		addTask(new AdminTask());
+		addTask(new ComsTask()); 
+		
 		//use button listener
 		useButton.addListener(new ClickListener() {
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
 				System.out.println("USE CLICKED: " + isOver());
-				((CrewMember) Client.getPlayer()).setCurrentTaskIfCollided();
+				setCurrentTaskIfCollided();
 			}
 		});
 
@@ -91,11 +100,9 @@ public class CrewMember extends Player {
 			public void clicked(InputEvent event, float x, float y) {
 				System.out.println("REPORT CLICKED: " + isOver());
 				
-				if(!hasTask("Emergency Meeting")){
-					addTask(new EmergencyMeeting());
-				}
-				
-				((CrewMember) Client.getPlayer()).setCurrentTask("Emergency Meeting");
+				//report button has unlimited meeting uses
+				addTask(new EmergencyMeeting());
+				setCurrentTask("Emergency Meeting");
 			}
 		});
 
@@ -104,6 +111,10 @@ public class CrewMember extends Player {
 	public void drawTasks(Batch batch) {
 		Gdx.input.setInputProcessor(this.stage);
 		tasksLabel.setText(tasksToString());
+		
+		if(isDead && hasTask("Emergency Meeting")) {
+			removeTask("Emergency Meeting");
+		}
 		
 		stage.act();
 		stage.draw();
@@ -210,6 +221,7 @@ public class CrewMember extends Player {
 		for(Task t: tasks) {
 			if(t.getTaskName().equals(task)){
 				toRemove.add(t);
+				break;
 			}
 		}
 		

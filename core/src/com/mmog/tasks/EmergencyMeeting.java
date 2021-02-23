@@ -52,7 +52,7 @@ public class EmergencyMeeting extends Task{
 	private long startTime = 0, elapsedTime = 0;
 	private ArrayList<Table> playerboxtables;
 	private String votedPlayer = "";
-	private boolean voted = false, end = false, drawVotes = false, drawSkippedVotes =  false, triggerMeeting = false;
+	private boolean voted = false, end = false, drawVotes = false, drawSkippedVotes =  false;
 	public static HashMap<String, Integer> votes;
 	LabelStyle timerstyle;
 	String votedOffPlayer = "";
@@ -63,6 +63,7 @@ public class EmergencyMeeting extends Task{
 		stage = new Stage();
 		table = new Table();
 		votes = new HashMap<String,Integer>();
+		drawVotes = false;
 		
 		//resizing fonts
 		font.getData().setScale(0.6f);
@@ -220,17 +221,7 @@ public class EmergencyMeeting extends Task{
 	public void render(Batch batch) {
 		(Client.getPlayer()).draw(batch);
 		Gdx.input.setInputProcessor(stage);
-		
-		if(!triggerMeeting) {
-			try {
-				Client.sendTriggerMeeting();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}	
-			triggerMeeting = true;
-		}
-		
+	
 		if(timerNum > 10) {
 			timerNum = (((timerNum * 1000) - (Gdx.graphics.getDeltaTime() * 1000)) /1000);
 			timer.setText(((int) timerNum) + "");
@@ -243,8 +234,6 @@ public class EmergencyMeeting extends Task{
 			skipvoteImage.setVisible(false);
 		}
 		
-		
-		
 		if(completed) {
 			if(!end) {
 				try {
@@ -256,13 +245,18 @@ public class EmergencyMeeting extends Task{
 				
 				end = true;
 			}
-			
+						
 			for(int i = 0; i < playerboxtables.size(); i++) {
 				if(voted) {
 					 playerboxtables.get(i).getChild(2).setVisible(false);
 					 playerboxtables.get(i).getChild(3).setVisible(false);
 				}
+				
 				if(end && !drawVotes) {
+					if(votes.size() != 0) {
+						drawVotes = true;
+					}
+					
 					for(Entry<String, Integer> e: votes.entrySet()) {
 						String playerName = e.getKey();
 						Integer numOfVotes = e.getValue();
@@ -271,11 +265,11 @@ public class EmergencyMeeting extends Task{
 							for(int k = 0; k < numOfVotes; k ++) {
 								Image playervoteiconImage = new Image(playervoteicon);
 								
-								playerboxtables.get(i).add(playervoteiconImage);
+								playerboxtables.get(i).add(playervoteiconImage);	
 							}
 						}
 					}
-					drawVotes = true;
+					
 				}
 			}
 			

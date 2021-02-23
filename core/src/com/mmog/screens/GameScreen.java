@@ -199,16 +199,6 @@ public class GameScreen extends AbstractScreen{
 		
 		Client.getPlayer().inGame = true;
 		Client.getPlayer().speed = 2f;
-		
-		if(Client.getPlayer() instanceof CrewMember) {
-			((CrewMember) Client.getPlayer()).addTask(new AdminTask());
-			((CrewMember) Client.getPlayer()).addTask(new ComsTask()); 
-			
-			((CrewMember) Client.getPlayer()).addTask(new EmergencyMeeting()); 
-		}
-		else {
-			((Imposter) Client.getPlayer()).addTask(new EmergencyMeeting()); 
-		}
 
 		map = new TmxMapLoader().load("map/map.tmx");
 		r = new OrthogonalTiledMapRenderer(map);
@@ -314,14 +304,14 @@ public class GameScreen extends AbstractScreen{
 		//draw all the other players
 		for (Player p : getYBasedSortedPlayers())
 		{
-			if(p.isDead && !p.addedToDead) {
+			if(p.isDead && !p.votedOff && !p.addedToDead) {
 				DeadPlayer dp = new DeadPlayer((int)p.getX(),(int)p.getY());
 				dp.setName(p.getPlayerName());
 
 				deadPlayers.add(dp);
 				p.addedToDead = true;
 			}
-		
+
 			//ghosts players can see everyone
 			if(Client.getPlayer().isDead && !p.inVent) {
 				p.draw(r.getBatch());

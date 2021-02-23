@@ -65,6 +65,7 @@ public class Player extends Sprite{
 	public boolean inVent = false, votedOff = false;
 	public MapObjects inGameWalls;
 	public boolean inGame = false;
+	public int meetingUses = 2;
 	
 	public Player(int playerID)
 	{

@@ -99,6 +99,11 @@ public class Imposter extends Player{
 		//add table as an actor to the stage
 		stage.addActor(table);
 
+		//for the use button
+		for(int i = 0; i < meetingUses; i++) {
+			addTask(new EmergencyMeeting());
+		}
+		
 		//use button listener
 		lightsButton.addListener(new ClickListener() {
 			@Override
@@ -194,11 +199,16 @@ public class Imposter extends Player{
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
 				System.out.println("REPORT CLICKED: " + isOver());
-				
-				if(!hasTask("Emergency Meeting")){
-					addTask(new EmergencyMeeting());
-				}
-				
+
+				addTask(new EmergencyMeeting());
+
+				try {
+					Client.sendTriggerMeeting();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}	
+
 				setCurrentTask("Emergency Meeting");
 			}
 		});
@@ -208,24 +218,34 @@ public class Imposter extends Player{
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
 				System.out.println("USE CLICKED: " + isOver());
-				((Imposter) Client.getPlayer()).setCurrentTaskIfCollided();
+				setCurrentTaskIfCollided();
 			}
 		});
 	}
 
-	public void setCurrentTaskIfCollided() {
+	public Task setCurrentTaskIfCollided() {
 		for(Task task: tasks) {
 			if(!task.isTaskCompleted() && checkCollisionOnTask(task.getTaskName())) {	
 				if(isDead && (task.getTaskName().equals("Electrical Task") || task.getTaskName().equals("Reactor Task"))) {
 					currentTask = null;
-					return;
+					return currentTask;
 				}
 				else {
+					if(task instanceof EmergencyMeeting) {
+						try {
+							Client.sendTriggerMeeting();
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}	
+					}
+					
 					currentTask = task;
-					return;
+					return currentTask;
 				}
 			}
 		}
+		return currentTask;
 	}
 
 	public boolean checkCollisionOnTask(String taskName) {
@@ -285,7 +305,7 @@ public class Imposter extends Player{
 		}
 		return false;
 	}
-	
+
 	public void addTask(Task task) {
 		tasks.add(task);
 	}
@@ -318,6 +338,10 @@ public class Imposter extends Player{
 
 		ventButton.setVisible(checkCollisionOnVent());
 
+		if(isDead && hasTask("Emergency Meeting")) {
+			removeTask("Emergency Meeting");
+		}
+		
 		//if lights sabotage on cool down, disable button
 		if(lightsOnCD) {
 			lightsButton.setVisible(false);
@@ -361,10 +385,10 @@ public class Imposter extends Player{
 			currentTask = null;
 			return toReturn;
 		}
-		
+
 		for(Task task: tasks) {
 			if(task.getTaskName().equals(taskName) && !task.isTaskCompleted()) {	
-				currentTask = task;
+				currentTask = task;		
 				return true;
 			}
 		}
