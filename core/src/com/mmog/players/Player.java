@@ -62,7 +62,7 @@ public class Player extends Sprite{
 	//animated background
 	TextureRegion[] frames = new TextureRegion[33];
 	public boolean addedToDead;
-	public boolean inVent = false;
+	public boolean inVent = false, votedOff = false;
 	public MapObjects inGameWalls;
 	public boolean inGame = false;
 	
@@ -117,6 +117,7 @@ public class Player extends Sprite{
 		isIdle = false;
 		inVent = false;
 		inGame = false;
+		votedOff = false;
 		this.playerName = "";
 		this.playerID = -1;
 	}

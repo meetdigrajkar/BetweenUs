@@ -243,46 +243,6 @@ public class EmergencyMeeting extends Task{
 			skipvoteImage.setVisible(false);
 		}
 		
-		for(int i = 0; i < playerboxtables.size(); i++) {
-			if(voted) {
-				 playerboxtables.get(i).getChild(2).setVisible(false);
-				 playerboxtables.get(i).getChild(3).setVisible(false);
-			}
-			if(end && !drawVotes) {
-				for(Entry<String, Integer> e: votes.entrySet()) {
-					String playerName = e.getKey();
-					Integer numOfVotes = e.getValue();
-					
-					if(((Label) playerboxtables.get(i).getChild(1)).getText().toString().equals(playerName)) {
-						for(int k = 0; k < numOfVotes; k ++) {
-							Image playervoteiconImage = new Image(playervoteicon);
-							
-							playerboxtables.get(i).add(playervoteiconImage);
-						}
-					}
-				}
-				drawVotes = true;
-			}
-		}
-		
-		if(end && !drawSkippedVotes) {
-			for(Entry<String, Integer> e: votes.entrySet()) {
-				String playerName = e.getKey();
-				Integer numOfVotes = e.getValue();
-				
-				if(playerName.equals("skipped")) {
-					int newx = 0;
-					for(int o = 0; o < numOfVotes; o++) {
-						Image playervoteiconImage = new Image(playervoteicon);
-						playervoteiconImage.setPosition((stage.getWidth()/3) + 60 + newx,(stage.getHeight()/3) + 50);
-						stage.addActor(playervoteiconImage);
-						
-						newx += 10;
-					}
-				}
-			}
-			drawSkippedVotes = true;
-		}
 		
 		
 		if(completed) {
@@ -295,6 +255,47 @@ public class EmergencyMeeting extends Task{
 				}
 				
 				end = true;
+			}
+			
+			for(int i = 0; i < playerboxtables.size(); i++) {
+				if(voted) {
+					 playerboxtables.get(i).getChild(2).setVisible(false);
+					 playerboxtables.get(i).getChild(3).setVisible(false);
+				}
+				if(end && !drawVotes) {
+					for(Entry<String, Integer> e: votes.entrySet()) {
+						String playerName = e.getKey();
+						Integer numOfVotes = e.getValue();
+						
+						if(((Label) playerboxtables.get(i).getChild(1)).getText().toString().equals(playerName)) {
+							for(int k = 0; k < numOfVotes; k ++) {
+								Image playervoteiconImage = new Image(playervoteicon);
+								
+								playerboxtables.get(i).add(playervoteiconImage);
+							}
+						}
+					}
+					drawVotes = true;
+				}
+			}
+			
+			if(end && !drawSkippedVotes) {
+				for(Entry<String, Integer> e: votes.entrySet()) {
+					String playerName = e.getKey();
+					Integer numOfVotes = e.getValue();
+					
+					if(playerName.equals("skipped")) {
+						int newx = 0;
+						for(int o = 0; o < numOfVotes; o++) {
+							Image playervoteiconImage = new Image(playervoteicon);
+							playervoteiconImage.setPosition((stage.getWidth()/3) + 60 + newx,(stage.getHeight()/3) + 50);
+							stage.addActor(playervoteiconImage);
+							
+							newx += 10;
+						}
+					}
+				}
+				drawSkippedVotes = true;
 			}
 			
 			if(timerNum > 0) {
@@ -325,8 +326,6 @@ public class EmergencyMeeting extends Task{
 						else if(currMaxVotes == numOfVotes) {
 							votedOffPlayer = "";
 						}
-						
-						
 					}
 					
 					if(playerName.equals("skipped")) {
@@ -342,6 +341,7 @@ public class EmergencyMeeting extends Task{
 				for(Player p: GameScreen.getYBasedSortedPlayers()) {
 					if(p.getPlayerName().equals(votedOffPlayer)) {
 						p.isDead = true;
+						p.votedOff = true;
 					}
 				}
 				
