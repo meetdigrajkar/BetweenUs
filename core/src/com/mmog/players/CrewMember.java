@@ -115,6 +115,11 @@ public class CrewMember extends Player {
 	}
 
 	public void setCurrentTask(String taskName) {
+		if(taskName == null) {
+			currentTask = null;
+			return;
+		}
+		
 		for(Task task: tasks) {
 			if(task.getTaskName().equals(taskName) && !task.isTaskCompleted()) {	
 				currentTask = task;
@@ -122,6 +127,7 @@ public class CrewMember extends Player {
 			}
 		}
 	}
+	
 
 	/*
 	 * Sets the current tasks of the crew member if the player collides with any of the tasks

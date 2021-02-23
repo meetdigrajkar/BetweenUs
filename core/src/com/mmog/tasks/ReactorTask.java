@@ -372,6 +372,7 @@ public class ReactorTask extends Task {
 			if(Client.getPlayer() instanceof CrewMember) {
 				if(((CrewMember) Client.getPlayer()).getCurrentTask().getTaskName().equals(taskName)) {
 					((CrewMember) Client.getPlayer()).setCurrentTask(null);
+					((CrewMember) Client.getPlayer()).removeTask(taskName);
 				}
 				
 				((CrewMember) Client.getPlayer()).removeTask(taskName);
@@ -379,6 +380,7 @@ public class ReactorTask extends Task {
 			else{
 				if(((Imposter) Client.getPlayer()).getCurrentTask().getTaskName().equals(taskName)) {
 					((Imposter) Client.getPlayer()).setCurrentTask(null);
+					((CrewMember) Client.getPlayer()).removeTask(taskName);
 				}
 				
 				((Imposter) Client.getPlayer()).removeTask(taskName);

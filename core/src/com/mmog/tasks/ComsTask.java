@@ -131,14 +131,15 @@ public class ComsTask extends Task {
 	public void render(Batch batch) {
 		(Client.getPlayer()).draw(batch);
 		Gdx.input.setInputProcessor(stage);
-		stage.draw();
-		
 	
 		if(completed) {
-			System.out.println("SUCCESS!");
-			((CrewMember) Client.getPlayer()).setCurrentTask(null);
-			((CrewMember) Client.getPlayer()).setTaskCompleted(taskName);
+			if(Client.getPlayer() instanceof CrewMember) {
+				((CrewMember) Client.getPlayer()).setCurrentTask(null);
+				((CrewMember) Client.getPlayer()).setTaskCompleted(taskName);
+			}
 		}
+		else
+			stage.draw();
 		
 	
 	}
