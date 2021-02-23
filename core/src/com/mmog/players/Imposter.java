@@ -209,7 +209,7 @@ public class Imposter extends Player{
 	public void setCurrentTaskIfCollided() {
 		for(Task task: tasks) {
 			if(!task.isTaskCompleted() && checkCollisionOnTask(task.getTaskName())) {	
-				setCurrentTask(task);
+				currentTask = task;
 				return;
 			}
 		}
@@ -338,8 +338,13 @@ public class Imposter extends Player{
 		return currentTask;
 	}
 
-	public void setCurrentTask(Task currentTask) {
-		this.currentTask = currentTask;
+	public void setCurrentTask(String taskName) {
+		for(Task task: tasks) {
+			if(task.getTaskName().equals(taskName) && !task.isTaskCompleted()) {	
+				currentTask = task;
+				return;
+			}
+		}
 	}
 
 }

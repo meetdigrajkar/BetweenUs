@@ -203,6 +203,7 @@ public class GameScreen extends AbstractScreen{
 		if(Client.getPlayer() instanceof CrewMember) {
 			((CrewMember) Client.getPlayer()).addTask(new AdminTask());
 			((CrewMember) Client.getPlayer()).addTask(new ComsTask()); 
+			
 			((CrewMember) Client.getPlayer()).addTask(new EmergencyMeeting()); 
 		}
 
@@ -383,6 +384,7 @@ public class GameScreen extends AbstractScreen{
 					((ComsTask) task).render(r.getBatch());
 				}
 				if(task instanceof EmergencyMeeting) {
+					Client.getPlayer().setPosition(150 * Client.getPlayer().getCollisionLayer().getTileWidth(), (Client.getPlayer().getCollisionLayer().getHeight() - 165) * Client.getPlayer().getCollisionLayer().getTileHeight());
 					((EmergencyMeeting) task).render(r.getBatch());
 				}
 			}

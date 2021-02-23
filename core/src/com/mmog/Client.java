@@ -175,6 +175,15 @@ public class Client
 		socket.send(datagramPacket);
 	}
 	
+	public static void sendTriggerMeeting() throws IOException{
+		String toSend = "";
+		toSend += 18 + ",";
+		toSend += player.connectedRoomName;
+		
+		DatagramPacket datagramPacket = new DatagramPacket(toSend.getBytes(), toSend.getBytes().length, address, 7077);	     
+		socket.send(datagramPacket);
+	}	
+	
 	public static void sendInVent() throws IOException{
 		String toSend = "";
 		toSend += 12 + ",";
@@ -495,6 +504,15 @@ public class Client
 				EmergencyMeeting.addVote(playerName, numOfVotes);
 			}
 
+		}
+		//trigger meeting
+		else if(command == 18) {
+			if(Client.getPlayer() instanceof CrewMember) {
+				((CrewMember) Client.getPlayer()).setCurrentTask("Emergency Meeting");
+			}
+			else if(Client.getPlayer() instanceof Imposter) {
+				((Imposter) Client.getPlayer()).setCurrentTask("Emergency Meeting");
+			}
 		}
 	}
 

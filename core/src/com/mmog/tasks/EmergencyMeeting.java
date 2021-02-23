@@ -51,7 +51,7 @@ public class EmergencyMeeting extends Task{
 	private long startTime = 0, elapsedTime = 0;
 	private ArrayList<Table> playerboxtables;
 	private String votedPlayer = "";
-	private boolean voted = false, end = false, drawVotes = false, drawSkippedVotes =  false;
+	private boolean voted = false, end = false, drawVotes = false, drawSkippedVotes =  false, triggerMeeting = false;
 	public static HashMap<String, Integer> votes;
 	LabelStyle timerstyle;
 	
@@ -218,6 +218,16 @@ public class EmergencyMeeting extends Task{
 	public void render(Batch batch) {
 		(Client.getPlayer()).draw(batch);
 		Gdx.input.setInputProcessor(stage);
+		
+		if(!triggerMeeting) {
+			try {
+				Client.sendTriggerMeeting();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}	
+			triggerMeeting = true;
+		}
 		
 		if(timerNum > 10) {
 			timerNum = (((timerNum * 1000) - (Gdx.graphics.getDeltaTime() * 1000)) /1000);

@@ -114,8 +114,13 @@ public class CrewMember extends Player {
 		return currentTask;
 	}
 
-	public void setCurrentTask(Task task) {
-		this.currentTask = task;
+	public void setCurrentTask(String taskName) {
+		for(Task task: tasks) {
+			if(task.getTaskName().equals(taskName) && !task.isTaskCompleted()) {	
+				currentTask = task;
+				return;
+			}
+		}
 	}
 
 	/*
