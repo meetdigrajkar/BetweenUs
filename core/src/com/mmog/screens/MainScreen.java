@@ -134,7 +134,7 @@ public class MainScreen extends AbstractScreen{
 			public void clicked(InputEvent event, float x, float y) {
 				System.out.println("Heading to Join Room Screen!");
 
-				if(!playerName.getText().equals("") && !playerName.getText().contains(",")) {
+				if(!playerName.getText().equals("") && !playerName.getText().contains(",") && playerName.getText().length() < 8) {
 					//create all the players and the local player
 					Client.createPlayer(playerName.getText());
 					Client.createPlayers();
@@ -152,7 +152,7 @@ public class MainScreen extends AbstractScreen{
 			public void clicked(InputEvent event, float x, float y) {
 				System.out.println("Heading to Create Room Screen!");
 
-				if(!playerName.getText().equals("") && !playerName.getText().contains(",")) {
+				if(!playerName.getText().equals("") && !playerName.getText().contains(",") && playerName.getText().length() < 8) {
 					//create all the players and the local player
 					Client.createPlayer(playerName.getText());
 					Client.createPlayers();
