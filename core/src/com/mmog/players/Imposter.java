@@ -342,6 +342,11 @@ public class Imposter extends Player{
 			removeTask("Emergency Meeting");
 		}
 		
+		if(GameScreen.meetingTriggered) {
+			addTask(new EmergencyMeeting());
+			GameScreen.meetingTriggered = false;
+		}
+		
 		//if lights sabotage on cool down, disable button
 		if(lightsOnCD) {
 			lightsButton.setVisible(false);

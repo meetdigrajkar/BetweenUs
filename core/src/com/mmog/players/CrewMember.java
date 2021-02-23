@@ -19,6 +19,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.mmog.Client;
+import com.mmog.screens.GameScreen;
 import com.mmog.tasks.AdminTask;
 import com.mmog.tasks.ComsTask;
 import com.mmog.tasks.EmergencyMeeting;
@@ -115,6 +116,11 @@ public class CrewMember extends Player {
 		
 		if(isDead && hasTask("Emergency Meeting")) {
 			removeTask("Emergency Meeting");
+		}
+		
+		if(GameScreen.meetingTriggered) {
+			addTask(new EmergencyMeeting());
+			GameScreen.meetingTriggered = false;
 		}
 		
 		stage.act();
