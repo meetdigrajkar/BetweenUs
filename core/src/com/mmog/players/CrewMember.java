@@ -1,5 +1,6 @@
 package com.mmog.players;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 import com.badlogic.gdx.Gdx;
@@ -158,6 +159,16 @@ public class CrewMember extends Player {
 					return;
 				}
 				else {
+					if(task instanceof EmergencyMeeting) {
+						try {
+							Client.sendTriggerMeeting();
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}	
+					}
+					
+					
 					currentTask = task;
 					return;
 				}
