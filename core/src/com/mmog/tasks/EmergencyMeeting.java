@@ -27,6 +27,7 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.mmog.Client;
 import com.mmog.players.CrewMember;
+import com.mmog.players.Imposter;
 import com.mmog.players.Player;
 import com.mmog.screens.GameScreen;
 import com.mmog.screens.ScreenEnum;
@@ -302,15 +303,21 @@ public class EmergencyMeeting extends Task{
 				else
 					timerstyle.fontColor = Color.WHITE;
 				
+				
 				timerNum = (((timerNum * 1000) - (Gdx.graphics.getDeltaTime() * 1000)) /1000);
 				timer.setText(((int) timerNum) + "");
 			
-				
 				timer.act(Gdx.graphics.getDeltaTime());
 			}
 			else {
-				((CrewMember) Client.getPlayer()).setCurrentTask(null);
-				((CrewMember) Client.getPlayer()).setTaskCompleted(taskName);
+				if(Client.getPlayer() instanceof CrewMember) {
+					((CrewMember) Client.getPlayer()).setCurrentTask(null);
+					((CrewMember) Client.getPlayer()).removeTask(taskName);
+				}
+				else{
+					((Imposter) Client.getPlayer()).setCurrentTask(null);
+					((Imposter) Client.getPlayer()).removeTask(taskName);
+				}
 			}
 		}
 		
