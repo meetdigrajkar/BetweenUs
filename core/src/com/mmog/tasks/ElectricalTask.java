@@ -304,11 +304,9 @@ public class ElectricalTask extends Task {
 
 			if(Client.getPlayer() instanceof CrewMember) {
 				((CrewMember) Client.getPlayer()).setCurrentTask(null);
-				((CrewMember) Client.getPlayer()).removeTask(taskName);
 			}
 			else{
 				((Imposter) Client.getPlayer()).setCurrentTask(null);
-				((Imposter) Client.getPlayer()).removeTask(taskName);
 			}
 		}
 	}
