@@ -206,6 +206,9 @@ public class GameScreen extends AbstractScreen{
 			
 			((CrewMember) Client.getPlayer()).addTask(new EmergencyMeeting()); 
 		}
+		else {
+			((Imposter) Client.getPlayer()).addTask(new EmergencyMeeting()); 
+		}
 
 		map = new TmxMapLoader().load("map/map.tmx");
 		r = new OrthogonalTiledMapRenderer(map);

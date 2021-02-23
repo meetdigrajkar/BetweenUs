@@ -349,10 +349,6 @@ public class Imposter extends Player{
 			return;
 		}
 		
-		if(!hasTask("Emergency Meeting") && taskName.equals("Emergency Meeting")) {
-			addTask(new EmergencyMeeting());
-		}
-		
 		for(Task task: tasks) {
 			if(task.getTaskName().equals(taskName) && !task.isTaskCompleted()) {	
 				currentTask = task;
