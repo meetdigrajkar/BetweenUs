@@ -474,7 +474,13 @@ public class GameScreen extends AbstractScreen{
 		try {
 			//if the player is an imposter and is NOT in the vent, allow movement
 			if(!Client.getPlayer().inVent) {
-				Client.getPlayer().render(Gdx.graphics.getDeltaTime());
+				if(Client.getPlayer() instanceof CrewMember && ((CrewMember) Client.getPlayer()).getCurrentTask() == null) {
+					(Client.getPlayer()).render(Gdx.graphics.getDeltaTime());
+				}
+				else if(Client.getPlayer() instanceof Imposter && ((Imposter) Client.getPlayer()).getCurrentTask() == null) {
+					Client.getPlayer().render(Gdx.graphics.getDeltaTime());
+				}
+			
 			}
 		} catch (Exception e) {
 			// TODO Auto-generated catch block

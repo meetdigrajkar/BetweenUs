@@ -55,6 +55,7 @@ public class EmergencyMeeting extends Task{
 	private boolean voted = false, end = false, drawVotes = false, drawSkippedVotes =  false, triggerMeeting = false;
 	public static HashMap<String, Integer> votes;
 	LabelStyle timerstyle;
+	String votedOffPlayer = "";
 	
 	public EmergencyMeeting() {
 		super(taskName);
@@ -310,6 +311,40 @@ public class EmergencyMeeting extends Task{
 				timer.act(Gdx.graphics.getDeltaTime());
 			}
 			else {
+				int currMaxVotes = 0, skippedVotes = 0;
+				for(Entry<String, Integer> es: votes.entrySet()) {
+					String playerName = es.getKey();
+					Integer numOfVotes = es.getValue();
+					
+					if(!playerName.equals("skipped")) {
+						//find new max vote
+						if(currMaxVotes < numOfVotes) {
+							currMaxVotes = numOfVotes;
+							votedOffPlayer = playerName;
+						}
+						else if(currMaxVotes == numOfVotes) {
+							votedOffPlayer = "";
+						}
+						
+						
+					}
+					
+					if(playerName.equals("skipped")) {
+						skippedVotes = numOfVotes;
+					}
+				}
+				
+				if(skippedVotes >= currMaxVotes) {
+					votedOffPlayer = "";
+				}
+				
+				
+				for(Player p: GameScreen.getYBasedSortedPlayers()) {
+					if(p.getPlayerName().equals(votedOffPlayer)) {
+						p.isDead = true;
+					}
+				}
+				
 				if(Client.getPlayer() instanceof CrewMember) {
 					((CrewMember) Client.getPlayer()).setCurrentTask(null);
 					((CrewMember) Client.getPlayer()).removeTask(taskName);
