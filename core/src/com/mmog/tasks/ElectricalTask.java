@@ -302,12 +302,6 @@ public class ElectricalTask extends Task {
 				sentFixed = true;
 			}
 
-			if(Client.getPlayer() instanceof CrewMember) {
-				((CrewMember) Client.getPlayer()).setCurrentTask(null);
-			}
-			else{
-				((Imposter) Client.getPlayer()).setCurrentTask(null);
-			}
 		}
 	}
 }
