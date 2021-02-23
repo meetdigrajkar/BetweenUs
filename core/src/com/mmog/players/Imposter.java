@@ -216,11 +216,12 @@ public class Imposter extends Player{
 	public void setCurrentTaskIfCollided() {
 		for(Task task: tasks) {
 			if(!task.isTaskCompleted() && checkCollisionOnTask(task.getTaskName())) {	
-				if(!isDead) {
-					currentTask = task;
-					return;
-				}else if(isDead && (task.getTaskName().equals("Electrical Task") || task.getTaskName().equals("Reactor Task"))) {
+				if(isDead && (task.getTaskName().equals("Electrical Task") || task.getTaskName().equals("Reactor Task"))) {
 					currentTask = null;
+					return;
+				}
+				else {
+					currentTask = task;
 					return;
 				}
 			}
