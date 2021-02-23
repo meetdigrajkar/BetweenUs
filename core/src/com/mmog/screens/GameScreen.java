@@ -344,8 +344,6 @@ public class GameScreen extends AbstractScreen{
 		r.getBatch().begin();
 		//if the player is a crew member, call setCurrentTask() on the player which sets the players current task if they have tried to start a task
 		if(Client.getPlayer() instanceof CrewMember) {
-			//((EmergencyMeeting) ((CrewMember) Client.getPlayer()).getTask("Emergency Meeting")).render(r.getBatch());
-			
 			//add lights task if the lights were sabotaged
 			if(light.getDistance() == 50 && !((CrewMember) Client.getPlayer()).hasTask("Electrical Task")) {
 				((CrewMember) Client.getPlayer()).addTask(new ElectricalTask());
@@ -358,8 +356,8 @@ public class GameScreen extends AbstractScreen{
 			
 			//check for collision on a dead body
 			for(DeadPlayer dp: deadPlayers) {
-				if(Client.getPlayer().getBoundingRectangle().overlaps(dp.getDeadPlayerRec())) {
-					System.out.println("FOUND DEAD BODY: @name: " + dp.getName());
+				if(!Client.getPlayer().isDead && Client.getPlayer().getBoundingRectangle().overlaps(dp.getDeadPlayerRec())) {
+					//System.out.println("FOUND DEAD BODY: @name: " + dp.getName());
 					((CrewMember) Client.getPlayer()).reportButton.setVisible(true);
 				}
 				else {
@@ -387,8 +385,9 @@ public class GameScreen extends AbstractScreen{
 					((ComsTask) task).render(r.getBatch());
 				}
 				if(task instanceof EmergencyMeeting) {
-					Client.getPlayer().setPosition(150 * Client.getPlayer().getCollisionLayer().getTileWidth(), (Client.getPlayer().getCollisionLayer().getHeight() - 165) * Client.getPlayer().getCollisionLayer().getTileHeight());
 					((EmergencyMeeting) task).render(r.getBatch());
+					Client.getPlayer().setPosition(150 * Client.getPlayer().getCollisionLayer().getTileWidth(), (Client.getPlayer().getCollisionLayer().getHeight() - 165) * Client.getPlayer().getCollisionLayer().getTileHeight());
+					deadPlayers.clear();
 				}
 			}
 
@@ -397,24 +396,7 @@ public class GameScreen extends AbstractScreen{
 			light.setDistance(500);
 			
 			((Imposter) Client.getPlayer()).drawUI(r.getBatch());
-			
-			//if the player has a current task, render the task screen ui
-			if(((Imposter) Client.getPlayer()).getCurrentTask() != null) {
-				//based on the task the player is doing, render the appropriate task 
-				task = ((Imposter) Client.getPlayer()).getCurrentTask();
-
-				if(task instanceof ReactorTask) {
-					((ReactorTask) task).render(r.getBatch());
-				}
-				if(task instanceof ElectricalTask) {
-					((ElectricalTask) task).render(r.getBatch());
-				}
-				if(task instanceof EmergencyMeeting) {
-					((EmergencyMeeting) task).render(r.getBatch());
-				}
-			}
-			
-			
+					
 			if(Client.getPlayer().inVent) {
 				//if the player is in the vent allow the player to move to other vents
 				for(Vent v: vents) {
@@ -462,12 +444,29 @@ public class GameScreen extends AbstractScreen{
 
 			//check for collision on a dead body
 			for(DeadPlayer dp: deadPlayers) {
-				if(Client.getPlayer().getBoundingRectangle().overlaps(dp.getDeadPlayerRec())) {
-					System.out.println("FOUND DEAD BODY: @name: " + dp.getName());
+				if(!Client.getPlayer().isDead && Client.getPlayer().getBoundingRectangle().overlaps(dp.getDeadPlayerRec())) {
 					((Imposter) Client.getPlayer()).reportButton.setVisible(true);
 				}
 				else {
 					((Imposter) Client.getPlayer()).reportButton.setVisible(false);
+				}
+			}
+			
+			//if the player has a current task, render the task screen ui
+			if(((Imposter) Client.getPlayer()).getCurrentTask() != null) {
+				//based on the task the player is doing, render the appropriate task 
+				task = ((Imposter) Client.getPlayer()).getCurrentTask();
+
+				if(task instanceof ReactorTask) {
+					((ReactorTask) task).render(r.getBatch());
+				}
+				if(task instanceof ElectricalTask) {
+					((ElectricalTask) task).render(r.getBatch());
+				}
+				if(task instanceof EmergencyMeeting) {
+					((EmergencyMeeting) task).render(r.getBatch());
+					Client.getPlayer().setPosition(150 * Client.getPlayer().getCollisionLayer().getTileWidth(), (Client.getPlayer().getCollisionLayer().getHeight() - 165) * Client.getPlayer().getCollisionLayer().getTileHeight());
+					deadPlayers.clear();
 				}
 			}
 		}

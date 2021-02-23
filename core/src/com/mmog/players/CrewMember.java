@@ -18,6 +18,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.mmog.Client;
+import com.mmog.tasks.EmergencyMeeting;
 import com.mmog.tasks.Task;
 
 public class CrewMember extends Player {
@@ -89,6 +90,12 @@ public class CrewMember extends Player {
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
 				System.out.println("REPORT CLICKED: " + isOver());
+				
+				if(!hasTask("Emergency Meeting")){
+					addTask(new EmergencyMeeting());
+				}
+				
+				((CrewMember) Client.getPlayer()).setCurrentTask("Emergency Meeting");
 			}
 		});
 
@@ -97,7 +104,7 @@ public class CrewMember extends Player {
 	public void drawTasks(Batch batch) {
 		Gdx.input.setInputProcessor(this.stage);
 		tasksLabel.setText(tasksToString());
-
+		
 		stage.act();
 		stage.draw();
 	}
@@ -135,8 +142,13 @@ public class CrewMember extends Player {
 	public void setCurrentTaskIfCollided() {
 		for(Task task: tasks) {
 			if(!task.isTaskCompleted() && checkCollisionOnTask(task.getTaskName())) {	
-				currentTask = task;
-				return;
+				if(!isDead) {
+					currentTask = task;
+					return;
+				}else if(isDead && (task.getTaskName().equals("Electrical Task") || task.getTaskName().equals("Reactor Task"))) {
+					currentTask = null;
+					return;
+				}
 			}
 		}
 	}

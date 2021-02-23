@@ -194,6 +194,12 @@ public class Imposter extends Player{
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
 				System.out.println("REPORT CLICKED: " + isOver());
+				
+				if(!hasTask("Emergency Meeting")){
+					addTask(new EmergencyMeeting());
+				}
+				
+				setCurrentTask("Emergency Meeting");
 			}
 		});
 
@@ -210,8 +216,13 @@ public class Imposter extends Player{
 	public void setCurrentTaskIfCollided() {
 		for(Task task: tasks) {
 			if(!task.isTaskCompleted() && checkCollisionOnTask(task.getTaskName())) {	
-				currentTask = task;
-				return;
+				if(!isDead) {
+					currentTask = task;
+					return;
+				}else if(isDead && (task.getTaskName().equals("Electrical Task") || task.getTaskName().equals("Reactor Task"))) {
+					currentTask = null;
+					return;
+				}
 			}
 		}
 	}
@@ -343,18 +354,20 @@ public class Imposter extends Player{
 		return currentTask;
 	}
 
-	public void setCurrentTask(String taskName) {
+	public boolean setCurrentTask(String taskName) {
+		boolean toReturn = false;
 		if(taskName == null) {
 			currentTask = null;
-			return;
+			return toReturn;
 		}
 		
 		for(Task task: tasks) {
 			if(task.getTaskName().equals(taskName) && !task.isTaskCompleted()) {	
 				currentTask = task;
-				return;
+				return true;
 			}
 		}
+		return toReturn;
 	}
 
 }
