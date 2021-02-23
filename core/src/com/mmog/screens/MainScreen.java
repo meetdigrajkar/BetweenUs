@@ -106,6 +106,7 @@ public class MainScreen extends AbstractScreen{
 		table.setSize(MAX_WIDTH, MAX_HEIGTH);
 
 		playerName = new TextField("", tfs);
+		playerName.setMaxLength(8);
 		playerName.setAlignment(Align.center);
 
 		//table items go here
@@ -134,7 +135,7 @@ public class MainScreen extends AbstractScreen{
 			public void clicked(InputEvent event, float x, float y) {
 				System.out.println("Heading to Join Room Screen!");
 
-				if(!playerName.getText().equals("") && !playerName.getText().contains(",") && playerName.getText().length() < 8) {
+				if(!playerName.getText().equals("") && !playerName.getText().contains(",")) {
 					//create all the players and the local player
 					Client.createPlayer(playerName.getText());
 					Client.createPlayers();
@@ -152,7 +153,7 @@ public class MainScreen extends AbstractScreen{
 			public void clicked(InputEvent event, float x, float y) {
 				System.out.println("Heading to Create Room Screen!");
 
-				if(!playerName.getText().equals("") && !playerName.getText().contains(",") && playerName.getText().length() < 8) {
+				if(!playerName.getText().equals("") && !playerName.getText().contains(",")) {
 					//create all the players and the local player
 					Client.createPlayer(playerName.getText());
 					Client.createPlayers();
