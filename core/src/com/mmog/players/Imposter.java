@@ -20,6 +20,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.mmog.Client;
 import com.mmog.screens.GameScreen;
 import com.mmog.tasks.ElectricalTask;
+import com.mmog.tasks.EmergencyMeeting;
 import com.mmog.tasks.ReactorTask;
 import com.mmog.tasks.Task;
 
@@ -272,6 +273,10 @@ public class Imposter extends Player{
 		}
 		return false;
 	}
+	
+	public void addTask(Task task) {
+		tasks.add(task);
+	}
 
 	public void addImposterToVent() {
 		for(Vent v: GameScreen.vents) {
@@ -339,6 +344,15 @@ public class Imposter extends Player{
 	}
 
 	public void setCurrentTask(String taskName) {
+		if(taskName == null) {
+			currentTask = null;
+			return;
+		}
+		
+		if(!hasTask("Emergency Meeting") && taskName.equals("Emergency Meeting")) {
+			addTask(new EmergencyMeeting());
+		}
+		
 		for(Task task: tasks) {
 			if(task.getTaskName().equals(taskName) && !task.isTaskCompleted()) {	
 				currentTask = task;
