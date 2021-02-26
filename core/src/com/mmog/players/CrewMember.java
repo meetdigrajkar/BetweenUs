@@ -104,6 +104,14 @@ public class CrewMember extends Player {
 				
 				//report button has unlimited meeting uses
 				addTask(new EmergencyMeeting());
+				
+				try {
+					Client.sendTriggerMeeting();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}	
+
 				setCurrentTask("Emergency Meeting");
 			}
 		});
