@@ -342,10 +342,6 @@ public class Imposter extends Player{
 			removeTask("Emergency Meeting");
 		}
 		
-		if(GameScreen.meetingTriggered) {
-			addTask(new EmergencyMeeting());
-			GameScreen.meetingTriggered = false;
-		}
 		
 		//if lights sabotage on cool down, disable button
 		if(lightsOnCD) {
@@ -390,7 +386,13 @@ public class Imposter extends Player{
 			currentTask = null;
 			return toReturn;
 		}
-
+		
+		if(taskName.equals("EmergencyMeeting")) {
+			currentTask = emergencyMeetings.pop();
+			toReturn = true;
+			return toReturn;
+		}
+		
 		for(Task task: tasks) {
 			if(task.getTaskName().equals(taskName) && !task.isTaskCompleted()) {	
 				currentTask = task;		

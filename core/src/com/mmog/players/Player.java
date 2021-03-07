@@ -1,6 +1,7 @@
 package com.mmog.players;
 
 import java.util.ArrayList;
+import java.util.Stack;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -31,6 +32,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.mmog.Client;
 import com.mmog.screens.GameScreen;
+import com.mmog.tasks.EmergencyMeeting;
+import com.mmog.tasks.Task;
 
 import box2dLight.Light;
 
@@ -66,6 +69,7 @@ public class Player extends Sprite{
 	public MapObjects inGameWalls;
 	public boolean inGame = false;
 	public int meetingUses = 2;
+	public Stack<Task> emergencyMeetings;
 	
 	public Player(int playerID)
 	{
@@ -78,6 +82,8 @@ public class Player extends Sprite{
 		justKilled = false;
 		
 		//player collison rectangle
+		
+		emergencyMeetings = new Stack<Task>();
 		
 		isDead = false;
 		createDeadAnim();

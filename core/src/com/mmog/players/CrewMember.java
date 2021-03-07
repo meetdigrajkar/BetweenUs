@@ -126,11 +126,6 @@ public class CrewMember extends Player {
 			removeTask("Emergency Meeting");
 		}
 		
-		if(GameScreen.meetingTriggered) {
-			addTask(new EmergencyMeeting());
-			GameScreen.meetingTriggered = false;
-		}
-		
 		stage.act();
 		stage.draw();
 	}
@@ -152,9 +147,16 @@ public class CrewMember extends Player {
 			currentTask = null;
 			return;
 		}
+		System.out.println("Setting current task!");
+		
+		if(taskName.equals("EmergencyMeeting")) {
+			currentTask = emergencyMeetings.pop();
+			return;
+		}
 		
 		for(Task task: tasks) {
 			if(task.getTaskName().equals(taskName) && !task.isTaskCompleted()) {	
+				System.out.println("Setting current task to: " + task.getTaskName());
 				currentTask = task;
 				return;
 			}

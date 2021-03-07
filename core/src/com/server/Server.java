@@ -417,6 +417,7 @@ public class Server {
 			roomName = dataArray[1];
 			
 			toAllClients = new StringBuilder();
+			
 			toAllClients.append(command);
 		}
 		
