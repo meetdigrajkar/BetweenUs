@@ -120,7 +120,19 @@ public class GameScreen extends AbstractScreen{
 	public GameScreen() {
 		super();
 	}
-
+	
+	public static int getNumOfAlivePlayers() {
+		int count = 0;
+		
+		for(Player p: getYBasedSortedPlayers()) {
+			if(!p.isDead) {
+				count++;
+			}
+		}
+		
+		return count;
+	}
+	
 	public static ArrayList<Player> getYBasedSortedPlayers() {
 		ArrayList<Player> allPlayers = new ArrayList();
 		allPlayers.add(Client.getPlayer());

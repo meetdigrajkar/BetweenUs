@@ -52,7 +52,7 @@ public class EmergencyMeeting extends Task{
 	private long startTime = 0, elapsedTime = 0;
 	private ArrayList<Table> playerboxtables;
 	private String votedPlayer = "";
-	private boolean voted = false, end = false, drawVotes = false, drawSkippedVotes =  false;
+	private boolean voted = false, end = false, drawVotes = false, drawSkippedVotes =  false, everyoneVoted = false;
 	public static HashMap<String, Integer> votes;
 	LabelStyle timerstyle;
 	String votedOffPlayer = "";
@@ -119,6 +119,7 @@ public class EmergencyMeeting extends Task{
 			
 			Label playerlabel = new Label (p.getPlayerName(), style);
 			Image playericonImage = new Image(playericon);
+			Image deadxImage = new Image(deadx);
 			final Image cancelvoteImage = new Image(cancelvote);
 			final Image confirmvoteImage = new Image(confirmvote);
 			
@@ -129,8 +130,13 @@ public class EmergencyMeeting extends Task{
 			playerboxtable.add(playerlabel).padRight(15);
 			playerboxtable.add(cancelvoteImage).padRight(5);
 			playerboxtable.add(confirmvoteImage);
+			
+			//if the player is dead add an x to the player box table
+			if(p.isDead) {
+				playerboxtable.add(deadxImage);
+			}
+			
 			playerboxtable.row();
-
 			playerboxtables.add(playerboxtable);
 			table.add(playerboxtables.get(i)).padRight(10);
 			
@@ -142,8 +148,10 @@ public class EmergencyMeeting extends Task{
 					if(!voted) {
 						System.out.println("CLICKED: @playerName: " + p.getPlayerName());
 						
-						cancelvoteImage.setVisible(true);
-						confirmvoteImage.setVisible(true);
+						if(!p.isDead) {
+							cancelvoteImage.setVisible(true);
+							confirmvoteImage.setVisible(true);
+						}
 					}	
 				}
 			});
@@ -194,7 +202,7 @@ public class EmergencyMeeting extends Task{
 		skipvoteImage.addListener(new ClickListener() {
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
-				if(!voted) {
+				if(!voted && !Client.getPlayer().isDead) {
 					System.out.println("SKIPPED VOTE!");
 					
 					voted = true;
@@ -231,7 +239,6 @@ public class EmergencyMeeting extends Task{
 		(Client.getPlayer()).draw(batch);
 		Gdx.input.setInputProcessor(stage);
 		
-		
 		disableReportButton();
 		
 		if(timerNum > 10) {
@@ -246,29 +253,31 @@ public class EmergencyMeeting extends Task{
 			skipvoteImage.setVisible(false);
 		}
 		
-		if(completed) {
-			if(!end) {
-				try {
-					Client.sendGetVotes();
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				
-				end = true;
+		if(!end) {
+			try {
+				Client.sendGetVotes();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
-						
-			for(int i = 0; i < playerboxtables.size(); i++) {
+			
+			end = true;
+		}
+		
+		if(votes.size() == GameScreen.getNumOfAlivePlayers()) {
+			timerNum = 10;
+			completed = true;
+		}
+		
+		
+		if(completed && end) {		
+			for(int i = 0; i < playerboxtables.size(); i++) {	
 				if(voted) {
 					 playerboxtables.get(i).getChild(2).setVisible(false);
 					 playerboxtables.get(i).getChild(3).setVisible(false);
 				}
 				
-				if(end && !drawVotes) {
-					if(votes.size() != 0) {
-						drawVotes = true;
-					}
-					
+				if(!drawVotes) {
 					for(Entry<String, Integer> e: votes.entrySet()) {
 						String playerName = e.getKey();
 						Integer numOfVotes = e.getValue();
@@ -282,6 +291,9 @@ public class EmergencyMeeting extends Task{
 						}
 					}
 					
+					if(votes.size() != 0) {
+						drawVotes = true;
+					}
 				}
 			}
 			
@@ -303,8 +315,9 @@ public class EmergencyMeeting extends Task{
 				}
 				drawSkippedVotes = true;
 			}
+		
 			
-			if(timerNum > 0) {
+			if(timerNum > 0 && timerNum <= 10) {
 				if((((int) timerNum) % 2) == 0) {
 					timerstyle.fontColor = Color.RED;
 				}
