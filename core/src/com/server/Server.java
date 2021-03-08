@@ -56,21 +56,21 @@ public class Server {
 
 				//get the command that was sent by the client
 				int command = Integer.parseInt(dataArray[0].trim());
-				
-				//if everyone has voted send the votes for the players
-				for(Room room: rooms) {
-					if(room.hasEveryoneVoted() && !room.isSentVotes()) {
-						//parse the command
-						command = 17;
-					}
-				}
-				
+							
 				//parse the command
 				parseCommandAndSend(command, dataArray, hostAddress,serverDatagramSocket);
 				
 				if(!rooms.isEmpty()) {
 					System.out.println("number of rooms: " + rooms.size());
 				}	
+				
+				//if everyone has voted send the votes for the players
+				for(Room room: rooms) {
+					if(room.hasEveryoneVoted() && !room.isSentVotes()) {
+						//parse the command
+						parseCommandAndSend(17, dataArray, hostAddress,serverDatagramSocket);
+					}
+				}
 				
 				//if the room is empty, remove room
 				ArrayList<Room> roomsToRemove = new ArrayList<Room>();

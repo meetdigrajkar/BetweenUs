@@ -149,8 +149,10 @@ public class EmergencyMeeting extends Task{
 						System.out.println("CLICKED: @playerName: " + p.getPlayerName());
 
 						if(!Client.getPlayer().isDead) {
-							cancelvoteImage.setVisible(true);
-							confirmvoteImage.setVisible(true);
+							if(p.isDead) {
+								cancelvoteImage.setVisible(true);
+								confirmvoteImage.setVisible(true);
+							}
 						}
 					}	
 				}
@@ -294,7 +296,7 @@ public class EmergencyMeeting extends Task{
 				}
 			}
 
-			if(end && !drawSkippedVotes) {
+			if(!drawSkippedVotes) {
 				for(Entry<String, Integer> e: votes.entrySet()) {
 					String playerName = e.getKey();
 					Integer numOfVotes = e.getValue();
@@ -313,8 +315,7 @@ public class EmergencyMeeting extends Task{
 				drawSkippedVotes = true;
 			}
 
-
-			if(timerNum > 0 && timerNum <= 10) {
+			if(timerNum >= 0 && timerNum <= 10) {
 				if((((int) timerNum) % 2) == 0) {
 					timerstyle.fontColor = Color.RED;
 				}
@@ -352,7 +353,6 @@ public class EmergencyMeeting extends Task{
 				if(skippedVotes >= currMaxVotes) {
 					votedOffPlayer = "";
 				}
-
 
 				for(Player p: GameScreen.getYBasedSortedPlayers()) {
 					if(p.getPlayerName().equals(votedOffPlayer)) {
