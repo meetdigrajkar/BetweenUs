@@ -326,6 +326,10 @@ public class GameScreen extends AbstractScreen{
 		}
 		r.getBatch().end();
 		
+		if(Client.getPlayer().emergencyMeetings.size() < 2) {
+			Client.getPlayer().emergencyMeetings.push(new EmergencyMeeting());
+		}
+		
 		light.setPosition(Client.getPlayer().getX() + 17, Client.getPlayer().getY() + 17);
 		rayhandler.setCombinedMatrix(cam);
 		rayhandler.updateAndRender();

@@ -38,6 +38,8 @@ public class CrewMember extends Player {
 
 	BitmapFont labelFont = new BitmapFont(Gdx.files.internal("UI/newlabelfont.fnt"));
 	Label tasksLabel;
+	
+	public boolean reported = false;
 
 	public CrewMember(int playerID) {
 		super(playerID);
@@ -102,16 +104,14 @@ public class CrewMember extends Player {
 			public void clicked(InputEvent event, float x, float y) {
 				System.out.println("REPORT CLICKED: " + isOver());
 				
-				//report button has unlimited meeting uses
-				addTask(new EmergencyMeeting());
-				
 				try {
 					Client.sendTriggerMeeting();
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}	
-
+				
+				reported = true;
 				setCurrentTask("Emergency Meeting");
 			}
 		});
@@ -147,10 +147,14 @@ public class CrewMember extends Player {
 			currentTask = null;
 			return;
 		}
-		System.out.println("Setting current task!");
 		
-		if(taskName.equals("EmergencyMeeting")) {
+		if(taskName.equals("Emergency Meeting") && !reported) {
 			currentTask = emergencyMeetings.pop();
+			return;
+		}
+		else if(taskName.equals("Emergency Meeting") && reported) {
+			currentTask = new EmergencyMeeting();
+			reported = false;
 			return;
 		}
 		

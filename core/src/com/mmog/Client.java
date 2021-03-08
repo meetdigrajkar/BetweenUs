@@ -508,6 +508,7 @@ public class Client
 		//trigger meeting
 		else if(command == 18) {
 			GameScreen.meetingTriggered = true;
+			
 			if(Client.getPlayer() instanceof CrewMember) {
 				((CrewMember) Client.getPlayer()).setCurrentTask("Emergency Meeting");
 			}

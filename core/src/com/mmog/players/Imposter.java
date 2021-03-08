@@ -38,7 +38,7 @@ public class Imposter extends Player{
 	public ArrayList<Task> tasks;
 	private Task currentTask;
 	private int lightsCDTimer = 3000, reactorCDTimer = 80;
-	private boolean lightsOnCD = false, reactorOnCD = false;
+	private boolean lightsOnCD = false, reactorOnCD = false, reported = false;
 
 	public Imposter(int playerID) {
 		super(playerID);
@@ -200,15 +200,14 @@ public class Imposter extends Player{
 			public void clicked(InputEvent event, float x, float y) {
 				System.out.println("REPORT CLICKED: " + isOver());
 
-				addTask(new EmergencyMeeting());
-
 				try {
 					Client.sendTriggerMeeting();
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}	
-
+				
+				reported = true;
 				setCurrentTask("Emergency Meeting");
 			}
 		});
@@ -380,26 +379,28 @@ public class Imposter extends Player{
 		return currentTask;
 	}
 
-	public boolean setCurrentTask(String taskName) {
-		boolean toReturn = false;
+	public void setCurrentTask(String taskName) {
 		if(taskName == null) {
 			currentTask = null;
-			return toReturn;
+			return;
 		}
 		
-		if(taskName.equals("EmergencyMeeting")) {
+		if(taskName.equals("Emergency Meeting") && !reported) {
 			currentTask = emergencyMeetings.pop();
-			toReturn = true;
-			return toReturn;
+			return;
+		}
+		else if(taskName.equals("Emergency Meeting") && reported) {
+			currentTask = new EmergencyMeeting();
+			reported = false;
+			return;
 		}
 		
 		for(Task task: tasks) {
 			if(task.getTaskName().equals(taskName) && !task.isTaskCompleted()) {	
 				currentTask = task;		
-				return true;
+				return;
 			}
 		}
-		return toReturn;
 	}
 
 }
