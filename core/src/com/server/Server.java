@@ -56,7 +56,15 @@ public class Server {
 
 				//get the command that was sent by the client
 				int command = Integer.parseInt(dataArray[0].trim());
-
+				
+				//if everyone has voted send the votes for the players
+				for(Room room: rooms) {
+					if(room.hasEveryoneVoted() && !room.isSentVotes()) {
+						//parse the command
+						command = 17;
+					}
+				}
+				
 				//parse the command
 				parseCommandAndSend(command, dataArray, hostAddress,serverDatagramSocket);
 				
@@ -215,6 +223,7 @@ public class Server {
 					for(ServerPlayer player : room.allPlayers) {
 						if(player.getPlayerName().equals(dataArray[1])) {
 							playerID = player.getPlayerID();
+							player.setDead(Boolean.parseBoolean(dataArray[6]));
 						}
 					}
 				}
@@ -402,6 +411,7 @@ public class Server {
 					toAllClients.append(room.getPlayerNameAndNumVotes());
 					toLocalc.append(room.getPlayerNameAndNumVotes());
 					
+					room.setSentVotes(true);
 					room.votes.clear();
 				}
 			}
@@ -415,6 +425,12 @@ public class Server {
 			toAll = true;
 			
 			roomName = dataArray[1];
+			
+			for(Room room: rooms) {
+				if(room.getRoomName().equals(roomName)) {
+					room.setSentVotes(false);
+				}
+			}
 			
 			toAllClients = new StringBuilder();
 			

@@ -24,6 +24,7 @@ public class Room {
 	public int numCrew, numImp;
 	ArrayList<Boolean> reactorTaskCompleted;
 	public HashMap<String, Integer> votes;
+	private boolean sentVotes = false;
 
 	public Room(String hostName, String roomName, InetAddress hostAddres, int numCrew, int numImp) {
 		this.setHostName(hostName);
@@ -73,6 +74,34 @@ public class Room {
 		}
 		
 		return toReturn;
+	}
+	
+	public boolean hasEveryoneVoted() {
+		//check the total number of votes of the players and compare with the total number of alive players
+		int totalVotes = 0;
+		
+		for(Entry<String, Integer> e: votes.entrySet()) {
+			int numOfVotes = e.getValue();
+			
+			totalVotes += numOfVotes;
+		}
+		
+		if(totalVotes == getNumOfAlivePlayers()) {
+			return true;
+		}
+		
+		return false;
+	}
+	
+	public int getNumOfAlivePlayers() {
+		int count = 0;
+		
+		for(ServerPlayer p: allPlayers) {
+			if(p.isDead()) {
+				count++;
+			}
+		}
+		return count;
 	}
 	
 	public void addVote(String playerVoted) {
@@ -242,5 +271,13 @@ public class Room {
 
 	public static void setR(Random r) {
 		Room.r = r;
+	}
+
+	public boolean isSentVotes() {
+		return sentVotes;
+	}
+
+	public void setSentVotes(boolean sentVotes) {
+		this.sentVotes = sentVotes;
 	}
 }
