@@ -217,11 +217,23 @@ public class EmergencyMeeting extends Task{
 	public static void addVote(String playerName, Integer numOfVotes) {
 		votes.put(playerName, numOfVotes);
 	}
-
+	
+	public void disableReportButton() {
+		if(Client.getPlayer() instanceof CrewMember) {
+			((CrewMember) Client.getPlayer()).reportButton.setVisible(false);
+		}
+		else if(Client.getPlayer() instanceof Imposter) {
+			((Imposter) Client.getPlayer()).reportButton.setVisible(false);
+		}
+	}
+	
 	public void render(Batch batch) {
 		(Client.getPlayer()).draw(batch);
 		Gdx.input.setInputProcessor(stage);
-	
+		
+		
+		disableReportButton();
+		
 		if(timerNum > 10) {
 			timerNum = (((timerNum * 1000) - (Gdx.graphics.getDeltaTime() * 1000)) /1000);
 			timer.setText(((int) timerNum) + "");

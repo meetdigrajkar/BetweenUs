@@ -111,8 +111,8 @@ public class GameScreen extends AbstractScreen{
 
 	public ArrayList<DeadPlayer> deadPlayers;
 	ShapeRenderer shapeRenderer = new ShapeRenderer();
-	
-	
+
+
 	public static boolean reactorTaskStarted = false;
 	public static boolean meetingTriggered =  false;
 
@@ -146,15 +146,15 @@ public class GameScreen extends AbstractScreen{
 	public void initVents() {
 		//map objects
 		ventObjects = map.getLayers().get("vents").getObjects();
-		
+
 		for(MapObject mo: ventObjects) {
 			//System.out.println(mo.getColor());
 			Rectangle rectangle = ((RectangleMapObject)mo).getRectangle();
 			vents.add(new Vent(rectangle));
 		}
-		
+
 		System.out.println("Number of Vents:" + vents.size());
-		
+
 		//set connected vents
 		vents.get(0).addConnectedVent(1);
 		vents.get(0).addConnectedVent(2);
@@ -197,7 +197,7 @@ public class GameScreen extends AbstractScreen{
 		this.setViewport(vp);
 
 		deadPlayers = new ArrayList<DeadPlayer>();
-		
+
 		Client.getPlayer().inGame = true;
 		Client.getPlayer().speed = 2f;
 
@@ -218,7 +218,7 @@ public class GameScreen extends AbstractScreen{
 
 		//map objects
 		mapObjects = map.getLayers().get("light layer").getObjects();
-		
+
 		buildBuildingsBodies();
 
 		vents = new ArrayList<Vent>();
@@ -294,14 +294,14 @@ public class GameScreen extends AbstractScreen{
 		//map renderer
 		r.setView(cam);
 		r.render();
-		
+
 		r.getBatch().begin();
-		
+
 		//draw all the dead bodies
 		for(DeadPlayer dp: deadPlayers) {
 			dp.draw(r.getBatch());
 		}
-		
+
 		//draw all the other players
 		for (Player p : getYBasedSortedPlayers())
 		{
@@ -325,17 +325,19 @@ public class GameScreen extends AbstractScreen{
 			}
 		}
 		r.getBatch().end();
-		
+
 		if(Client.getPlayer().emergencyMeetings.size() < 2) {
 			Client.getPlayer().emergencyMeetings.push(new EmergencyMeeting());
 		}
-		
-		light.setPosition(Client.getPlayer().getX() + 17, Client.getPlayer().getY() + 17);
-		rayhandler.setCombinedMatrix(cam);
-		rayhandler.updateAndRender();
 
-		detectingKeyPresses();
+		if(!Client.getPlayer().isDead) {
+			light.setPosition(Client.getPlayer().getX() + 17, Client.getPlayer().getY() + 17);
+			rayhandler.setCombinedMatrix(cam);
+			rayhandler.updateAndRender();
+		}
 		
+		detectingKeyPresses();
+
 		r.getBatch().begin();
 		//if the player is a crew member, call setCurrentTask() on the player which sets the players current task if they have tried to start a task
 		if(Client.getPlayer() instanceof CrewMember) {
@@ -343,12 +345,12 @@ public class GameScreen extends AbstractScreen{
 			if(light.getDistance() == 50 && !((CrewMember) Client.getPlayer()).hasTask("Electrical Task")) {
 				((CrewMember) Client.getPlayer()).addTask(new ElectricalTask());
 			}
-			
+
 			//add the reactor task if the reactor was sabotaged
 			if(reactorTaskStarted && !((CrewMember) Client.getPlayer()).hasTask("Reactor Task")) {
 				((CrewMember) Client.getPlayer()).addTask(new ReactorTask());
 			}
-			
+
 			//check for collision on a dead body
 			for(DeadPlayer dp: deadPlayers) {
 				if(!Client.getPlayer().isDead && Client.getPlayer().getBoundingRectangle().overlaps(dp.getDeadPlayerRec())) {
@@ -389,9 +391,9 @@ public class GameScreen extends AbstractScreen{
 		}
 		else if(Client.getPlayer() instanceof Imposter) {
 			light.setDistance(500);
-			
+
 			((Imposter) Client.getPlayer()).drawUI(r.getBatch());
-					
+
 			if(Client.getPlayer().inVent) {
 				//if the player is in the vent allow the player to move to other vents
 				for(Vent v: vents) {
@@ -399,18 +401,18 @@ public class GameScreen extends AbstractScreen{
 					if(v.hasImposter((Imposter) Client.getPlayer())) {
 						if(Gdx.input.isKeyJustPressed(Keys.LEFT)) {
 							System.out.println("MOVING LEFT");
-							
+
 							vents.get(v.getConnectedVents().get(0)).addImposter((Imposter) Client.getPlayer());
-							
+
 							Client.getPlayer().setPosition(vents.get(v.getConnectedVents().get(0)).getRec().x, vents.get(v.getConnectedVents().get(0)).getRec().y);
 							v.removeImposter((Imposter) Client.getPlayer());
 							break;
 						}
 						else if(Gdx.input.isKeyJustPressed(Keys.RIGHT)) {
 							System.out.println("MOVING RIGHT");
-							
+
 							vents.get(v.getConnectedVents().get(1)).addImposter((Imposter) Client.getPlayer());
-							
+
 							Client.getPlayer().setPosition(vents.get(v.getConnectedVents().get(0)).getRec().x, vents.get(v.getConnectedVents().get(0)).getRec().y);
 							v.removeImposter((Imposter) Client.getPlayer());
 							break;
@@ -446,7 +448,7 @@ public class GameScreen extends AbstractScreen{
 					((Imposter) Client.getPlayer()).reportButton.setVisible(false);
 				}
 			}
-			
+
 			//if the player has a current task, render the task screen ui
 			if(((Imposter) Client.getPlayer()).getCurrentTask() != null) {
 				//based on the task the player is doing, render the appropriate task 
@@ -475,7 +477,7 @@ public class GameScreen extends AbstractScreen{
 				else if(Client.getPlayer() instanceof Imposter && ((Imposter) Client.getPlayer()).getCurrentTask() == null) {
 					Client.getPlayer().render(Gdx.graphics.getDeltaTime());
 				}
-			
+
 			}
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
