@@ -1,11 +1,5 @@
 package com.mmog.tasks;
 
-import java.util.concurrent.TimeUnit;
-
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
-import javax.swing.UIDefaults;
-import javax.swing.UIManager;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
@@ -21,11 +15,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.Slider;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.DragListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
-import com.badlogic.gdx.utils.TimeUtils;
-import com.badlogic.gdx.utils.Timer;
 import com.mmog.Client;
 import com.mmog.players.CrewMember;
 
@@ -35,10 +26,11 @@ public class ComsTask extends Task {
 	float oldY[] = new float[0];
 	int timeLeft = 10;
 	boolean completed = false;
+	boolean updatingLabel = false;
 	Stage stage;
 	Sprite wifiLever, wifiPanel, sideLid, hinge;
 	final Image wifiLeverImg, wifiPanelImg, sideLidImg, hingeImg;  
-	private long startTime = 0, elapsedTime = 0;
+	Label modemLabel;
 	
 	
 	public ComsTask() {
@@ -58,12 +50,10 @@ public class ComsTask extends Task {
 		hingeImg = new Image(hinge);
 		
 		stage.addActor(wifiPanelImg);
-		//stage.addActor(wifiLeverImg);
 		stage.addActor(sideLidImg);
 		stage.addActor(hingeImg);
 		
 		wifiPanelImg.setPosition(stage.getWidth() /2 - 200, stage.getHeight() / 2 - 250);	
-		//wifiLeverImg.setPosition(stage.getWidth() /2 + 75, stage.getHeight() / 2 + 135);
 		sideLidImg.setPosition(stage.getWidth() /2 - 390, stage.getHeight() / 2 - 290);
 		hingeImg.setPosition(stage.getWidth() /2 - 260, stage.getHeight() / 2 - 290);
 		
@@ -86,9 +76,10 @@ public class ComsTask extends Task {
 		stage.addActor(t);
 		
 		LabelStyle ls = new LabelStyle(new BitmapFont(), Color.WHITE);
-		final Label modemLabel = new Label("Please Turn On Your Modem", ls);
+		modemLabel = new Label("Please Turn On Your Modem", ls);
 		stage.addActor(modemLabel);
 		modemLabel.setPosition(stage.getWidth() /2 - 145, stage.getHeight() / 2 + 165);
+		
 		
 		
 		
@@ -108,38 +99,28 @@ public class ComsTask extends Task {
 				super.touchUp(event, x, y, pointer, button);
 				if (lever.getPercent() == 1.0) {
 					lever.setDisabled(true);
-					while (timeLeft > 0) {
-						modemLabel.setText("Please wait " + timeLeft + " seconds.");
-						System.out.println("Please wait " + timeLeft + " seconds.");
-						System.out.println(" ");
-						timeLeft = timeLeft -1;
-						try {
-							TimeUnit.SECONDS.sleep(1);
-						} catch (InterruptedException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
+					long timeCompleted = System.currentTimeMillis()/ 1000;
+					modemLabel.setText("     Please wait 5 seconds");
+					while ((System.currentTimeMillis()/1000)  - timeCompleted  < 5) {
+						
 					}	
+					completed = true;
 				}
-				completed = true;
 			}
 		});
-		
 	}
 	
-	
 	public void render(Batch batch) {
-		(Client.getPlayer()).draw(batch);
+		((CrewMember) Client.getPlayer()).draw(batch);
 		Gdx.input.setInputProcessor(stage);
+		stage.draw();
+		
 	
 		if(completed) {
-			if(Client.getPlayer() instanceof CrewMember) {
-				((CrewMember) Client.getPlayer()).setCurrentTask(null);
-				((CrewMember) Client.getPlayer()).setTaskCompleted(taskName);
-			}
+			System.out.println("SUCCESS!");
+			((CrewMember) Client.getPlayer()).setCurrentTask(null);
+			((CrewMember) Client.getPlayer()).setTaskCompleted(taskName);
 		}
-		else
-			stage.draw();
 		
 	
 	}
