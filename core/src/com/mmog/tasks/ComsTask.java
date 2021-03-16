@@ -106,7 +106,6 @@ public class ComsTask extends Task {
 					}	
 					completed = true;
 				}
-				
 			}
 		});
 	}
