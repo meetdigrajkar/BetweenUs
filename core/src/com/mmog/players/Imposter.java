@@ -273,12 +273,25 @@ public class Imposter extends Player{
 		}
 	}
 
+	public void removeAllMeetings() {
+		ArrayList<Task> toRemove = new ArrayList<Task>();
+		for(Task t: tasks) {
+			if(t instanceof EmergencyMeeting) {
+				toRemove.add(t);		
+			}	
+		}	
+		tasks.removeAll(toRemove);
+	}
+	
 	public void removeTask(String task) {
 		ArrayList<Task> toRemove = new ArrayList<Task>();
 
 		for(Task t: tasks) {
-			if(t.getTaskName().equals(task)){
-				toRemove.add(t);
+			if(t instanceof EmergencyMeeting) {
+				if(((EmergencyMeeting) t).meetingCompleted) {
+					toRemove.add(t);
+					break;
+				}
 			}
 		}
 
@@ -337,10 +350,10 @@ public class Imposter extends Player{
 
 		ventButton.setVisible(checkCollisionOnVent());
 
-		if(isDead && hasTask("Emergency Meeting")) {
-			removeTask("Emergency Meeting");
+		if(isDead) {
+			this.removeAllMeetings();
+			ventButton.setVisible(false);
 		}
-		
 		
 		//if lights sabotage on cool down, disable button
 		if(lightsOnCD) {
@@ -369,7 +382,6 @@ public class Imposter extends Player{
 				reactorButton.setVisible(true);
 			}
 		}
-
 
 		stage.act();
 		stage.draw();

@@ -52,7 +52,7 @@ public class EmergencyMeeting extends Task{
 
 	Sprite meetingbg,playerbox,chaticon,cancelvote, confirmvote, playervoteicon, deadx, skipvote, skipped, playervoted, playericon, chatbg, messagebg, sendbutton, receivedbg;
 	final Image meetingbgImage, chaticonImage, playervotedImage, deadxImage, skippedImage,skipvoteImage, chatbgImage, messagebgImage, sendbuttonImage;
-	boolean completed = false;
+	boolean getVotes = false;
 	boolean isChatting = false;
 	private Label timer;
 	private float timerNum = 60;
@@ -63,7 +63,7 @@ public class EmergencyMeeting extends Task{
 	private long startTime = 0, elapsedTime = 0;
 	private ArrayList<Table> playerboxtables, messagesTable;
 	private String votedPlayer = "";
-	private boolean voted = false, end = false, drawVotes = false, drawSkippedVotes =  false, everyoneVoted = false;
+	private boolean voted = false, receivedVotes = false, drawVotes = false, drawSkippedVotes =  false, everyoneVoted = false;
 	public HashMap<String, Integer> votes;
 	LabelStyle timerstyle;
 	String votedOffPlayer = "";
@@ -80,9 +80,12 @@ public class EmergencyMeeting extends Task{
 	private TextArea message_field;
 	
 	private Skin skin;
+	
+	public boolean meetingCompleted;
+	
 	public EmergencyMeeting() {
 		super(taskName);
-
+		meetingCompleted = false;
 		stage = new Stage();
 		table = new Table();
 		votes = new HashMap<String,Integer>();
@@ -169,7 +172,6 @@ public class EmergencyMeeting extends Task{
 		stage.addActor(sendbuttonImage);
 		stage.addActor(messageField);
 		
-	
 
 		//table for the playerbox
 		table.setFillParent(true);
@@ -396,8 +398,8 @@ public class EmergencyMeeting extends Task{
 				users.add(p.getPlayerName());
 			}
 		}
-		users_list.setItems(users);
 		
+		users_list.setItems(users);
 
 		users_scroll = new ScrollPane(users_list, skin);
 		users_scroll.setFadeScrollBars(false);
@@ -452,19 +454,19 @@ public class EmergencyMeeting extends Task{
 		chat_label.act(Gdx.graphics.getDeltaTime());
 		disableReportButton();
 		
-		if(timerNum > 10) {
+		if(timerNum >= 10) {
 			timerNum = (((timerNum * 1000) - (Gdx.graphics.getDeltaTime() * 1000)) /1000);
 			timer.setText(((int) timerNum) + "");
 		}
 		else {
-			completed = true;
+			getVotes = true;
 		}
 		
 		if(voted) {
 			skipvoteImage.setVisible(false);
 		}
 		
-		if(!end) {
+		if(getVotes && !receivedVotes) {
 			try {
 				Client.sendGetVotes();
 			} catch (IOException e) {
@@ -472,16 +474,17 @@ public class EmergencyMeeting extends Task{
 				e.printStackTrace();
 			}
 			
-			end = true;
+			receivedVotes = true;
 		}
 		
+		/*
 		if(votes.size() == GameScreen.getNumOfAlivePlayers()) {
 			timerNum = 10;
-			completed = true;
+			getVotes = true;
 		}
+		*/
 		
-		
-		if(completed && end) {		
+		if(receivedVotes) {		
 			for(int i = 0; i < playerboxtables.size(); i++) {	
 				if(voted) {
 					 playerboxtables.get(i).getChild(2).setVisible(false);
@@ -508,7 +511,7 @@ public class EmergencyMeeting extends Task{
 				}
 			}
 			
-			if(end && !drawSkippedVotes) {
+			if(!drawSkippedVotes) {
 				for(Entry<String, Integer> e: votes.entrySet()) {
 					String playerName = e.getKey();
 					Integer numOfVotes = e.getValue();
@@ -528,7 +531,7 @@ public class EmergencyMeeting extends Task{
 			}
 		
 			
-			if(timerNum > 0 && timerNum <= 10) {
+			if(timerNum > 0) {
 				if((((int) timerNum) % 2) == 0) {
 					timerstyle.fontColor = Color.RED;
 				}
@@ -575,13 +578,15 @@ public class EmergencyMeeting extends Task{
 					}
 				}
 				
+				meetingCompleted = true;
+				
 				if(Client.getPlayer() instanceof CrewMember) {
-					((CrewMember) Client.getPlayer()).removeTask(taskName);
 					((CrewMember) Client.getPlayer()).setCurrentTask(null);
+					((CrewMember) Client.getPlayer()).removeTask(taskName);
 				}
 				else{
-					((Imposter) Client.getPlayer()).removeTask(taskName);
 					((Imposter) Client.getPlayer()).setCurrentTask(null);
+					((Imposter) Client.getPlayer()).removeTask(taskName);
 				}
 			}
 		}
