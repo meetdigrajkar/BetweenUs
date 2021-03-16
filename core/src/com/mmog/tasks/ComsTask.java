@@ -82,6 +82,7 @@ public class ComsTask extends Task {
 		
 		
 		
+		
 		lever.addListener(new DragListener() {
 			@Override
 			public boolean touchDown(InputEvent e, float x, float y, int pointer, int button) {
