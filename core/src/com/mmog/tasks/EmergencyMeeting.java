@@ -33,6 +33,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.DragListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.mmog.Client;
 import com.mmog.players.CrewMember;
@@ -387,6 +388,16 @@ public class EmergencyMeeting extends Task{
 		table.add(chat_scroll).width(300f).height(400f).colspan(2);
 
 		users_list = new List<String>(skin);
+		
+		Array<String> users = new Array<String>();
+		users.add("Player Names");
+		for(final Player p: GameScreen.getYBasedSortedPlayers()) {
+			if (!p.isDead) {
+				users.add(p.getPlayerName());
+			}
+		}
+		users_list.setItems(users);
+		
 
 		users_scroll = new ScrollPane(users_list, skin);
 		users_scroll.setFadeScrollBars(false);
