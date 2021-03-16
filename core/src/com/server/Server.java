@@ -421,6 +421,29 @@ public class Server {
 			toAllClients.append(command);
 		}
 		
+		//send message to all clients
+		else if(command == 19) {
+			toLocal = true;
+			toAll = true;
+			
+			roomName = dataArray[2];
+			
+			toAllClients = new StringBuilder();
+			toLocalc = new StringBuilder();
+			
+			toAllClients.append(dataArray[1] + ",");
+			toAllClients.append(dataArray[3] + ",");
+			
+			
+			toLocalc.append(dataArray[1] + ",");
+			toLocalc.append(dataArray[3] + ",");
+			
+			toLocalc.append(command);
+			toAllClients.append(command);
+			System.out.println("Sending message to all clients");
+			
+		}
+		
 		//send the command
 		sendCommand(toLocalc.toString(),toAllClients.toString(),serverDatagramSocket, command, toLocal, toAll, hostAddress, roomName);
 	}
@@ -473,10 +496,10 @@ public class Server {
 				for(ServerPlayer player : room.allPlayers) {
 					InetAddress address = player.getAddress();
 
-					if((command == 0 || command == 17) && address.equals(hostAddress)) {
+					if((command == 0 || command == 17 || command == 19) && address.equals(hostAddress)) {
 						toSend = new DatagramPacket(toLocalc.getBytes(), toLocalc.getBytes().length, hostAddress, 8000);
 					}
-					else if((command == 0 || command == 1 || command == 4 || command == 10 || command == 12 || command == 13 || command == 14 || command == 17 || command == 18) && !address.equals(hostAddress)) {
+					else if((command == 0 || command == 1 || command == 4 || command == 10 || command == 12 || command == 13 || command == 14 || command == 17 || command == 18 || command == 19) && !address.equals(hostAddress)) {
 						toSend = new DatagramPacket(toAllClients.getBytes(), toAllClients.getBytes().length, address, 8000);
 					}
 

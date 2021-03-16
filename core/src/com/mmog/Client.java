@@ -289,6 +289,18 @@ public class Client
 		DatagramPacket datagramPacket = new DatagramPacket(toSend.getBytes(), toSend.getBytes().length, address, 7077);	     
 		socket.send(datagramPacket);
 	}
+	
+	public static void sendMessageCommand(String message) throws IOException {
+		String toSend = "";
+		toSend += 19 + ",";
+		toSend += player.getPlayerName() + ",";
+		toSend += player.connectedRoomName + ",";
+		toSend += message;
+		
+		System.out.println(toSend);
+		DatagramPacket datagramPacket = new DatagramPacket(toSend.getBytes(), toSend.getBytes().length, address, 7077);	     
+		socket.send(datagramPacket);
+	}
 
 	public static void createPlayer(String name) {
 		player = new Player(-1);
@@ -501,7 +513,13 @@ public class Client
 				String playerName = dataArray[i];
 				Integer numOfVotes = Integer.parseInt(dataArray[i+1]);
 				
-				EmergencyMeeting.addVote(playerName, numOfVotes);
+				if(Client.getPlayer() instanceof CrewMember) {
+					((EmergencyMeeting)((CrewMember) Client.getPlayer()).getCurrentTask()).addVote(playerName, numOfVotes);
+				}
+				else if(Client.getPlayer() instanceof Imposter) {
+					((EmergencyMeeting)((Imposter) Client.getPlayer()).getCurrentTask()).addVote(playerName, numOfVotes);
+				}
+				
 			}
 
 		}
@@ -515,6 +533,25 @@ public class Client
 			else if(Client.getPlayer() instanceof Imposter) {
 				((Imposter) Client.getPlayer()).setCurrentTask("Emergency Meeting");
 			}
+		}
+		
+		//receive message
+		else if(command == 19) {
+			System.out.println("Received Message");
+			
+			String playerName = dataArray[0];
+			String message = dataArray[1];
+			
+			if(Client.getPlayer() instanceof CrewMember) {
+				((EmergencyMeeting)((CrewMember) Client.getPlayer()).getCurrentTask()).updateMessage(playerName, message);
+			}
+			else if(Client.getPlayer() instanceof Imposter) {
+				((EmergencyMeeting)((Imposter) Client.getPlayer()).getCurrentTask()).updateMessage(playerName, message);
+			}
+			
+			//EmergencyMeeting.updateMessage(playerName, message);
+			
+			
 		}
 	}
 
