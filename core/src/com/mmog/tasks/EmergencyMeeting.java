@@ -50,7 +50,7 @@ public class EmergencyMeeting extends Task{
 	Stage stage;
 
 	Sprite meetingbg,playerbox,chaticon,cancelvote, confirmvote, playervoteicon, deadx, skipvote, skipped, playervoted, playericon, chatbg, messagebg, sendbutton, receivedbg;
-	final Image meetingbgImage, chaticonImage, playervotedImage, deadxImage, skippedImage,skipvoteImage, chatbgImage, messagebgImage, sendbuttonImage, playericonImage;
+	final Image meetingbgImage, chaticonImage, playervotedImage, deadxImage, skippedImage,skipvoteImage, chatbgImage, messagebgImage, sendbuttonImage;
 	boolean completed = false;
 	boolean isChatting = false;
 	private Label timer;
@@ -123,7 +123,6 @@ public class EmergencyMeeting extends Task{
 		chatbgImage = new Image(chatbg);
 		messagebgImage = new Image(messagebg);
 		sendbuttonImage = new Image(sendbutton);
-		playericonImage = new Image(playericon);
 		
 		
 
@@ -190,6 +189,7 @@ public class EmergencyMeeting extends Task{
 			Image deadxImage = new Image(deadx);
 			final Image cancelvoteImage = new Image(cancelvote);
 			final Image confirmvoteImage = new Image(confirmvote);
+			final Image playericonImage = new Image(playericon);
 			
 			cancelvoteImage.setVisible(false);
 			confirmvoteImage.setVisible(false);
@@ -218,7 +218,8 @@ public class EmergencyMeeting extends Task{
 					if(!voted) {
 						System.out.println("CLICKED: @playerName: " + p.getPlayerName());
 						
-						if(!p.isDead) {
+						//if the local player is NOT dead and the player being voted for is NOT dead, then allow them to be VOTED
+						if(!Client.getPlayer().isDead && !p.isDead) {
 							cancelvoteImage.setVisible(true);
 							confirmvoteImage.setVisible(true);
 						}
