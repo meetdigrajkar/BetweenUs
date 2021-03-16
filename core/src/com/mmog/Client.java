@@ -500,18 +500,13 @@ public class Client
 				
 				((CrewMember) Client.getPlayer()).removeTask("Electrical Task");
 			}
-			else{
-				if(((Imposter) Client.getPlayer()).getCurrentTask().getTaskName().equals("Electrical Task")) {
-					((Imposter) Client.getPlayer()).setCurrentTask(null);
-				}
-				
-				((Imposter) Client.getPlayer()).removeTask("Electrical Task");
-			}
 		}
 		else if(command == 17) {
 			for(int i = 0; i < size-1;i+=2) {
 				String playerName = dataArray[i];
 				Integer numOfVotes = Integer.parseInt(dataArray[i+1]);
+				
+				System.out.println("Recevied a vote:" + "@playername:" + playerName + "@votes:" + numOfVotes);
 				
 				if(Client.getPlayer() instanceof CrewMember) {
 					((EmergencyMeeting)((CrewMember) Client.getPlayer()).getCurrentTask()).addVote(playerName, numOfVotes);
@@ -548,10 +543,6 @@ public class Client
 			else if(Client.getPlayer() instanceof Imposter) {
 				((EmergencyMeeting)((Imposter) Client.getPlayer()).getCurrentTask()).updateMessage(playerName, message);
 			}
-			
-			//EmergencyMeeting.updateMessage(playerName, message);
-			
-			
 		}
 	}
 

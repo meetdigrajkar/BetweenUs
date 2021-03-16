@@ -38,7 +38,7 @@ public class CrewMember extends Player {
 
 	BitmapFont labelFont = new BitmapFont(Gdx.files.internal("UI/newlabelfont.fnt"));
 	Label tasksLabel;
-	
+
 	public boolean reported = false;
 
 	public CrewMember(int playerID) {
@@ -66,7 +66,7 @@ public class CrewMember extends Player {
 		//init images
 		useButton = new ImageButton(use);
 		reportButton = new ImageButton(report);
-		
+
 		reportButton.setVisible(false);
 
 		//labels
@@ -81,14 +81,15 @@ public class CrewMember extends Player {
 
 		//add table as an actor to the stage
 		stage.addActor(table);
-		
+
 		//for the use button
 		for(int i = 0; i < meetingUses; i++) {
 			addTask(new EmergencyMeeting());
 		}
+
 		addTask(new AdminTask());
 		addTask(new ComsTask()); 
-		
+
 		//use button listener
 		useButton.addListener(new ClickListener() {
 			@Override
@@ -103,14 +104,14 @@ public class CrewMember extends Player {
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
 				System.out.println("REPORT CLICKED: " + isOver());
-				
+
 				try {
 					Client.sendTriggerMeeting();
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}	
-				
+
 				reported = true;
 				setCurrentTask("Emergency Meeting");
 			}
@@ -121,11 +122,11 @@ public class CrewMember extends Player {
 	public void drawTasks(Batch batch) {
 		Gdx.input.setInputProcessor(this.stage);
 		tasksLabel.setText(tasksToString());
-		
-		if(isDead && hasTask("Emergency Meeting")) {
-			removeTask("Emergency Meeting");
+
+		if(isDead) {
+			this.removeAllMeetings();
 		}
-		
+
 		stage.act();
 		stage.draw();
 	}
@@ -147,7 +148,7 @@ public class CrewMember extends Player {
 			currentTask = null;
 			return;
 		}
-		
+
 		if(taskName.equals("Emergency Meeting") && !reported) {
 			currentTask = emergencyMeetings.pop();
 			return;
@@ -157,7 +158,7 @@ public class CrewMember extends Player {
 			reported = false;
 			return;
 		}
-		
+
 		for(Task task: tasks) {
 			if(task.getTaskName().equals(taskName) && !task.isTaskCompleted()) {	
 				System.out.println("Setting current task to: " + task.getTaskName());
@@ -166,7 +167,7 @@ public class CrewMember extends Player {
 			}
 		}
 	}
-	
+
 
 	/*
 	 * Sets the current tasks of the crew member if the player collides with any of the tasks
@@ -187,8 +188,8 @@ public class CrewMember extends Player {
 							e.printStackTrace();
 						}	
 					}
-					
-					
+
+
 					currentTask = task;
 					return;
 				}
@@ -245,17 +246,33 @@ public class CrewMember extends Player {
 
 		return tasksString;
 	}
-	
+
 	public void removeTask(String task) {
 		ArrayList<Task> toRemove = new ArrayList<Task>();
-		
+
 		for(Task t: tasks) {
-			if(t.getTaskName().equals(task)){
+			if(t instanceof EmergencyMeeting) {
+				if(((EmergencyMeeting) t).meetingCompleted) {
+					toRemove.add(t);
+					break;
+				}
+			}
+			else if(t.getTaskName().equals(task)) {
 				toRemove.add(t);
 				break;
 			}
 		}
-		
+
+		tasks.removeAll(toRemove);
+	}
+	
+	public void removeAllMeetings() {
+		ArrayList<Task> toRemove = new ArrayList<Task>();
+		for(Task t: tasks) {
+			if(t instanceof EmergencyMeeting) {
+				toRemove.add(t);		
+			}	
+		}	
 		tasks.removeAll(toRemove);
 	}
 

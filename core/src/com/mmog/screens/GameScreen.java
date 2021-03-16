@@ -313,7 +313,7 @@ public class GameScreen extends AbstractScreen{
 		for(DeadPlayer dp: deadPlayers) {
 			dp.draw(r.getBatch());
 		}
-
+		
 		//draw all the other players
 		for (Player p : getYBasedSortedPlayers())
 		{

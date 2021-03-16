@@ -288,10 +288,6 @@ public class ElectricalTask extends Task {
 		stage.draw();
 
 		if(done) {
-			System.out.println("SUCCESS!");
-			
-			GameScreen.light.setDistance(180);
-
 			if(!sentFixed) {
 				try {
 					Client.sendLightsFixed();
@@ -301,7 +297,11 @@ public class ElectricalTask extends Task {
 				}
 				sentFixed = true;
 			}
-
+			
+			if(Client.getPlayer() instanceof Imposter) {
+				((Imposter) Client.getPlayer()).setCurrentTask(null);
+				((Imposter) Client.getPlayer()).removeTask("Electrical Task");
+			}
 		}
 	}
 }
