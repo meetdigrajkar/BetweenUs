@@ -85,7 +85,7 @@ public class Player extends Sprite{
 		
 		emergencyMeetings = new Stack<Task>();
 		
-		isDead = true;
+		isDead = false;
 		createDeadAnim();
 		isHost = false;
 		walkRightAtlas = new TextureAtlas(Gdx.files.internal("Walk.atlas"));
@@ -214,7 +214,6 @@ public class Player extends Sprite{
 			}
 			else
 				batch.draw(ghostRight.getKeyFrame(elapsedTime, true), getX(), getY(),32,50);
-			
 		}
 
 		/*
