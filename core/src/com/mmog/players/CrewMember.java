@@ -145,15 +145,13 @@ public class CrewMember extends Player {
 		
 		for(Task t: tasks) {
 			if(t.isTaskCompleted()) {
+				System.out.println(t.getTaskName() + "IS COMPLETE!");
 				completedTasks += 1;
-			}
-			else if(t instanceof EmergencyMeeting) {
-				totalTasks -= 1;
 			}
 		}
 		
 		//if all the tasks are completed, send the command to the server
-		if(completedTasks == totalTasks) {
+		if(completedTasks == totalTasks - 2) {
 			try {
 				Client.sendCompletedAllTasks();
 			} catch (IOException e) {

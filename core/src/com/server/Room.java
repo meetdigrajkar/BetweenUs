@@ -268,6 +268,8 @@ public class Room {
 
 	public boolean isAllCrewMembersTasksCompleted() {
 		//check the size of the completed crew members and compare with all the crew members in the game
+		System.out.println(completedCrewMembers.size() + " completed : allcrew " + getCrewMembers().size());
+		
 		if(completedCrewMembers.size() == getCrewMembers().size()) {
 			return true;
 		}

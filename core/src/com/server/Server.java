@@ -45,7 +45,7 @@ public class Server {
 
 				String receivedData = new String(datagramPacket.getData(),datagramPacket.getOffset(),datagramPacket.getLength());
 
-				System.out.println("received data: " + receivedData);
+				//System.out.println("received data: " + receivedData);
 				String[] dataArray = parseData(receivedData);
 
 				//check if the client is in the connected clients list.
@@ -74,7 +74,7 @@ public class Server {
 						//System.out.println("Before checking end game logic");
 						
 						//if ALL the crew members are done their tasks, send a END GAME command
-						if(!room.sentWinCommand && !room.sentCrewWinCommand && (room.isAllCrewMembersTasksCompleted() || room.isAllImposterDead())) {
+						if(!room.sentWinCommand && !room.sentCrewWinCommand && (room.isAllCrewMembersTasksCompleted())) {
 							System.out.println(room.isAllCrewMembersTasksCompleted() + " : " + room.isAllImposterDead());
 							
 							System.out.println("CREW MEMBER WIN LOGIC");
@@ -83,12 +83,14 @@ public class Server {
 							room.sentWinCommand = true;
 						}
 						//check if the imposters win if the ratio is 1 to 1
+						
 						else if(!room.sentWinCommand && !room.sentImposterWinCommand && (room.isImposterRatio1to1() || room.isSabotagedIncomplete)) {
 							System.out.println("IMPOSTERS WIN LOGIC");
 							sendWinCommand(room, false, true ,serverDatagramSocket);
 							room.sentImposterWinCommand = true;
 							room.sentWinCommand = true;
-						}	
+						}
+						
 					}
 				}
 				rooms.removeAll(roomsToRemove);
@@ -498,6 +500,7 @@ public class Server {
 
 			for(Room room: rooms) {
 				if(room.getRoomName().equals(roomName)) {
+					System.out.print(crewName + "finished his tasks");
 					room.addCompletedCrew(crewName);
 				}
 			}
@@ -575,7 +578,7 @@ public class Server {
 
 					try {
 						//change the packet to send based on whether to send to local, all (except local), and both
-						System.out.println("Server is sending @command: " + command + " to @ClientID: " + player.getPlayerID() + " @Address: " + address);
+						//System.out.println("Server is sending @command: " + command + " to @ClientID: " + player.getPlayerID() + " @Address: " + address);
 						if (toLocal && address.equals(hostAddress))
 						{
 							serverDatagramSocket.send(toSend);
