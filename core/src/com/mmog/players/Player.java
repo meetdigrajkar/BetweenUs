@@ -39,10 +39,10 @@ import box2dLight.Light;
 
 public class Player extends Sprite{
 
-	private TextureAtlas walkRightAtlas;
-	private TextureAtlas walkLeftAtlas;
-	private Animation<TextureRegion> walkLeft;
-	private Animation<TextureRegion> walkRight;
+	private TextureAtlas walkRightAtlas, ghostRightAtlas;
+	private TextureAtlas walkLeftAtlas, ghostLeftAtlas;
+	private Animation<TextureRegion> walkLeft, ghostLeft;
+	private Animation<TextureRegion> walkRight, ghostRight;
 	public float elapsedTime = 0;
 	private String playerName;
 	public boolean isFlipped, isDead, isIdle;
@@ -85,15 +85,21 @@ public class Player extends Sprite{
 		
 		emergencyMeetings = new Stack<Task>();
 		
-		isDead = false;
+		isDead = true;
 		createDeadAnim();
 		isHost = false;
 		walkRightAtlas = new TextureAtlas(Gdx.files.internal("Walk.atlas"));
 		walkLeftAtlas = new TextureAtlas(Gdx.files.internal("Walk.atlas"));
+		
+		ghostRightAtlas = new TextureAtlas(Gdx.files.internal("ghostbob.atlas"));
+		ghostLeftAtlas = new TextureAtlas(Gdx.files.internal("ghostbob.atlas"));
 
 		isFlipped = false;
 		walkRight = new Animation<TextureRegion>(1/15f, walkRightAtlas.getRegions());
 		walkLeft = new Animation<TextureRegion>(1/15f, walkLeftAtlas.getRegions());
+		
+		ghostRight = new Animation<TextureRegion>(1/48f, ghostRightAtlas.getRegions());
+		ghostLeft = new Animation<TextureRegion>(1/48f, ghostLeftAtlas.getRegions());
 		isIdle = false;
 
 		this.setPlayerID(playerID);
@@ -106,10 +112,16 @@ public class Player extends Sprite{
 		for (float i = 0; i < 1; i += 0.01f)
 		{
 			TextureRegion tr = walkLeft.getKeyFrame(i,true);
-
+			TextureRegion gl = ghostLeft.getKeyFrame(i,true);
+			
 			if(!tr.isFlipX())
 			{
 				tr.flip(true, false);
+			}
+			
+			if(!gl.isFlipX())
+			{
+				gl.flip(true, false);
 			}
 		}
 	}
@@ -135,7 +147,7 @@ public class Player extends Sprite{
 		float y = getY();
 
 		set(new Sprite((new Texture("Among Us - Player Base/Individual Sprites/Ghost/ghostbob0048.png"))));
-		setSize(32,45);
+		setSize(32,50);
 		setPosition(x,y);
 	}
 
@@ -186,13 +198,23 @@ public class Player extends Sprite{
 		//batch.setColor(Color.YELLOW);
 
 		elapsedTime += delta;
-		if (isFlipped && !isIdle && !isDead)
+		if (isFlipped && !isIdle)
 		{
-			batch.draw(walkLeft.getKeyFrame(elapsedTime, true), getX(), getY(),32,50);
+			if(!isDead) {
+				batch.draw(walkLeft.getKeyFrame(elapsedTime, true), getX(), getY(),32,50);
+			}
+			else
+				batch.draw(ghostLeft.getKeyFrame(elapsedTime, true), getX(), getY(),32,50);
+			
 		}
-		else if (!isFlipped && !isIdle && !isDead)
+		else if (!isFlipped && !isIdle)
 		{
-			batch.draw(walkRight.getKeyFrame(elapsedTime, true), getX(), getY(),32,50);
+			if(!isDead) {
+				batch.draw(walkRight.getKeyFrame(elapsedTime, true), getX(), getY(),32,50);
+			}
+			else
+				batch.draw(ghostRight.getKeyFrame(elapsedTime, true), getX(), getY(),32,50);
+			
 		}
 
 		/*
@@ -210,17 +232,18 @@ public class Player extends Sprite{
 			ghostSet = true;
 		}
 
-		if(ghostSet) {
-			setDead();
-		}
-
 		if (isIdle)
 		{
 			if(isFlipped && !isFlipX() || !isFlipped && isFlipX())
 			{
 				flip(true, false);
 			}
+			
 			super.draw(batch);
+			
+			if(isDead) {
+				setDead();
+			}
 		}
 	}
 
