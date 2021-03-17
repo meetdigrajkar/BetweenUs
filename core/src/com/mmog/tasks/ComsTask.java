@@ -100,7 +100,7 @@ public class ComsTask extends Task {
 				if (lever.getPercent() == 1.0) {
 					lever.setDisabled(true);
 					long timeCompleted = System.currentTimeMillis()/ 1000;
-					modemLabel.setText("     Please wait 5 seconds");
+					modemLabel.setText("     Modem is rebooting");
 					while ((System.currentTimeMillis()/1000)  - timeCompleted  < 5) {
 						
 					}	
