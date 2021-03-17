@@ -86,9 +86,6 @@ public class Player extends Sprite{
 		setHatID(-1);
 		setOldhatID(hatID);
 		
-		//set test hat
-		//hat = new Sprite (new Texture("Hats/hats0002.png"));
-		
 		//player collison rectangle
 		
 		emergencyMeetings = new Stack<Task>();
@@ -263,6 +260,7 @@ public class Player extends Sprite{
 		if(hatID != -1) {
 			hat = LobbyScreen.hats.get(hatID);
 			hat.setPosition(getX(), getY() + (getHeight()/2) + 11);
+			hat.setSize(30, 30);
 			hat.draw(batch,0.9f);
 		}
 		//player name
