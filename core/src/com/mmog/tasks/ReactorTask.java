@@ -372,6 +372,7 @@ public class ReactorTask extends Task {
 	public static void setCompletedTask(Boolean isCompleted) {
 		if(isCompleted) {
 			GameScreen.reactorTaskStarted = false;
+			GameScreen.timer.setVisible(false);
 			
 			if(Client.getPlayer() instanceof CrewMember) {
 				if(((CrewMember) Client.getPlayer()).getCurrentTask().getTaskName().equals(taskName)) {
