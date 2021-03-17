@@ -10,6 +10,7 @@ public class ServerPlayer {
 	private String playerName;
 	private boolean isHost;
 	private boolean isDead;
+	private int hatID;
 	
 	public ServerPlayer(String playerName, InetAddress address) {
 		this.setPlayerName(playerName);
@@ -63,5 +64,13 @@ public class ServerPlayer {
 
 	public void setDead(boolean isDead) {
 		this.isDead = isDead;
+	}
+
+	public int getHatID() {
+		return hatID;
+	}
+
+	public void setHatID(int hatID) {
+		this.hatID = hatID;
 	}
 }

@@ -162,7 +162,7 @@ public class Imposter extends Player{
 
 					//sends message to all other players that the player has vented OUT
 					try {
-						Client.sendOutVent(getX(), getY(), isFlipped, isDead, isIdle);
+						Client.sendOutVent(getX(), getY(), isFlipped, isDead, isIdle, getHatID(), hatIsFlipped);
 					} catch (IOException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();

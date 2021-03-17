@@ -1,6 +1,7 @@
 package com.mmog.screens;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
@@ -9,7 +10,9 @@ import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.maps.MapObjects;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
@@ -42,6 +45,9 @@ public class LobbyScreen extends AbstractScreen{
 
 	Table table;
 	BitmapFont font;
+	public static ArrayList<Sprite> hats;
+	private int hatID;
+	private int totalHats = 50;
 
 	public LobbyScreen() {
 		super();
@@ -57,6 +63,26 @@ public class LobbyScreen extends AbstractScreen{
 	public void show() {
 		cameraSetup();
 		Client.getPlayer().speed = 2f;
+		hats = new ArrayList<Sprite>();
+		hatID = -1;
+		initHats();
+	}
+
+	public void initHats() {
+		for(int i = 2; i <= totalHats; i++) {
+			Sprite hat = null;
+
+			if(i < 10) {
+				hat = new Sprite(new Texture("Hats/hats000" + i + ".png" ));
+			}
+			else {
+				hat = new Sprite(new Texture("Hats/hats00" + i + ".png" ));
+			}
+
+			if(hat != null) {
+				hats.add(hat);
+			}
+		}
 	}
 
 	public void detectingKeyPresses() {
@@ -67,6 +93,15 @@ public class LobbyScreen extends AbstractScreen{
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
+		}
+		//change hat command
+		else if(Gdx.input.isKeyJustPressed(Keys.L)) {
+			hatID += 1;
+			if(hatID == totalHats - 1) {
+				hatID = 0;
+			}
+			//toggle through a list of hats everytime the hat command is triggered
+			Client.getPlayer().setHat(hats.get(hatID), hatID);
 		}
 	}
 
@@ -80,14 +115,14 @@ public class LobbyScreen extends AbstractScreen{
 		//map renderer
 		r.setView(cam);
 		r.render();
-		
+
 		detectingKeyPresses();
-		
+
 		r.getBatch().begin();
 		//if the player role has updated, replace the player with either crew member or imposter
 		Client.replacePlayerByRole(r.getBatch());
 		r.getBatch().end();
-		
+
 		r.getBatch().begin();
 
 		Client.getPlayer().draw(r.getBatch());
@@ -126,7 +161,7 @@ public class LobbyScreen extends AbstractScreen{
 
 		map = new TmxMapLoader().load("map/lobby.tmx");
 		r = new OrthogonalTiledMapRenderer(map);
-		
+
 		Client.getPlayer().setCollisionLayer((TiledMapTileLayer) map.getLayers().get(0));
 		Client.getPlayer().setPosition(38 * Client.getPlayer().getCollisionLayer().getTileWidth(), (Client.getPlayer().getCollisionLayer().getHeight() - 30) * Client.getPlayer().getCollisionLayer().getTileHeight());
 
@@ -148,7 +183,7 @@ public class LobbyScreen extends AbstractScreen{
 		// TODO Auto-generated method stub
 		super.dispose();
 	}
-	
+
 	@Override
 	public void dispose() {
 		// TODO Auto-generated method stub

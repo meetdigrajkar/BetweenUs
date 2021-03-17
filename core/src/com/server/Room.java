@@ -304,10 +304,11 @@ public class Room {
 		return getNumOfAliveCrew() == getNumOfAliveImposters();
 	}
 
-	public void updatePlayer(String name, boolean isDead) {
+	public void updatePlayer(String name, boolean isDead, int hatID) {
 		for(ServerPlayer p: allPlayers){
 			if(p.getPlayerName().equals(name)) {
 				p.setDead(isDead);
+				p.setHatID(hatID);
 			}
 		}
 	}

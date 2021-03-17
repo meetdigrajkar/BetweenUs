@@ -73,11 +73,13 @@ public class Client
 			
 			String name = getPlayer().getPlayerName();
 			String roomName = getPlayer().connectedRoomName;
+			int hatID = getPlayer().getHatID();
 			
 			if(player.role.equals("CrewMember")) {
 				player = new CrewMember(getPlayer().getPlayerID());
 				player.setPlayerName(name);
 				player.connectedRoomName = roomName;
+				player.setHatID(hatID);
 				//start the game, roles are assigned.
 				//draw the banner for crew member	
 				ScreenManager.getInstance().showScreen(ScreenEnum.ROLE_UI);
@@ -86,6 +88,7 @@ public class Client
 				player = new Imposter(getPlayer().getPlayerID());
 				player.setPlayerName(name);
 				player.connectedRoomName = roomName;
+				player.setHatID(hatID);
 				//start the game, roles are assigned.
 				ScreenManager.getInstance().showScreen(ScreenEnum.ROLE_UI);
 			}
@@ -141,7 +144,7 @@ public class Client
 		socket.send(datagramPacket);
 	}
 
-	public static void sendUpdate(float x, float y, boolean isFlipped, boolean isDead, boolean isIdle) throws Exception
+	public static void sendUpdate(float x, float y, boolean isFlipped, boolean isDead, boolean isIdle, int hatID, boolean hatIsFlipped) throws Exception
 	{
 		String toSend = "";
 		toSend += 1 + ",";
@@ -151,7 +154,9 @@ public class Client
 		toSend +=  y +",";
 		toSend +=  isFlipped + ","; 
 		toSend +=  isDead + ",";  
-		toSend +=  isIdle;
+		toSend +=  isIdle + ",";
+		toSend +=  hatID + ",";
+		toSend +=  hatIsFlipped;
 
 		DatagramPacket datagramPacket = new DatagramPacket(toSend.getBytes(), toSend.getBytes().length, address, 7077);	     
 		socket.send(datagramPacket);	      	      
@@ -205,7 +210,7 @@ public class Client
 		socket.send(datagramPacket);
 	}
 	
-	public static void sendOutVent(float x, float y, boolean isFlipped, boolean isDead, boolean isIdle) throws IOException{
+	public static void sendOutVent(float x, float y, boolean isFlipped, boolean isDead, boolean isIdle, int hatID, boolean hatIsFlipped) throws IOException{
 		String toSend = "";
 		toSend += 13 + ",";
 		toSend += player.connectedRoomName + ",";
@@ -214,7 +219,9 @@ public class Client
 		toSend +=  y +",";
 		toSend +=  isFlipped + ","; 
 		toSend +=  isDead + ",";  
-		toSend +=  isIdle;
+		toSend +=  isIdle + ",";
+		toSend += hatID + ",";
+		toSend += hatIsFlipped;
 				
 		DatagramPacket datagramPacket = new DatagramPacket(toSend.getBytes(), toSend.getBytes().length, address, 7077);	     
 		socket.send(datagramPacket);
@@ -337,10 +344,10 @@ public class Client
 		return player;
 	}
 
-	public static void updateConnectedClient(int playerID, float x, float y, boolean isFlipped, boolean isDead, boolean isIdle) {
+	public static void updateConnectedClient(int playerID, float x, float y, boolean isFlipped, boolean isDead, boolean isIdle, int hatID,boolean hatIsFlipped) {
 		for(Player p: players) {
 			if(p.getPlayerID() == playerID) {
-				p.setAll(x, y, isFlipped, isDead, isIdle);
+				p.setAll(x, y, isFlipped, isDead, isIdle, hatID, hatIsFlipped);
 				return;
 			}
 		}
@@ -420,9 +427,11 @@ public class Client
 			boolean isFlipped = Boolean.parseBoolean(dataArray[2]);
 			boolean isDead = Boolean.parseBoolean(dataArray[3]);
 			boolean isIdle = Boolean.parseBoolean(dataArray[4]);
-			int playerID = Integer.parseInt(dataArray[5]);
+			int hatID = Integer.parseInt(dataArray[5]);
+			boolean hatIsFlipped = Boolean.parseBoolean(dataArray[6]);
+			int playerID = Integer.parseInt(dataArray[7]);
 
-			updateConnectedClient(playerID, x, y, isFlipped, isDead, isIdle);
+			updateConnectedClient(playerID, x, y, isFlipped, isDead, isIdle, hatID, hatIsFlipped);
 		}
 		else if(command == 3) {
 			String role = dataArray[0];
@@ -500,7 +509,7 @@ public class Client
 			for(Player p: players) {
 				if(p.getPlayerName().equals(ventedPlayer)) {
 					p.inVent = vented;
-					p.setAll(Float.parseFloat(dataArray[2]),Float.parseFloat(dataArray[3]), Boolean.parseBoolean(dataArray[4]), Boolean.parseBoolean(dataArray[5]), Boolean.parseBoolean(dataArray[6]));
+					p.setAll(Float.parseFloat(dataArray[2]),Float.parseFloat(dataArray[3]), Boolean.parseBoolean(dataArray[4]), Boolean.parseBoolean(dataArray[5]), Boolean.parseBoolean(dataArray[6]), Integer.parseInt(dataArray[7]),  Boolean.parseBoolean(dataArray[8]));
 				}
 			}
 		}

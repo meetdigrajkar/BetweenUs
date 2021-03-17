@@ -32,6 +32,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.mmog.Client;
 import com.mmog.screens.GameScreen;
+import com.mmog.screens.LobbyScreen;
 import com.mmog.tasks.EmergencyMeeting;
 import com.mmog.tasks.Task;
 
@@ -45,7 +46,7 @@ public class Player extends Sprite{
 	private Animation<TextureRegion> walkRight, ghostRight;
 	public float elapsedTime = 0;
 	private String playerName;
-	public boolean isFlipped, isDead, isIdle;
+	public boolean isFlipped, isDead, isIdle, hatIsFlipped;
 	private int playerID;
 	private TiledMapTileLayer collisionLayer;
 	boolean collisionX = false, collisionY = false;
@@ -70,6 +71,8 @@ public class Player extends Sprite{
 	public boolean inGame = false;
 	public int meetingUses = 2;
 	public Stack<Task> emergencyMeetings;
+	public Sprite hat;
+	private int hatID, oldhatID;
 	
 	public Player(int playerID)
 	{
@@ -80,6 +83,11 @@ public class Player extends Sprite{
 		addedToDead = false;
 		//this.setColor(Color.YELLOW);
 		justKilled = false;
+		setHatID(-1);
+		setOldhatID(hatID);
+		
+		//set test hat
+		//hat = new Sprite (new Texture("Hats/hats0002.png"));
 		
 		//player collison rectangle
 		
@@ -95,6 +103,7 @@ public class Player extends Sprite{
 		ghostLeftAtlas = new TextureAtlas(Gdx.files.internal("ghostbob.atlas"));
 
 		isFlipped = false;
+		hatIsFlipped = false;
 		walkRight = new Animation<TextureRegion>(1/15f, walkRightAtlas.getRegions());
 		walkLeft = new Animation<TextureRegion>(1/15f, walkLeftAtlas.getRegions());
 		
@@ -106,7 +115,8 @@ public class Player extends Sprite{
 
 		this.playerName = "";
 
-		f = new BitmapFont();
+		f = new BitmapFont(Gdx.files.internal("UI/newlabelfont.fnt"));
+		f.getData().setScale(0.2f);
 
 
 		for (float i = 0; i < 1; i += 0.01f)
@@ -125,7 +135,7 @@ public class Player extends Sprite{
 			}
 		}
 	}
-
+	
 	public void clearAll() {
 		ghostSet = false;
 		addedToDead = false;
@@ -137,10 +147,19 @@ public class Player extends Sprite{
 		inVent = false;
 		inGame = false;
 		votedOff = false;
+		hatIsFlipped = false;
+		hat = null;
+		setHatID(-1);
+		setOldhatID(-1);
 		this.playerName = "";
 		this.playerID = -1;
 	}
-
+	
+	public void setHat(Sprite hat, int hatID) {
+		this.hat = hat;
+		this.setHatID(hatID);
+		hat.setSize(30, 30);
+	}
 
 	public void setDead() {
 		float x = getX();
@@ -192,14 +211,16 @@ public class Player extends Sprite{
 	}
 
 	public void update(float delta, Batch batch) {
-		//player name
-		f.draw(batch, getPlayerName(), getX() + getWidth()/2 - getPlayerName().length() * 2 - 2, getY() + getHeight() + 20);
 		//set player color here too
 		//batch.setColor(Color.YELLOW);
-
+		
 		elapsedTime += delta;
 		if (isFlipped && !isIdle)
 		{
+			if(hatID != -1 && hat != null && hatIsFlipped && !hat.isFlipX()) {
+				hat.flip(true, false);
+			}
+			
 			if(!isDead) {
 				batch.draw(walkLeft.getKeyFrame(elapsedTime, true), getX(), getY(),32,50);
 			}
@@ -209,23 +230,16 @@ public class Player extends Sprite{
 		}
 		else if (!isFlipped && !isIdle)
 		{
+			if(hatID != -1 && hat != null && !hatIsFlipped && hat.isFlipX()) {
+				hat.flip(true, false);
+			}
+			
 			if(!isDead) {
 				batch.draw(walkRight.getKeyFrame(elapsedTime, true), getX(), getY(),32,50);
 			}
 			else
 				batch.draw(ghostRight.getKeyFrame(elapsedTime, true), getX(), getY(),32,50);
 		}
-
-		/*
-		else if(justKilled) {
-			batch.draw(animation.getKeyFrame(elapsedTime),getX(),getY(),32,50);
-
-			if(elapsedTime > 5) {
-				//setDead();
-				justKilled = false;
-			}
-		}
-		 */
 
 		if(isDead) {
 			ghostSet = true;
@@ -244,6 +258,15 @@ public class Player extends Sprite{
 				setDead();
 			}
 		}
+		
+		//draw hat if the player has one
+		if(hatID != -1) {
+			hat = LobbyScreen.hats.get(hatID);
+			hat.setPosition(getX(), getY() + (getHeight()/2) + 11);
+			hat.draw(batch,0.9f);
+		}
+		//player name
+		f.draw(batch, getPlayerName(), getX() + getWidth()/2 - getPlayerName().length() * 2 - 5, getY() + getHeight() + 20);
 	}
 
 	public void createDeadAnim() {
@@ -291,7 +314,7 @@ public class Player extends Sprite{
 	}
 
 	public void render(float delta) throws Exception
-	{	
+	{			
 		if(Gdx.input.isKeyPressed(Input.Keys.A)){
 			for(int i = 0; i<speed;i++) {
 				if(!collisionAtX(-1,"blocked")) {
@@ -300,10 +323,11 @@ public class Player extends Sprite{
 			}
 
 			isFlipped = true;
+			hatIsFlipped = true;
 			isIdle=false;
 			playerMoved = true;
 		}
-
+		
 		else if(Gdx.input.isKeyPressed(Input.Keys.D)){
 			for(int i = 0; i<speed;i++) {
 				if(!collisionAtX(1,"blocked")) {
@@ -312,6 +336,7 @@ public class Player extends Sprite{
 			}
 
 			isFlipped = false;
+			hatIsFlipped = false;
 			isIdle=false;
 			playerMoved = true;
 		}
@@ -342,13 +367,21 @@ public class Player extends Sprite{
 		if (!isIdle && !Gdx.input.isKeyPressed(Input.Keys.W) && !Gdx.input.isKeyPressed(Input.Keys.A) && !Gdx.input.isKeyPressed(Input.Keys.S) && !Gdx.input.isKeyPressed(Input.Keys.D) )
 		{               	
 			isIdle = true;
-			Client.sendUpdate(getX(), getY(), isFlipped, isDead, isIdle);
+			Client.sendUpdate(getX(), getY(), isFlipped, isDead, isIdle, getHatID(), hatIsFlipped);
 			playerMoved = false;
 		}
 
-		if(playerMoved) {
-			Client.sendUpdate(getX(), getY(), isFlipped, isDead, isIdle);
+		if(playerMoved || hatChanged()) {
+			Client.sendUpdate(getX(), getY(), isFlipped, isDead, isIdle, getHatID(), hatIsFlipped);
 		}
+	}
+	
+	public boolean hatChanged() {
+		if(oldhatID != hatID) {
+			oldhatID = hatID;
+			return true;
+		}
+		return false;
 	}
 
 	public int getPlayerID() {
@@ -359,12 +392,14 @@ public class Player extends Sprite{
 		this.playerID = playerID;
 	}
 
-	public void setAll(float x, float y, boolean isFlipped, boolean isDead, boolean isIdle) {
+	public void setAll(float x, float y, boolean isFlipped, boolean isDead, boolean isIdle, int hatID, boolean hatIsFlipped) {
 		setX(x);
 		setY(y);
 		this.isFlipped = isFlipped;
 		this.isDead = isDead;
 		this.isIdle = isIdle;
+		this.setHatID(hatID);
+		this.hatIsFlipped = hatIsFlipped;
 	}
 
 	public ArrayList<String> getAll(){
@@ -386,5 +421,21 @@ public class Player extends Sprite{
 
 	public void setPlayerName(String playerName) {
 		this.playerName = playerName;
+	}
+
+	public int getHatID() {
+		return hatID;
+	}
+
+	public void setHatID(int hatID) {
+		this.hatID = hatID;
+	}
+
+	public int getOldhatID() {
+		return oldhatID;
+	}
+
+	public void setOldhatID(int oldhatID) {
+		this.oldhatID = oldhatID;
 	}
 }

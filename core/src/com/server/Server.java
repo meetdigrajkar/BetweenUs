@@ -243,13 +243,15 @@ public class Server {
 			roomName = dataArray[2];
 			int playerID = -5;
 			boolean isDead = Boolean.parseBoolean(dataArray[6]);
+			int hatID = Integer.parseInt(dataArray[8]);
+			//boolean hatIsFlipped = Boolean.parseBoolean(dataArray[9]);
 			toAllClients = (new StringBuilder());
 
 			for(Room room: rooms) {
 				if(room.getRoomName().equals(roomName)) {
 					System.out.println("found room");
 					room.addPlayer(dataArray[1], hostAddress);		
-					room.updatePlayer(dataArray[1], isDead);
+					room.updatePlayer(dataArray[1], isDead, hatID);
 			
 					for(int i = 3; i < dataArray.length; i++) {
 						//System.out.println(dataArray[i].trim());
@@ -401,6 +403,8 @@ public class Server {
 			toAllClients.append(dataArray[5]).append(",");
 			toAllClients.append(dataArray[6]).append(",");
 			toAllClients.append(dataArray[7]).append(",");
+			toAllClients.append(dataArray[8]).append(",");
+			toAllClients.append(dataArray[9]).append(",");
 
 			toAllClients.append(command);
 		}
