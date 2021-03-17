@@ -95,7 +95,6 @@ public class EmergencyMeeting extends Task{
 		
 		messagesTable = new ArrayList<Table>();
 
-
 		//resizing fonts
 		font.getData().setScale(0.6f);
 
