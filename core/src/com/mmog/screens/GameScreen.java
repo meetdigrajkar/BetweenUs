@@ -118,6 +118,7 @@ public class GameScreen extends AbstractScreen{
 	public static Label timer;
 	public static final int TIMER_START_VALUE = 60;	
 	public static float timerNum = TIMER_START_VALUE;
+	public static boolean crewWin, imposterWin;
 
 	public GameScreen() {
 		super();
@@ -211,7 +212,10 @@ public class GameScreen extends AbstractScreen{
 		this.setViewport(vp);
 
 		deadPlayers = new ArrayList<DeadPlayer>();
-
+		
+		crewWin = false;
+		imposterWin = false;
+		
 		Client.getPlayer().inGame = true;
 		Client.getPlayer().speed = 2f;
 
@@ -529,8 +533,18 @@ public class GameScreen extends AbstractScreen{
 			}
 		}
 		
+		//END THE GAME AND GO TO END GAME SCREEN
+		endGame();
+		
 		this.draw();
 		this.act();
+	}
+	
+	
+	private void endGame() {
+		if(crewWin || imposterWin) {
+			ScreenManager.getInstance().showScreen(ScreenEnum.END_SCREEN);
+		}
 	}
 
 	public void detectingKeyPresses() {

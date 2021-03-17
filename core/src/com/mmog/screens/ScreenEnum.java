@@ -27,6 +27,11 @@ public enum ScreenEnum {
             return new CreateRoomScreen();
         }
     },
+	END_SCREEN {
+        public AbstractScreen getScreen(Object... params) {
+            return new EndGameScreen();
+        }
+    },
     GAME {
         public AbstractScreen getScreen(Object... params) {
             return new GameScreen();

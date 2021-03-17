@@ -569,6 +569,10 @@ public class Client
 			boolean impostersWin = Boolean.parseBoolean(dataArray[1]);
 			
 			System.out.println("Crew Members:" + crewWin + "Imposters:" + impostersWin);
+			
+			//we can switch screens yaaay
+			GameScreen.crewWin = crewWin;
+			GameScreen.imposterWin = impostersWin;
 		}
 	}
 
