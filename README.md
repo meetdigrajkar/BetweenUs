@@ -59,7 +59,7 @@ Game Screen
 * Imposters
 * Four Tasks: Admin, Communcations, Electrical and Reactor
 * Polus Map
-* Multiplayer across the Internet (Client-Server archictecture)
+* Multiplayer across the Internet (Client-Server architecture)
 
 ## Code
 
