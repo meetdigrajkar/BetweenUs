@@ -531,7 +531,7 @@ public class GameScreen extends AbstractScreen{
 		}
 		
 		//END THE GAME AND GO TO END GAME SCREEN
-		endGame();
+		//endGame();
 		
 		this.draw();
 		this.act();
