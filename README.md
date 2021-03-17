@@ -2,7 +2,7 @@
 
 ## About / Synopsis
 
-* A Java adaptation of Among Us/Mafia
+* A Java & Libgdx adaptation of Among Us/Mafia
 * Project status: working/prototype
 * Group 66
 
