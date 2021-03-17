@@ -95,7 +95,7 @@ public class EmergencyMeeting extends Task{
 		
 		messagesTable = new ArrayList<Table>();
 
-
+		
 		//resizing fonts
 		font.getData().setScale(0.6f);
 
@@ -427,14 +427,15 @@ public class EmergencyMeeting extends Task{
 				System.out.println("Sending Message");
 				
 				//Use Client method to send message to server
-				
-				if (!message_field.getText().isEmpty()) {
-					try {
-						Client.sendMessageCommand(message_field.getText());
-						message_field.setText("");
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+				if (!Client.getPlayer().isDead) {
+					if (!message_field.getText().isEmpty()) {
+						try {
+							Client.sendMessageCommand(message_field.getText());
+							message_field.setText("");
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
 					}
 				}
 			}});
