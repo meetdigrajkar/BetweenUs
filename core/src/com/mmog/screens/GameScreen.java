@@ -111,11 +111,13 @@ public class GameScreen extends AbstractScreen{
 
 	public ArrayList<DeadPlayer> deadPlayers;
 	ShapeRenderer shapeRenderer = new ShapeRenderer();
-
-
+	
 	public static boolean reactorTaskStarted = false;
-	public static boolean meetingTriggered =  false;
-
+	public static boolean meetingTriggered =  false, sentImpostersWin = false;
+	
+	public static Label timer;
+	public static final int TIMER_START_VALUE = 60;	
+	public static float timerNum = TIMER_START_VALUE;
 
 	public GameScreen() {
 		super();
@@ -245,6 +247,13 @@ public class GameScreen extends AbstractScreen{
 		//change the light distance when the imposter sends the sabotage request
 		light = new ConeLight(rayhandler,120,Color.WHITE, 180,Client.getPlayer().getX(), Client.getPlayer().getY(),360,360);
 		light.setPosition(Client.getPlayer().getX()+ 17,Client.getPlayer().getY()+ 17);
+		
+		LabelStyle style = new LabelStyle(font, Color.BLACK);
+		LabelStyle timerstyle = new LabelStyle(font, Color.WHITE);
+		
+		timer = new Label(timerNum + "", timerstyle);
+		
+		this.addActor(timer);
 	}
 
 	private void buildBuildingsBodies() {
@@ -349,7 +358,7 @@ public class GameScreen extends AbstractScreen{
 		}
 		
 		detectingKeyPresses();
-
+		
 		r.getBatch().begin();
 		//if the player is a crew member, call setCurrentTask() on the player which sets the players current task if they have tried to start a task
 		if(Client.getPlayer() instanceof CrewMember) {
@@ -497,6 +506,27 @@ public class GameScreen extends AbstractScreen{
 		}
 
 		r.getBatch().end();
+		
+		//count down once reactor task has started
+		if(reactorTaskStarted && timerNum > 0) {
+			timerNum = (((timerNum * 1000) - (Gdx.graphics.getDeltaTime() * 1000)) /1000);
+			timer.setText(((int) timerNum) + "");
+		}
+		//end game, imposters win if timer gets to 0
+		else if(timerNum <= 0 && !sentImpostersWin) {
+			if(Client.getPlayer() instanceof Imposter) {
+				try {
+					Client.sendImpostersWin();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				sentImpostersWin = true;
+			}
+		}
+		
+		this.draw();
+		this.act();
 	}
 
 	public void detectingKeyPresses() {

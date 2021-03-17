@@ -39,14 +39,16 @@ public class CrewMember extends Player {
 	BitmapFont labelFont = new BitmapFont(Gdx.files.internal("UI/newlabelfont.fnt"));
 	Label tasksLabel;
 
-	public boolean reported = false;
+	public boolean reported = false, sentCompletedTasks;
 
+	private int totalTasks = tasks.size();
+	
 	public CrewMember(int playerID) {
 		super(playerID);
 		this.tasks = new ArrayList<Task>();
 		f = new BitmapFont();
 		currentTask = null;
-
+		sentCompletedTasks = false;
 		stage = new Stage();
 
 		table = new Table();
@@ -126,13 +128,38 @@ public class CrewMember extends Player {
 		if(isDead) {
 			this.removeAllMeetings();
 		}
-
+		
+		//check if crewmember has finished all the tasks and send a message to the server that the crew member is done tasks
+		if(!sentCompletedTasks) {
+			checkAndSendTasksCompleted();
+		}
+		
 		stage.act();
 		stage.draw();
 	}
 
-	public void drawLabel(Batch batch) {
-
+	public void checkAndSendTasksCompleted(){
+		int completedTasks = 0;
+		
+		for(Task t: tasks) {
+			if(t.isTaskCompleted()) {
+				completedTasks += 1;
+			}
+			else if(t instanceof EmergencyMeeting) {
+				totalTasks -= 1;
+			}
+		}
+		
+		//if all the tasks are completed, send the command to the server
+		if(completedTasks == totalTasks) {
+			try {
+				Client.sendCompletedAllTasks();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			sentCompletedTasks = true;
+		}	
 	}
 
 	public void addTask(Task task) {
@@ -188,7 +215,6 @@ public class CrewMember extends Player {
 							e.printStackTrace();
 						}	
 					}
-
 
 					currentTask = task;
 					return;

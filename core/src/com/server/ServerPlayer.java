@@ -9,6 +9,7 @@ public class ServerPlayer {
 	private String role;
 	private String playerName;
 	private boolean isHost;
+	private boolean isDead;
 	
 	public ServerPlayer(String playerName, InetAddress address) {
 		this.setPlayerName(playerName);
@@ -54,5 +55,13 @@ public class ServerPlayer {
 
 	public void setHost(boolean isHost) {
 		this.isHost = isHost;
+	}
+
+	public boolean isDead() {
+		return isDead;
+	}
+
+	public void setDead(boolean isDead) {
+		this.isDead = isDead;
 	}
 }

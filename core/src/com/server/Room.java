@@ -24,6 +24,9 @@ public class Room {
 	public int numCrew, numImp;
 	ArrayList<Boolean> reactorTaskCompleted;
 	public HashMap<String, Integer> votes;
+	private ArrayList<String> completedCrewMembers;
+	public boolean sentCrewWinCommand;
+	public boolean sentImposterWinCommand, isSabotagedIncomplete;
 
 	public Room(String hostName, String roomName, InetAddress hostAddres, int numCrew, int numImp) {
 		this.setHostName(hostName);
@@ -33,7 +36,10 @@ public class Room {
 		this.numImp = numImp;
 		rolelist = new ArrayList<>();
 		votes = new HashMap<String, Integer>();
-		
+		completedCrewMembers = new ArrayList<String>();
+		sentCrewWinCommand = false;
+		sentImposterWinCommand = false;
+		isSabotagedIncomplete = false;
 		//populate rolelist
 
 		for(int i = 0; i < numCrew; i++) {
@@ -153,6 +159,17 @@ public class Room {
 		}
 		return crew;
 	}
+	
+	public ArrayList<ServerPlayer> getImposters(){
+		ArrayList<ServerPlayer> imposters = new ArrayList<ServerPlayer>();
+
+		for(ServerPlayer p: allPlayers) {
+			if(p.getRole().equals("Imposters")) {
+				imposters.add(p);
+			}
+		}
+		return imposters;
+	}
 
 	public void addPlayer(String playerName, InetAddress hostAddress) {
 		boolean isIn = false;
@@ -242,5 +259,54 @@ public class Room {
 
 	public static void setR(Random r) {
 		Room.r = r;
+	}
+
+	public void addCompletedCrew(String crewName) {
+		completedCrewMembers.add(crewName);
+	}
+
+	public boolean isAllCrewMembersTasksCompleted() {
+		//check the size of the completed crew members and compare with all the crew members in the game
+		if(completedCrewMembers.size() == getCrewMembers().size()) {
+			return true;
+		}
+		return false;
+	}
+	
+	public int getNumOfAliveCrew() {
+		int count = 0;
+		for(ServerPlayer p: getCrewMembers()) {
+			if(!p.isDead()) {
+				count ++;
+			}
+		}
+		return count;
+	}
+	
+	public int getNumOfAliveImposters() {
+		int count = 0;
+		for(ServerPlayer p: getImposters()) {
+			if(!p.isDead()) {
+				count ++;
+			}
+		}
+		return count;
+	}
+	
+	public boolean isImposterRatio1to1() {
+		//check if the size of all the alive imposters is equal to the alive crew members
+		return getNumOfAliveCrew() == getNumOfAliveImposters();
+	}
+
+	public void updatePlayer(String name, boolean isDead) {
+		for(ServerPlayer p: allPlayers){
+			if(p.getPlayerName().equals(name)) {
+				p.setDead(isDead);
+			}
+		}
+	}
+
+	public boolean isAllImposterDead() {
+		return getNumOfAliveImposters() == 0;
 	}
 }

@@ -279,6 +279,25 @@ public class Client
 		DatagramPacket datagramPacket = new DatagramPacket(toSend.getBytes(), toSend.getBytes().length, address, 7077);	     
 		socket.send(datagramPacket);
 	}
+	
+	public static void sendImpostersWin() throws IOException {
+		String toSend = "";
+		toSend += 22 + ",";
+		toSend += Client.getPlayer().connectedRoomName +",";
+
+		DatagramPacket datagramPacket = new DatagramPacket(toSend.getBytes(), toSend.getBytes().length, address, 7077);	     
+		socket.send(datagramPacket);
+	}
+	
+	public static void sendCompletedAllTasks() throws IOException{
+		String toSend = "";
+		toSend += 20 + ",";
+		toSend += Client.getPlayer().connectedRoomName +",";
+		toSend += getPlayer().getPlayerName();
+
+		DatagramPacket datagramPacket = new DatagramPacket(toSend.getBytes(), toSend.getBytes().length, address, 7077);	     
+		socket.send(datagramPacket);
+	}
 
 	public static void sendRefreshCommand() throws IOException {
 		String toSend = "";
@@ -543,6 +562,13 @@ public class Client
 			else if(Client.getPlayer() instanceof Imposter) {
 				((EmergencyMeeting)((Imposter) Client.getPlayer()).getCurrentTask()).updateMessage(playerName, message);
 			}
+		}
+		//received end game logic
+		else if(command == 21) {
+			boolean crewWin = Boolean.parseBoolean(dataArray[0]);
+			boolean impostersWin = Boolean.parseBoolean(dataArray[1]);
+			
+			System.out.println("Crew Members:" + crewWin + "Imposters:" + impostersWin);
 		}
 	}
 

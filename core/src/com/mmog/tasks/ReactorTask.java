@@ -54,7 +54,9 @@ public class ReactorTask extends Task {
 		float MAX_HEIGTH = Gdx.graphics.getHeight();
 		table.setSize(MAX_WIDTH, MAX_HEIGTH);
 		table.center();
-
+		
+		GameScreen.timerNum = GameScreen.TIMER_START_VALUE;
+		
 		textButtonStyleN = new TextButton.TextButtonStyle();
 		textButtonStyleN.up = new TextureRegionDrawable(new Texture("GreyButton.png"));
 		textButtonStyleN.down = new TextureRegionDrawable(new Texture("GreenButton.png"));
@@ -369,6 +371,8 @@ public class ReactorTask extends Task {
 
 	public static void setCompletedTask(Boolean isCompleted) {
 		if(isCompleted) {
+			GameScreen.reactorTaskStarted = false;
+			
 			if(Client.getPlayer() instanceof CrewMember) {
 				if(((CrewMember) Client.getPlayer()).getCurrentTask().getTaskName().equals(taskName)) {
 					((CrewMember) Client.getPlayer()).setCurrentTask(null);
