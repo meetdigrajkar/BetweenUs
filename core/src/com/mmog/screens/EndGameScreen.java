@@ -43,7 +43,7 @@ public class EndGameScreen extends AbstractScreen{
 		TextureRegionDrawable crewbg = new TextureRegionDrawable(new Texture("UI/crew_win.jpg"));
 		TextureRegionDrawable impbg = new TextureRegionDrawable(new Texture("UI/imposters_win.jpg"));
 
-		Label p = new Label("Press P to Exit..", labelFontStyle);
+		Label p = new Label("Press ESCAPE to Exit..", labelFontStyle);
 		
 		table.center();
 		if(GameScreen.crewWin) {
@@ -78,7 +78,7 @@ public class EndGameScreen extends AbstractScreen{
 		
 		draw();
 		
-		if(Gdx.input.isKeyPressed(Keys.P) && Client.getPlayer() != null) {
+		if(Gdx.input.isKeyPressed(Keys.ESCAPE) && Client.getPlayer() != null) {
 			System.out.println("EXITING GAME!");
 			ScreenManager.getInstance().showScreen(ScreenEnum.MAIN_MENU);
 		}

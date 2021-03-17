@@ -213,9 +213,6 @@ public class GameScreen extends AbstractScreen{
 
 		deadPlayers = new ArrayList<DeadPlayer>();
 		
-		crewWin = false;
-		imposterWin = false;
-		
 		Client.getPlayer().inGame = true;
 		Client.getPlayer().speed = 2f;
 
@@ -543,6 +540,7 @@ public class GameScreen extends AbstractScreen{
 	
 	private void endGame() {
 		if(crewWin || imposterWin) {
+			System.out.println("EXITING GAME!");
 			ScreenManager.getInstance().showScreen(ScreenEnum.END_SCREEN);
 		}
 	}

@@ -420,7 +420,7 @@ public class Client
 			boolean isFlipped = Boolean.parseBoolean(dataArray[2]);
 			boolean isDead = Boolean.parseBoolean(dataArray[3]);
 			boolean isIdle = Boolean.parseBoolean(dataArray[4]);
-			int playerID = Integer.parseInt(dataArray[5].trim());
+			int playerID = Integer.parseInt(dataArray[5]);
 
 			updateConnectedClient(playerID, x, y, isFlipped, isDead, isIdle);
 		}
