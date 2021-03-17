@@ -522,11 +522,13 @@ public class Client
 			GameScreen.light.setDistance(180);
 			
 			if(Client.getPlayer() instanceof CrewMember) {
-				if(((CrewMember) Client.getPlayer()).getCurrentTask().getTaskName().equals("Electrical Task")) {
-					((CrewMember) Client.getPlayer()).setCurrentTask(null);
+				if(((CrewMember) Client.getPlayer()).getCurrentTask() != null) {
+					if(((CrewMember) Client.getPlayer()).getCurrentTask().getTaskName().equals("Electrical Task")) {
+						((CrewMember) Client.getPlayer()).setCurrentTask(null);
+					}
+					
+					((CrewMember) Client.getPlayer()).removeTask("Electrical Task");
 				}
-				
-				((CrewMember) Client.getPlayer()).removeTask("Electrical Task");
 			}
 		}
 		else if(command == 17) {
