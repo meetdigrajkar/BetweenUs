@@ -33,7 +33,25 @@ Sample:
 
 ### Screenshots
 
-* Include Screenshots here
+Title Screen
+
+![1](https://github.com/meetdigrajkar/BetweenUs/blob/master/screenshots/main_screen.PNG)
+
+Join Room Screen
+
+![1](https://github.com/meetdigrajkar/BetweenUs/blob/master/screenshots/join_screen.PNG)
+
+Create Room Screen
+
+![1](https://github.com/meetdigrajkar/BetweenUs/blob/master/screenshots/create_room_screen.PNG)
+
+Lobby Screen
+
+![1](https://github.com/meetdigrajkar/BetweenUs/blob/master/screenshots/lobby_screen.PNG)
+
+Game Screen
+
+![1](https://github.com/meetdigrajkar/BetweenUs/blob/master/screenshots/game_screen.PNG)
 
 ### Features
 
@@ -47,7 +65,7 @@ Sample:
 
 ### Content
 
-* Whether you're a Crew Member or an Imposter, you're guaranteed to have a good time with some friends across the Internet.
+* Developed in Java using Libgdx and Gradle
 
 ### Requirements
 
