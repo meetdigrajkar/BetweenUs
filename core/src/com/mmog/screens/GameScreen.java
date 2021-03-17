@@ -248,10 +248,11 @@ public class GameScreen extends AbstractScreen{
 		light = new ConeLight(rayhandler,120,Color.WHITE, 180,Client.getPlayer().getX(), Client.getPlayer().getY(),360,360);
 		light.setPosition(Client.getPlayer().getX()+ 17,Client.getPlayer().getY()+ 17);
 		
-		LabelStyle style = new LabelStyle(font, Color.BLACK);
-		LabelStyle timerstyle = new LabelStyle(font, Color.WHITE);
+		LabelStyle timerstyle = new LabelStyle(f, Color.WHITE);
 		
 		timer = new Label(timerNum + "", timerstyle);
+		timer.setPosition(Client.getPlayer().getX(),Client.getPlayer().getY());
+		timer.setVisible(false);
 		
 		this.addActor(timer);
 	}
@@ -315,7 +316,7 @@ public class GameScreen extends AbstractScreen{
 		//map renderer
 		r.setView(cam);
 		r.render();
-
+		
 		r.getBatch().begin();
 
 		//draw all the dead bodies
@@ -489,6 +490,8 @@ public class GameScreen extends AbstractScreen{
 			}
 		}
 
+		timer.setPosition(Client.getPlayer().getX() + 350,Client.getPlayer().getY() + 200);
+		
 		try {
 			//if the player is an imposter and is NOT in the vent, allow movement
 			if(!Client.getPlayer().inVent) {
@@ -504,11 +507,12 @@ public class GameScreen extends AbstractScreen{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
+		
 		r.getBatch().end();
 		
 		//count down once reactor task has started
 		if(reactorTaskStarted && timerNum > 0) {
+			timer.setVisible(true);
 			timerNum = (((timerNum * 1000) - (Gdx.graphics.getDeltaTime() * 1000)) /1000);
 			timer.setText(((int) timerNum) + "");
 		}

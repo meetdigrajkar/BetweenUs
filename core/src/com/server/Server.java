@@ -69,17 +69,27 @@ public class Server {
 						roomsToRemove.add(room);
 					}
 
-					//if ALL the crew members are done their tasks, send a END GAME command
-					if(!room.sentCrewWinCommand && (room.isAllCrewMembersTasksCompleted() || room.isAllImposterDead())) {
-						sendWinCommand(room, true, false ,serverDatagramSocket);
-						room.sentCrewWinCommand = true;
+					
+					if(room.startGame) {
+						//System.out.println("Before checking end game logic");
+						
+						//if ALL the crew members are done their tasks, send a END GAME command
+						if(!room.sentWinCommand && !room.sentCrewWinCommand && (room.isAllCrewMembersTasksCompleted() || room.isAllImposterDead())) {
+							System.out.println(room.isAllCrewMembersTasksCompleted() + " : " + room.isAllImposterDead());
+							
+							System.out.println("CREW MEMBER WIN LOGIC");
+							sendWinCommand(room, true, false ,serverDatagramSocket);
+							room.sentCrewWinCommand = true;
+							room.sentWinCommand = true;
+						}
+						//check if the imposters win if the ratio is 1 to 1
+						else if(!room.sentWinCommand && !room.sentImposterWinCommand && (room.isImposterRatio1to1() || room.isSabotagedIncomplete)) {
+							System.out.println("IMPOSTERS WIN LOGIC");
+							sendWinCommand(room, false, true ,serverDatagramSocket);
+							room.sentImposterWinCommand = true;
+							room.sentWinCommand = true;
+						}	
 					}
-					//check if the imposters win if the ratio is 1 to 1
-					else if(!room.sentImposterWinCommand && (room.isImposterRatio1to1() || room.isSabotagedIncomplete)) {
-						sendWinCommand(room, false, true ,serverDatagramSocket);
-						room.sentImposterWinCommand = true;
-					}
-
 				}
 				rooms.removeAll(roomsToRemove);
 			}
@@ -148,19 +158,19 @@ public class Server {
 			StringBuilder toAllClients = (new StringBuilder());
 
 			//assign a random role from the role list
-			System.out.println(room.printRoleList());
+			//System.out.println(room.printRoleList());
 
 			if(room.rolelist.size() > 0) {
 				role = room.assignRole();
 
 				player.setRole(role);
-				System.out.println("Player: " + player.getPlayerName() + " was assigned: " + player.getRole());
+				//System.out.println("Player: " + player.getPlayerName() + " was assigned: " + player.getRole());
 
 				toAllClients.append(role).append(",");
 				toAllClients.append(3);
 				toallString = toAllClients.toString();
 
-				System.out.println("Sending role: " + role + " to address: " + address);
+				//System.out.println("Sending role: " + role + " to address: " + address);
 				DatagramPacket toSend = new DatagramPacket(toallString.getBytes(), toallString.getBytes().length, address, 8000);
 
 				try {
@@ -396,7 +406,7 @@ public class Server {
 		}
 		//reactor command sent
 		else if(command == 14) {
-			toLocal = false;
+			toLocal = true;
 			toAll = true;
 
 			roomName = dataArray[1];
@@ -405,6 +415,10 @@ public class Server {
 			toAllClients = (new StringBuilder());
 			toAllClients.append(pn).append(",");
 			toAllClients.append(command);
+			
+			toLocalc = (new StringBuilder());
+			toLocalc.append(pn).append(",");
+			toLocalc.append(command);
 		}
 		else if(command == 15) {
 			sendLightsToCrew(command,dataArray[1],serverDatagramSocket);

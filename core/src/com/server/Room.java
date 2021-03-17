@@ -20,13 +20,13 @@ public class Room {
 	//public HashMap<Integer, String> connectedPlayersNames;
 	private static Random r;
 	public ArrayList<String> rolelist;
-	public  boolean startGame = false;
+	public boolean startGame = false;
 	public int numCrew, numImp;
 	ArrayList<Boolean> reactorTaskCompleted;
 	public HashMap<String, Integer> votes;
 	private ArrayList<String> completedCrewMembers;
 	public boolean sentCrewWinCommand;
-	public boolean sentImposterWinCommand, isSabotagedIncomplete;
+	public boolean sentImposterWinCommand, isSabotagedIncomplete, sentWinCommand;
 
 	public Room(String hostName, String roomName, InetAddress hostAddres, int numCrew, int numImp) {
 		this.setHostName(hostName);
@@ -40,6 +40,7 @@ public class Room {
 		sentCrewWinCommand = false;
 		sentImposterWinCommand = false;
 		isSabotagedIncomplete = false;
+		sentWinCommand = false;
 		//populate rolelist
 
 		for(int i = 0; i < numCrew; i++) {
@@ -164,7 +165,7 @@ public class Room {
 		ArrayList<ServerPlayer> imposters = new ArrayList<ServerPlayer>();
 
 		for(ServerPlayer p: allPlayers) {
-			if(p.getRole().equals("Imposters")) {
+			if(p.getRole().equals("Imposter")) {
 				imposters.add(p);
 			}
 		}
@@ -285,7 +286,10 @@ public class Room {
 	
 	public int getNumOfAliveImposters() {
 		int count = 0;
+		System.out.println("BEFORE GETTING IMPOSTERS");
+		
 		for(ServerPlayer p: getImposters()) {
+			System.out.println("@playername:" + p.getPlayerName() + " : " + p.isDead());
 			if(!p.isDead()) {
 				count ++;
 			}

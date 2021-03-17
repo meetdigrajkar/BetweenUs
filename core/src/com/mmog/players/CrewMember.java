@@ -41,7 +41,7 @@ public class CrewMember extends Player {
 
 	public boolean reported = false, sentCompletedTasks;
 
-	private int totalTasks = tasks.size();
+	private int totalTasks = 0;
 	
 	public CrewMember(int playerID) {
 		super(playerID);
@@ -92,6 +92,8 @@ public class CrewMember extends Player {
 		addTask(new AdminTask());
 		addTask(new ComsTask()); 
 
+		totalTasks = tasks.size();
+		 
 		//use button listener
 		useButton.addListener(new ClickListener() {
 			@Override

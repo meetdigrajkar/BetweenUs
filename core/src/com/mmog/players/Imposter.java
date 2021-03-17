@@ -144,7 +144,6 @@ public class Imposter extends Player{
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-
 			}
 		});
 
