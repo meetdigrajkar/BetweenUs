@@ -70,20 +70,16 @@ public class Server {
 					}
 		
 					if(room.startGame) {
-						//System.out.println("Before checking end game logic");
-						
 						//if ALL the crew members are done their tasks, send a END GAME command
 						if(!room.sentWinCommand && !room.sentCrewWinCommand && (room.isAllCrewMembersTasksCompleted() || room.isAllImposterDead())) {
-							System.out.println(room.isAllCrewMembersTasksCompleted() + " : " + room.isAllImposterDead());
-							
-							System.out.println("CREW MEMBER WIN LOGIC");
+							System.out.println("Crew Tasks Completed: " + room.isAllCrewMembersTasksCompleted() + ", All Imposters Dead: " + room.isAllImposterDead());
 							sendWinCommand(room, true, false ,serverDatagramSocket);
 							room.sentCrewWinCommand = true;
 							room.sentWinCommand = true;
 						}
 						//check if the imposters win if the ratio is 1 to 1
 						else if(!room.sentWinCommand && !room.sentImposterWinCommand && (room.isImposterRatio1to1() || room.isSabotagedIncomplete)) {
-							System.out.println("IMPOSTERS WIN LOGIC");
+							System.out.println("Imposter Ratio OneToOne: " + room.isImposterRatio1to1() + ", Sabotage Task Incomplete: " + room.isSabotagedIncomplete);
 							sendWinCommand(room, false, true ,serverDatagramSocket);
 							room.sentImposterWinCommand = true;
 							room.sentWinCommand = true;
@@ -251,7 +247,6 @@ public class Server {
 
 			for(Room room: rooms) {
 				if(room.getRoomName().equals(roomName)) {
-					System.out.println("found room");
 					room.addPlayer(dataArray[1], hostAddress);		
 					room.updatePlayer(dataArray[1], isDead, hatID);
 			

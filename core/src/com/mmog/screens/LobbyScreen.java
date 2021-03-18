@@ -87,7 +87,7 @@ public class LobbyScreen extends AbstractScreen{
 
 	public void detectingKeyPresses() {
 		//starting the game.
-		if(Gdx.input.isKeyPressed(Keys.ENTER) && Client.getPlayer().isHost) {
+		if(Gdx.input.isKeyJustPressed(Keys.ENTER) && Client.getPlayer().isHost) {
 			try {
 				Client.sendStartCommand();
 			} catch (IOException e) {
@@ -103,7 +103,7 @@ public class LobbyScreen extends AbstractScreen{
 			//toggle through a list of hats everytime the hat command is triggered
 			Client.getPlayer().setHat(hats.get(hatID), hatID);
 		}
-		else if(Gdx.input.isKeyPressed(Keys.ESCAPE)) {
+		else if(Gdx.input.isKeyJustPressed(Keys.ESCAPE)) {
 			System.out.println("Back To Main Screen!");
 			Client.removeClient();
 		}

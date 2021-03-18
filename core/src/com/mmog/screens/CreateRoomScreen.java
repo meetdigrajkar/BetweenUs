@@ -132,7 +132,6 @@ public class CreateRoomScreen extends AbstractScreen {
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
 				if((!roomName.getText().contains(",")) && !roomName.getText().isEmpty()) {
-					System.out.println("Created A Room");
 					numCrew = Integer.parseInt(crewMembers.getText());
 					numImp = Integer.parseInt(imposters.getText());
 

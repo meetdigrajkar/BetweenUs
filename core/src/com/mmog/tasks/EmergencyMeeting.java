@@ -183,7 +183,7 @@ public class EmergencyMeeting extends Task{
 		int count = 0, i = 0;
 
 		for(final Player p: GameScreen.getYBasedSortedPlayers()) {
-			System.out.println("ADDED: @playerName: " + p.getPlayerName());
+			//System.out.println("ADDED: @playerName: " + p.getPlayerName());
 
 			Table playerboxtable = new Table();
 			playerboxtable.background(new TextureRegionDrawable(playerbox));
@@ -219,7 +219,7 @@ public class EmergencyMeeting extends Task{
 				@Override
 				public void clicked(InputEvent event, float x, float y) {
 					if(!voted) {
-						System.out.println("CLICKED: @playerName: " + p.getPlayerName());
+						//System.out.println("CLICKED: @playerName: " + p.getPlayerName());
 						
 						//if the local player is NOT dead and the player being voted for is NOT dead, then allow them to be VOTED
 						if(!Client.getPlayer().isDead && !p.isDead) {
@@ -233,7 +233,7 @@ public class EmergencyMeeting extends Task{
 			playerboxtables.get(i).getChild(2).addListener(new ClickListener() {
 				@Override
 				public void clicked(InputEvent event, float x, float y) {
-					System.out.println("CANCEL CLICK ON: @playerName: " + p.getPlayerName());
+					//System.out.println("CANCEL CLICK ON: @playerName: " + p.getPlayerName());
 					
 					cancelvoteImage.setVisible(false);
 					confirmvoteImage.setVisible(false);

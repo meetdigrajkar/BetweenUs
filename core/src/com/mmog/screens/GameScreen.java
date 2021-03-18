@@ -119,7 +119,8 @@ public class GameScreen extends AbstractScreen{
 	public static final int TIMER_START_VALUE = 60;	
 	public static float timerNum = TIMER_START_VALUE;
 	public static boolean crewWin, imposterWin;
-
+	LabelStyle timerstyle;
+	
 	public GameScreen() {
 		super();
 	}
@@ -213,6 +214,9 @@ public class GameScreen extends AbstractScreen{
 
 		deadPlayers = new ArrayList<DeadPlayer>();
 		
+		f.getData().setScale(0.17f);
+		timerstyle = new LabelStyle(f, Color.WHITE);
+		
 		Client.getPlayer().inGame = true;
 		Client.getPlayer().speed = 2f;
 
@@ -248,8 +252,6 @@ public class GameScreen extends AbstractScreen{
 		//change the light distance when the imposter sends the sabotage request
 		light = new ConeLight(rayhandler,120,Color.WHITE, 180,Client.getPlayer().getX(), Client.getPlayer().getY(),360,360);
 		light.setPosition(Client.getPlayer().getX()+ 17,Client.getPlayer().getY()+ 17);
-		
-		LabelStyle timerstyle = new LabelStyle(f, Color.WHITE);
 		
 		timer = new Label(timerNum + "", timerstyle);
 		timer.setPosition(Client.getPlayer().getX(),Client.getPlayer().getY());
@@ -491,7 +493,7 @@ public class GameScreen extends AbstractScreen{
 			}
 		}
 
-		timer.setPosition(Client.getPlayer().getX() + 350,Client.getPlayer().getY() + 200);
+		timer.setPosition(Client.getPlayer().getX() + 310,Client.getPlayer().getY() + 250);
 		
 		try {
 			//if the player is an imposter and is NOT in the vent, allow movement
@@ -515,7 +517,13 @@ public class GameScreen extends AbstractScreen{
 		if(reactorTaskStarted && timerNum > 0) {
 			timer.setVisible(true);
 			timerNum = (((timerNum * 1000) - (Gdx.graphics.getDeltaTime() * 1000)) /1000);
-			timer.setText(((int) timerNum) + "");
+			timer.setText("Restart the Reactor!\n" + "Time Remaining: " + ((int) timerNum));
+			
+			if((((int) timerNum) % 2) == 0) {
+				timerstyle.fontColor = Color.RED;
+			}
+			else
+				timerstyle.fontColor = Color.WHITE;
 		}
 		//end game, imposters win if timer gets to 0
 		else if(timerNum <= 0 && !sentImpostersWin) {

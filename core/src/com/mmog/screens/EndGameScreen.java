@@ -80,6 +80,8 @@ public class EndGameScreen extends AbstractScreen{
 		
 		if(Gdx.input.isKeyPressed(Keys.ESCAPE) && Client.getPlayer() != null) {
 			System.out.println("EXITING GAME!");
+			GameScreen.crewWin = false;
+			GameScreen.imposterWin = false;
 			ScreenManager.getInstance().showScreen(ScreenEnum.MAIN_MENU);
 		}
 	}

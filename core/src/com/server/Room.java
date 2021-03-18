@@ -144,7 +144,7 @@ public class Room {
 	}
 
 	public boolean isRoomEmpty() {
-		if(allPlayers.size() == 0) {
+		if(allPlayers.isEmpty()) {
 			return true;
 		}
 		return false;
@@ -156,7 +156,6 @@ public class Room {
 		for(ServerPlayer p: allPlayers) {
 			if(p.getRole().equals("CrewMember")) {
 				crew.add(p);
-				System.out.println(p.getPlayerName() + "IS A CREW MEMBER-------------------------------------------------------------------------");
 			}
 		}
 		return crew;
@@ -205,7 +204,8 @@ public class Room {
 		for(String role: rolelist) {
 			roles += role + ",";
 		}
-		return roles;
+		String toReturn = roles.substring(0, roles.length() - 1);
+		return toReturn;
 	}
 
 	public ServerPlayer removePlayer(String name) {
@@ -275,8 +275,11 @@ public class Room {
 
 	public boolean isAllCrewMembersTasksCompleted() {
 		//check the size of the completed crew members and compare with all the crew members in the game
-		System.out.println(completedCrewMembers.size() + " completed : allcrew " + getCrewMembers().size());
+		System.out.println("# of Crew members that are done tasks: " + completedCrewMembers.size() + ", Total # of Crew members: " + getCrewMembers().size());
 		
+		if(getCrewMembers().isEmpty()) {
+			return false;
+		}
 		if(completedCrewMembers.size() == getCrewMembers().size()) {
 			return true;
 		}
@@ -295,10 +298,7 @@ public class Room {
 	
 	public int getNumOfAliveImposters() {
 		int count = 0;
-		System.out.println("BEFORE GETTING IMPOSTERS");
-		
 		for(ServerPlayer p: getImposters()) {
-			System.out.println("@playername:" + p.getPlayerName() + " : " + p.isDead());
 			if(!p.isDead()) {
 				count ++;
 			}

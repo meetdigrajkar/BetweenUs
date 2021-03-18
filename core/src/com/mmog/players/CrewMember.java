@@ -207,17 +207,20 @@ public class CrewMember extends Player {
 					return;
 				}
 				else {
-					if(task instanceof EmergencyMeeting) {
+					if(task instanceof EmergencyMeeting && !GameScreen.reactorTaskStarted) {
 						try {
 							Client.sendTriggerMeeting();
+							currentTask = task;
+							return;
 						} catch (IOException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}	
 					}
-
-					currentTask = task;
-					return;
+					else {
+						currentTask = task;
+						return;
+					}
 				}
 			}
 		}
