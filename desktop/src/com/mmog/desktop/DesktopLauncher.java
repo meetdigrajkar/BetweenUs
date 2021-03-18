@@ -18,7 +18,7 @@ public class DesktopLauncher {
         config.addIcon("icons/icon_32.png", FileType.Internal);
         config.addIcon("icons/icon_128.png", FileType.Internal);
         
-        //config.fullscreen = true;
+        config.fullscreen = true;
         
         Client client = new Client();
 		// Start the listening thread...

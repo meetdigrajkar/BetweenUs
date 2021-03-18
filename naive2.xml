@@ -2,7 +2,7 @@
 <launch4jConfig>
   <dontWrapJar>false</dontWrapJar>
   <headerType>gui</headerType>
-  <jar>E:\Carleton\FOURTH YEAR\CapstoneProject\distributions\desktop-1.0.jar</jar>
+  <jar>E:\Carleton\FOURTH YEAR\CapstoneProject\distributions\desktop-1.0-L.jar</jar>
   <outfile>E:\Carleton\FOURTH YEAR\CapstoneProject\distributions\BetweenUs-L.exe</outfile>
   <errTitle></errTitle>
   <cmdLine></cmdLine>

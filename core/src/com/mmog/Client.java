@@ -48,7 +48,7 @@ public class Client
 		// Create a Datagram Socket...
 		try
 		{ 
-			address = InetAddress.getByName("127.0.0.1");
+			address = InetAddress.getByName("72.137.66.20");
 
 			socket = new DatagramSocket(8000);
 		}
