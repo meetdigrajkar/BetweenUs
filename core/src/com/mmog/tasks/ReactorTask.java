@@ -375,17 +375,19 @@ public class ReactorTask extends Task {
 			GameScreen.timer.setVisible(false);
 			
 			if(Client.getPlayer() instanceof CrewMember) {
-				if(((CrewMember) Client.getPlayer()).getCurrentTask().getTaskName().equals(taskName)) {
-					((CrewMember) Client.getPlayer()).setCurrentTask(null);
+				if(((CrewMember) Client.getPlayer()).getCurrentTask() != null) {
+					if(((CrewMember) Client.getPlayer()).getCurrentTask().getTaskName().equals(taskName)) {
+						((CrewMember) Client.getPlayer()).setCurrentTask(null);
+					}
 				}
-				
 				((CrewMember) Client.getPlayer()).removeTask(taskName);
 			}
 			else{
-				if(((Imposter) Client.getPlayer()).getCurrentTask().getTaskName().equals(taskName)) {
-					((Imposter) Client.getPlayer()).setCurrentTask(null);
+				if(((Imposter) Client.getPlayer()).getCurrentTask() != null) {
+					if(((Imposter) Client.getPlayer()).getCurrentTask().getTaskName().equals(taskName)) {
+						((Imposter) Client.getPlayer()).setCurrentTask(null);
+					}
 				}
-				
 				((Imposter) Client.getPlayer()).removeTask(taskName);
 			}
 			

@@ -111,6 +111,7 @@ public class Room {
 				this.hostID = p.getPlayerID() + i;
 				this.hostAddress = allPlayers.get(p.getPlayerID() + i).getAddress();
 				this.hostName = allPlayers.get(p.getPlayerID() + i).getPlayerName();
+				break;
 			}
 		}
 	}
