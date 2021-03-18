@@ -152,7 +152,7 @@ public class EmergencyMeeting extends Task{
 		//set position
 		meetingbgImage.setPosition(stage.getWidth()/3,stage.getHeight()/3);
 		chatbgImage.setPosition(stage.getWidth()/3 + 50,stage.getHeight()/3 + 50);
-		chaticonImage.setPosition((stage.getWidth()/2) + 380, (stage.getHeight()/2) + 300);
+		chaticonImage.setPosition((stage.getWidth()/2) + 465, (stage.getHeight()/2) + 300);
 		skippedImage.setPosition((stage.getWidth()/3) + 60,(stage.getHeight()/3) + 80);
 		skipvoteImage.setPosition((stage.getWidth()/3) + 60,(stage.getHeight()/3) + 150);
 		timer.setPosition((stage.getWidth()/2) + 465,(stage.getHeight()/3) + 80);
@@ -343,7 +343,7 @@ public class EmergencyMeeting extends Task{
 		stage.addActor(chatTable);
 		stage.addActor(skippedImage);
 				
-		chatTable.setPosition(stage.getWidth()/3 - 600,stage.getHeight()/3 - 250);
+		chatTable.setPosition(stage.getWidth()/3 - 600,stage.getHeight()/3 - 225);
 	}
 	
 	public void addVote(String playerName, Integer numOfVotes) {
@@ -383,6 +383,8 @@ public class EmergencyMeeting extends Task{
 		chat_label = new Label("", v2);
 		chat_label.setWrap(true);
 		chat_label.setAlignment(Align.topLeft);
+		chat_label.setFontScale(0.25f, 0.25f);
+		
 		
 		chat_scroll = new ScrollPane(chat_label, skin);
 		chat_scroll.setFadeScrollBars(false);
@@ -400,11 +402,11 @@ public class EmergencyMeeting extends Task{
 		}
 		
 		users_list.setItems(users);
-
+	
 		users_scroll = new ScrollPane(users_list, skin);
 		users_scroll.setFadeScrollBars(false);
 
-		table.add(users_scroll).width(150f).height(400f).colspan(2);
+		table.add(users_scroll).width(150f).height(400f).colspan(3);
 
 		message_field = new TextArea("", skin);
 		message_field.setPrefRows(2);
