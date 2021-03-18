@@ -4,8 +4,12 @@ import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.Random;
+import java.util.Stack;
 import java.util.Map.Entry;
+import java.util.Queue;
 
 public class Room {
 
@@ -14,7 +18,7 @@ public class Room {
 	private int hostID;
 
 	//room info
-	public ArrayList<ServerPlayer> allPlayers;
+	public Queue<ServerPlayer> allPlayers;
 
 	//public HashMap<Integer,InetAddress> connectedPlayers;
 	//public HashMap<Integer, String> connectedPlayersNames;
@@ -56,7 +60,7 @@ public class Room {
 		//reactor task is incomplete by default
 		reactorTaskCompleted = new ArrayList<Boolean>();
 
-		allPlayers = new ArrayList<ServerPlayer>();
+		allPlayers = new LinkedList<ServerPlayer>();
 
 		setR(new Random());
 	}
@@ -103,16 +107,12 @@ public class Room {
 	}
 
 	public void transferHost(ServerPlayer p) {
-		//loop through all players
-		//check if the next player exist
-		for(int i = 1; i < allPlayers.size(); i++) {
-			//if the next player exists, transfer host
-			if(allPlayers.get(p.getPlayerID() + i) != null) {
-				this.hostID = p.getPlayerID() + i;
-				this.hostAddress = allPlayers.get(p.getPlayerID() + i).getAddress();
-				this.hostName = allPlayers.get(p.getPlayerID() + i).getPlayerName();
-				break;
-			}
+		System.out.println(p.getPlayerName() + " @id: " + p.getPlayerID() + " has left, tranfering host to next available player");
+		
+		if(!allPlayers.isEmpty()) {
+			this.hostID = allPlayers.peek().getPlayerID();
+			this.hostAddress = allPlayers.peek().getAddress();
+			this.hostName = allPlayers.peek().getPlayerName();
 		}
 	}
 
@@ -178,16 +178,15 @@ public class Room {
 
 		if(allPlayers.isEmpty()) {
 			ServerPlayer player = new ServerPlayer(playerName, hostAddress);
-			allPlayers.add(player);
+			allPlayers.offer(player);
 			player.setPlayerID(1);
 			return;
 		}else {
-			//loop through all players and check if the player exists in the list
-			//if the player in list, isIn is true
-			for(int i = 0; i < allPlayers.size();i++) {
-				ServerPlayer p = allPlayers.get(i);	
-
-				if(p.getPlayerName().equals(playerName)) {
+			//check if there is a player with the player name and the host address in allplayers
+			Iterator<ServerPlayer> it = allPlayers.iterator();
+			
+			while(it.hasNext()) {
+				if(it.next().getPlayerName().equals(playerName)) {
 					isIn = true;
 				}
 			}
@@ -195,7 +194,7 @@ public class Room {
 
 		if(!isIn) {
 			ServerPlayer player = new ServerPlayer(playerName, hostAddress);
-			allPlayers.add(player);
+			allPlayers.offer(player);
 			player.setPlayerID(allPlayers.size());
 			return;
 		}
@@ -210,16 +209,23 @@ public class Room {
 	}
 
 	public ServerPlayer removePlayer(String name) {
+		ServerPlayer playerRemoved = null;
+		
+		//remove the player with the player name
+		Iterator<ServerPlayer> it = allPlayers.iterator();
+		
 		ArrayList<ServerPlayer> playersToRemove = new ArrayList<ServerPlayer>();
-
-		for(ServerPlayer player: allPlayers) {
-			if(player.getPlayerName().equals(name)) {
-				playersToRemove.add(player);
+		
+		while(it.hasNext()) {
+			playerRemoved = it.next();
+			if(playerRemoved.getPlayerName().equals(name)) {
+				playersToRemove.add(playerRemoved);
+				break;
 			}
 		}
-		ServerPlayer playerRemoved = playersToRemove.get(0);
+		
 		allPlayers.removeAll(playersToRemove);
-
+		
 		return playerRemoved;
 	}
 

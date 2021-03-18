@@ -103,6 +103,10 @@ public class LobbyScreen extends AbstractScreen{
 			//toggle through a list of hats everytime the hat command is triggered
 			Client.getPlayer().setHat(hats.get(hatID), hatID);
 		}
+		else if(Gdx.input.isKeyPressed(Keys.ESCAPE)) {
+			System.out.println("Back To Main Screen!");
+			Client.removeClient();
+		}
 	}
 
 	@Override

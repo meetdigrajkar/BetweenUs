@@ -68,8 +68,7 @@ public class Server {
 					if(room.isRoomEmpty()) {
 						roomsToRemove.add(room);
 					}
-
-					
+		
 					if(room.startGame) {
 						//System.out.println("Before checking end game logic");
 						
@@ -216,8 +215,11 @@ public class Server {
 					for(ServerPlayer player : room.allPlayers) {
 						InetAddress address = player.getAddress();
 						int playerID = player.getPlayerID();
+						
 						String name = player.getPlayerName();
-
+						
+						System.out.println(name + " @id: " + playerID + "IS CONNECTED!");
+						
 						//sending to the client the packet came from
 						if(!name.equals(playerName)) {
 							toLocalc.append(playerID).append(",").append(name).append(",");
