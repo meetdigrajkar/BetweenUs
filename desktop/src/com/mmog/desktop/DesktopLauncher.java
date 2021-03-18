@@ -2,6 +2,7 @@ package com.mmog.desktop;
 
 import java.io.IOException;
 
+import com.badlogic.gdx.Files.FileType;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 import com.mmog.Client;
@@ -13,6 +14,10 @@ public class DesktopLauncher {
 		config.title = "Between Us";
         config.height = 1080;
         config.width = 1920;
+        config.resizable = true;
+        config.addIcon("icons/icon_32.png", FileType.Internal);
+        config.addIcon("icons/icon_128.png", FileType.Internal);
+        
         //config.fullscreen = true;
         
         Client client = new Client();
