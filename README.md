@@ -75,10 +75,10 @@ Game Screen
 
 ### Build
 
-1. Clone repository from this github page
-2. Download an Setup AdoptJDK in your favourite IDE from https://adoptopenjdk.net/
-3. Open project in your favourite IDE, import the project as a Gradle Project (preferably not IntelliJ because it sucks!)
-4. Change IPv4 address in Client.java to where the Server will be hosted
+1. Clone repository from this github page.
+2. Download the latest version and setup AdoptJDK in your favourite IDE from https://adoptopenjdk.net/
+3. Open the project in your favourite IDE and import the project as a Gradle Project (preferably not in IntelliJ because it sucks!)
+4. Change IPv4 address in Client.java (Line 51) to where the Server will be hosted
 5. Port forward port 7077 on the machine that will be running Server.java
 6. This step is for the player that will be hosting the Server - Run Server.java as a Java Application
 7. Run DesktopLauncher.java as a Java Application
