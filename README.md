@@ -89,7 +89,7 @@ Game Screen
 
 ## Resources (Documentation and other links)
 
-* Great thanks to the sprite sheet cutter tool available at https://www.spriters-resource.com/pc_computer/amongus/
+* Great thanks to the sprite sheets available at https://www.spriters-resource.com/pc_computer/amongus/
 
 ## Contributing / Developers
 
