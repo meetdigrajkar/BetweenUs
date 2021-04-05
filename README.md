@@ -18,7 +18,6 @@
 >   * [Code](#code)
 >     * [Content](#content)
 >     * [Build](#build)
->     * [Deploy (how to install build product)](#deploy-how-to-install-build-product)
 >   * [Resources (Documentation and other links)](#resources-documentation-and-other-links)
 >   * [Contributing / Reporting issues](#contributing--reporting-issues)
 
@@ -74,7 +73,7 @@ Game Screen
 * Gradle
 * LibGdx
 
-### Build options..
+### Build
 
 1. Clone repository from this github page
 2. Download an Setup AdoptJDK in your favourite IDE from https://adoptopenjdk.net/
