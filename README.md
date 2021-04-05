@@ -27,7 +27,9 @@
 
 Sample:
 
-* Run the Java executable file 'BetweenUs.jar'
+* The Server (Server.java) must be hosted locally by one of the players and the port 7077 must be forwarded on the Server's machine.
+* The player hosting the Server must provide their IPv4 address to the Client players.
+* Hopefully, in the future the Server will be hosted on the cloud. Thank you!
 
 ## Usage
 
@@ -75,8 +77,16 @@ Game Screen
 ### Build options..
 
 1. Clone repository from this github page
-2. Open project in your favourite IDE (preferably not IntelliJ because it sucks!)
-3. Run the DesktopLauncher (found under MMOG-desktop) and the Server (if hosting locally, found under MMOG-core/server)
+2. Download an Setup AdoptJDK in your favourite IDE from https://adoptopenjdk.net/
+3. Open project in your favourite IDE, import the project as a Gradle Project (preferably not IntelliJ because it sucks!)
+4. Change IPv4 address in Client.java to where the Server will be hosted
+5. Port forward port 7077 on the machine that will be running Server.java
+6. This step is for the player that will be hosting the Server - Run Server.java as a Java Application
+7. Run DesktopLauncher.java as a Java Application
+8. Create a Room
+9. Let other players know to join the newly created room via the "Join Room" Screen. (Click Refresh to fetch the available rooms)
+10. Once everyone is in the game, the host will press "Enter" to start the game.
+11. Enjoy!
 
 ## Resources (Documentation and other links)
 
